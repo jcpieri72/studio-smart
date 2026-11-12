@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FisicaFacile</title>
+<meta name="theme-color" content="#2457D6">
+<meta name="description" content="Impara le grandezze fisiche con lezioni semplici, trucchi ed esercizi.">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTYiIGZpbGw9IiMyNDU3RDYiLz48cmVjdCB4PSIxMCIgeT0iMzgiIHdpZHRoPSI0NCIgaGVpZ2h0PSIxNSIgcng9IjMiIGZpbGw9IiNGRkQyM0YiLz48cGF0aCBkPSJNMTYgMzh2N00yMiAzOHY0TTI4IDM4djdNMzQgMzh2NE00MCAzOHY3TTQ2IDM4djQiIHN0cm9rZT0iIzFCMkI0QiIgc3Ryb2tlLXdpZHRoPSIyLjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik0yMyAzMFYxMmgxN00yMyAyMWgxMiIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjUuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBmaWxsPSJub25lIi8+PC9zdmc+Cg==">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F6F8FB; --grid:rgba(36,87,214,.07); --card:#FFFFFF; --line:#DCE3EE;
+  --ink:#1B2B4B; --ink2:#55627F; --blue:#2457D6; --blue-soft:#E7EEFF;
+  --yellow:#FFD23F; --red:#E23D3D; --red-soft:#FDECEC; --green:#12945F; --green-soft:#E3F6EC;
+  --shadow:0 1px 0 rgba(27,43,75,.06),0 6px 18px -10px rgba(27,43,75,.25);
+  --font:"Lexend",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --hand:"Caveat","Segoe Print","Comic Sans MS",cursive;
+  --fs:16px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#121A26; --grid:rgba(255,255,255,.045); --card:#1B2533; --line:#2C3A4F;
+    --ink:#E8EEF8; --ink2:#9FB0CB; --blue:#7EA5FF; --blue-soft:#22314D;
+    --red:#FF7272; --red-soft:#3A2228; --green:#3DD68C; --green-soft:#183427;
+    --shadow:0 6px 18px -10px rgba(0,0,0,.6); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#121A26; --grid:rgba(255,255,255,.045); --card:#1B2533; --line:#2C3A4F;
+  --ink:#E8EEF8; --ink2:#9FB0CB; --blue:#7EA5FF; --blue-soft:#22314D;
+  --red:#FF7272; --red-soft:#3A2228; --green:#3DD68C; --green-soft:#183427;
+  --shadow:0 6px 18px -10px rgba(0,0,0,.6); color-scheme:dark;
+}
+:root[data-size="big"]{--fs:18.5px}
+*{box-sizing:border-box}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
+html{height:100%;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px)}
+body{
+  margin:0;min-height:100%;font-family:var(--font);font-size:var(--fs);line-height:1.55;color:var(--ink);
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:22px 22px;-webkit-tap-highlight-color:transparent;
+}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--card)}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:8px}
+sup{font-size:.7em;line-height:0}
+
+/* barra in alto */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;align-items:center;gap:10px;
+  padding:10px 16px;background:var(--card);border-bottom:1.5px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.12em;letter-spacing:-.01em;flex:1;min-width:0}
+.brand-mark{width:30px;height:30px;flex:none}
+.brand small{font-weight:400;color:var(--ink2);font-size:.62em;margin-left:2px}
+.sync{display:flex;align-items:center;gap:6px;font-size:.78em;color:var(--ink2);background:none;border:1.5px solid var(--line);border-radius:99px;padding:4px 10px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ink2)}
+.dot.on{background:var(--green)} .dot.off{background:#B9C2D3}
+
+/* struttura */
+.wrap{display:flex;min-height:calc(100vh - 56px)}
+main{flex:1;min-width:0;padding:18px 16px 110px;max-width:780px;margin:0 auto;width:100%}
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;justify-content:space-around;
+  background:var(--card);border-top:1.5px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px))}
+.nav button{flex:1;background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;
+  font-size:.7em;color:var(--ink2);padding:6px 2px;border-radius:12px}
+.nav button svg{width:24px;height:24px}
+.nav button.act{color:var(--blue);font-weight:600}
+.nav button.act svg{stroke-width:2.4}
+@media (min-width:900px){
+  .nav{position:sticky;top:57px;bottom:auto;right:auto;height:calc(100vh - 57px);flex-direction:column;justify-content:flex-start;
+    gap:4px;width:200px;border-top:0;border-right:1.5px solid var(--line);padding:16px 10px}
+  .nav button{flex:none;flex-direction:row;gap:12px;font-size:.92em;padding:10px 14px;justify-content:flex-start}
+  .nav button.act{background:var(--blue-soft)}
+  main{padding:28px 32px 60px}
+}
+
+/* tipografia */
+h1{font-size:1.65em;line-height:1.15;margin:.2em 0 .35em;letter-spacing:-.02em}
+h2{font-size:1.2em;margin:1.4em 0 .6em;letter-spacing:-.01em}
+h3{font-size:1.04em;margin:0 0 .35em}
+p{margin:.45em 0}
+.muted{color:var(--ink2)}
+.small{font-size:.86em}
+
+/* blocchi */
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+.stack>*+*{margin-top:12px}
+.row{display:flex;gap:10px;align-items:center}
+.grow{flex:1;min-width:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:12px;padding:12px 18px;
+  font-weight:600;background:var(--blue);color:#fff;min-height:46px}
+:root[data-theme="dark"] .btn{color:#0E1726}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn{color:#0E1726}}
+.btn.ghost{background:transparent;color:var(--blue);border:1.5px solid var(--line)}
+.btn.wide{width:100%}
+.btn:disabled{opacity:.45;cursor:default}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:.78em;padding:3px 10px;border-radius:99px;background:var(--blue-soft);color:var(--blue);font-weight:600}
+
+/* saluto */
+.hello{margin:4px 0 18px}
+.hello h1{font-size:1.9em}
+.topic.next{border-left:6px solid var(--tc,var(--blue))}
+
+/* righello (elemento distintivo) */
+.ruler{position:relative;height:30px;border:1.5px solid var(--ink2);border-radius:5px;background:var(--card);overflow:hidden}
+.ruler .fill{position:absolute;inset:0 auto 0 0;background:var(--tc,var(--yellow));opacity:.38;transition:width .6s ease}
+.ruler::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+   linear-gradient(90deg,var(--ink2) 1.5px,transparent 1.5px) 0 0/10% 13px repeat-x,
+   linear-gradient(90deg,var(--ink2) 1px,transparent 1px) 0 0/2% 6px repeat-x,
+   linear-gradient(90deg,var(--ink2) 1px,transparent 1px) 0 0/5% 9px repeat-x;opacity:.65}
+.ruler .val{position:absolute;right:8px;bottom:2px;font-size:.72em;font-weight:700;color:var(--ink)}
+.ruler.big{height:44px}
+.ruler.big .val{font-size:.9em;bottom:4px}
+
+/* argomenti */
+.topics{display:grid;gap:12px}
+@media (min-width:620px){.topics{grid-template-columns:1fr 1fr}}
+.topic{display:block;width:100%;text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--shadow)}
+.topic .head{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.tnum{width:42px;height:42px;flex:none;border-radius:12px;display:grid;place-items:center;font-weight:700;color:#fff;background:var(--tc)}
+.topic h3{margin:0;font-size:1em}
+.topic .sub{font-size:.8em;color:var(--ink2)}
+.medal{font-size:1.25em}
+
+/* pagina argomento */
+.thead{display:flex;gap:14px;align-items:center;margin-bottom:6px}
+.thead .tnum{width:52px;height:52px;font-size:1.25em}
+.back{background:none;border:0;color:var(--blue);font-weight:600;padding:6px 0;margin-bottom:6px;display:inline-flex;gap:6px;align-items:center}
+.tabs{display:flex;gap:6px;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:4px;margin:14px 0 16px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 58px);z-index:5}
+.tabs button{flex:1;border:0;background:none;border-radius:10px;padding:9px 4px;font-weight:600;color:var(--ink2)}
+.tabs button.act{background:var(--tc,var(--blue));color:#fff}
+
+/* lezioni */
+.lesson{position:relative}
+.lesson .step{font-size:.8em;color:var(--ink2);margin-bottom:4px}
+.lesson h3{font-size:1.18em}
+.lesson ul{padding-left:1.2em;margin:.4em 0}
+.lesson li{margin:.25em 0}
+.ex{background:var(--blue-soft);border-radius:12px;padding:10px 12px;margin:10px 0}
+.ex b:first-child{color:var(--blue)}
+.hl{background:linear-gradient(transparent 55%,rgba(255,210,63,.6) 55%);padding:0 2px}
+.tbl{overflow-x:auto;margin:10px 0}
+.tbl table{border-collapse:collapse;width:100%;font-size:.9em;min-width:280px}
+.tbl th,.tbl td{border:1px solid var(--line);padding:6px 8px;text-align:left}
+.tbl th{background:var(--blue-soft)}
+.dots{display:flex;gap:6px;justify-content:center;margin:12px 0}
+.dots i{width:9px;height:9px;border-radius:50%;background:var(--line)}
+.dots i.done{background:var(--tc,var(--blue))}
+.dots i.cur{outline:2px solid var(--tc,var(--blue));outline-offset:2px}
+.lnav{display:flex;gap:10px}
+.lnav .btn{flex:1}
+
+/* scaletta */
+.ladder{display:flex;flex-direction:column;gap:3px;margin:10px 0}
+.ladder div{display:flex;align-items:center;gap:10px}
+.ladder span{display:inline-block;padding:5px 10px;border-radius:8px;background:var(--blue-soft);font-weight:700;min-width:58px;text-align:center}
+.ladder .base{background:var(--yellow);color:#1B2B4B}
+
+/* trucchi */
+.trick{background:var(--card);border:1.5px solid var(--line);border-radius:4px 16px 16px 16px;padding:14px 16px;position:relative;box-shadow:var(--shadow)}
+.trick::before{content:"";position:absolute;left:-1.5px;top:-1.5px;width:58px;height:7px;background:var(--tc,var(--yellow));border-radius:4px 4px 0 0;opacity:.85}
+.trick h3{margin-top:4px}
+.hand{font-family:var(--hand);font-size:1.6em;line-height:1.2;color:var(--blue);margin:6px 0}
+
+/* triangolo delle formule */
+.tri{position:relative;width:230px;height:200px;margin:10px auto 4px}
+.tri .shape{position:absolute;inset:0;clip-path:polygon(50% 0,100% 100%,0 100%);background:var(--tc,var(--blue));opacity:.18}
+.tri .bar{position:absolute;left:22%;right:22%;top:54%;height:3px;background:var(--ink)}
+.tri .mid{position:absolute;left:50%;top:64%;width:3px;height:30%;background:var(--ink);transform:translateX(-50%)}
+.tri button{position:absolute;width:62px;height:62px;border-radius:50%;border:2px solid var(--ink);background:var(--card);font-size:1.4em;font-weight:700;font-style:italic}
+.tri button.cov{background:var(--ink);color:var(--card)}
+.tri .t{left:50%;top:18%;transform:translateX(-50%)}
+.tri .l{left:12%;bottom:4%}
+.tri .r{right:12%;bottom:4%}
+.trires{text-align:center;font-size:1.25em;font-weight:700;min-height:1.6em}
+
+/* livelli */
+.levels{display:grid;gap:10px}
+.level{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:14px}
+.level .lv{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;background:var(--blue-soft);color:var(--blue);font-weight:700;flex:none}
+.level.test{border-color:var(--tc,var(--blue));border-width:2px}
+.stars{letter-spacing:2px;font-size:1.05em;color:#E5A800}
+.stars .no{color:var(--line)}
+
+/* quiz */
+.qtop{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.qbar{flex:1;height:10px;border-radius:99px;background:var(--line);overflow:hidden}
+.qbar i{display:block;height:100%;background:var(--tc,var(--blue));transition:width .3s}
+.qcount{font-size:.85em;color:var(--ink2);font-weight:600}
+.qtext{font-size:1.14em;font-weight:500;margin:4px 0 16px}
+.opts{display:grid;gap:10px}
+.opt{width:100%;text-align:left;padding:14px 16px;border-radius:14px;background:var(--card);border:2px solid var(--line);min-height:54px;font-size:1.02em}
+.opt.ok{border-color:var(--green);background:var(--green-soft)}
+.opt.ko{border-color:var(--red);background:var(--red-soft)}
+.opt:disabled{cursor:default;opacity:1}
+.numrow{display:flex;gap:8px;align-items:stretch}
+.numrow input{flex:1;min-width:0;border:2px solid var(--line);border-radius:14px;padding:12px 14px;font-size:1.15em;background:var(--card)}
+.numrow input:focus{border-color:var(--blue);outline:none}
+.numrow .unit{display:grid;place-items:center;padding:0 12px;font-weight:700;color:var(--ink2)}
+.keys{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.keys button{border:1.5px solid var(--line);background:var(--card);border-radius:10px;padding:8px 14px;font-weight:700}
+.fb{margin-top:16px;border-radius:14px;padding:14px 16px;border:2px solid}
+.fb.ok{border-color:var(--green);background:var(--green-soft)}
+.fb.ko{border-color:var(--red);background:var(--red-soft)}
+.fb h3{margin:0 0 4px}
+.fb.ok h3{color:var(--green)} .fb.ko h3{color:var(--red)}
+.qfoot{position:sticky;bottom:calc(12px + env(safe-area-inset-bottom,0px));margin-top:16px}
+
+/* risultato */
+.result{text-align:center}
+.result .score{font-size:3.2em;font-weight:700;letter-spacing:-.03em;line-height:1}
+.result .stars{font-size:2em}
+.wrong{border-left:4px solid var(--red)}
+
+/* impostazioni / selezione */
+.check{display:flex;gap:12px;align-items:center;padding:12px;border:1.5px solid var(--line);border-radius:14px;background:var(--card);cursor:pointer}
+.check input{width:22px;height:22px;accent-color:var(--blue);flex:none}
+.seg{display:flex;border:1.5px solid var(--line);border-radius:12px;overflow:hidden}
+.seg button{flex:1;border:0;background:var(--card);padding:10px 6px;font-size:.9em}
+.seg button.act{background:var(--blue);color:#fff;font-weight:600}
+.field{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:11px 12px;background:var(--card)}
+.formula{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px dashed var(--line)}
+.formula:last-child{border-bottom:0}
+.formula b{font-size:1.08em;white-space:nowrap}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--ink);color:var(--card);padding:10px 16px;border-radius:12px;z-index:50;font-size:.9em;max-width:90vw}
+.sheet-bg{position:fixed;inset:0;background:rgba(10,16,30,.45);z-index:40;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--paper);width:100%;max-width:640px;max-height:88vh;overflow:auto;border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px))}
+@media (min-width:700px){.sheet-bg{align-items:center}.sheet{border-radius:20px}}
+.pop{animation:pop .35s ease}
+@keyframes pop{from{transform:scale(.96);opacity:.4}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+</style>
+</head>
+<body>
+<header class="top"><div class="brand"><svg class="brand-mark" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#2457D6"/><rect x="10" y="38" width="44" height="15" rx="3" fill="#FFD23F"/><path d="M16 38v7M22 38v4M28 38v7M34 38v4M40 38v7M46 38v4" stroke="#1B2B4B" stroke-width="2.4" stroke-linecap="round"/><path d="M23 30V12h17M23 21h12" stroke="#fff" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+<span>FisicaFacile</span></div><button class="sync" id="sync" data-go="impostazioni" aria-label="Stato sincronizzazione"></button></header>
+<div class="wrap"><nav class="nav" id="nav" aria-label="Menu"></nav><main id="main"></main></div>
+<script>
+// ===== CONTENUTI: 9 argomenti di fisica per la 1ª superiore =====
+const TOPICS = [
+{ id:1, color:"#2457D6", title:"Grandezze fisiche e Sistema Internazionale", short:"Grandezze fisiche",
+  sub:"Cosa si misura, fondamentali e derivate, unità SI",
+  lessons:[
+   {t:"Che cos’è una grandezza fisica", h:`
+    <p>Una <span class="hl">grandezza fisica</span> è una caratteristica che si può <b>misurare</b> con uno strumento e che dà lo stesso risultato per tutti.</p>
+    <div class="ex"><b>Sì:</b> la lunghezza del banco, la massa dello zaino, il tempo di una corsa, la temperatura della stanza.</div>
+    <div class="ex"><b>No:</b> la bellezza di un quadro, la simpatia di un amico, il coraggio. Non esiste uno strumento che li misuri per tutti allo stesso modo.</div>`},
+   {t:"Misurare = confrontare", h:`
+    <p><b>Misurare</b> vuol dire confrontare una grandezza con un’altra della stessa specie scelta come <span class="hl">unità di misura</span>, e contare quante volte ci sta.</p>
+    <div class="ex"><b>Esempio:</b> il banco è lungo 1,2 m: il metro “ci sta” 1,2 volte.</div>
+    <p>Una misura ha sempre <b>due parti</b>: il numero e l’unità. Scrivere solo “1,2” non vuol dire niente!</p>
+    <div class="ex"><b>Come in ragioneria:</b> “costa 15” non basta, serve dire 15 € o 15 $.</div>`},
+   {t:"Il Sistema Internazionale (SI)", h:`
+    <p>Per capirsi in tutto il mondo si usa il <b>Sistema Internazionale</b>, che fissa <span class="hl">7 grandezze fondamentali</span>, ognuna con la sua unità:</p>
+    <div class="tbl"><table><tr><th>Grandezza</th><th>Unità</th><th>Simbolo</th></tr>
+    <tr><td>lunghezza</td><td>metro</td><td>m</td></tr><tr><td>massa</td><td>kilogrammo</td><td>kg</td></tr>
+    <tr><td>tempo</td><td>secondo</td><td>s</td></tr><tr><td>temperatura</td><td>kelvin</td><td>K</td></tr>
+    <tr><td>intensità di corrente</td><td>ampere</td><td>A</td></tr><tr><td>quantità di sostanza</td><td>mole</td><td>mol</td></tr>
+    <tr><td>intensità luminosa</td><td>candela</td><td>cd</td></tr></table></div>
+    <p class="small muted">Le più usate quest’anno: lunghezza, massa e tempo.</p>`},
+   {t:"Grandezze derivate", h:`
+    <p>Le <span class="hl">grandezze derivate</span> si ottengono combinando quelle fondamentali con moltiplicazioni e divisioni.</p>
+    <div class="tbl"><table><tr><th>Grandezza</th><th>Come si ottiene</th><th>Unità SI</th></tr>
+    <tr><td>area</td><td>lunghezza × lunghezza</td><td>m²</td></tr>
+    <tr><td>volume</td><td>lunghezza × lunghezza × lunghezza</td><td>m³</td></tr>
+    <tr><td>velocità</td><td>lunghezza ÷ tempo</td><td>m/s</td></tr>
+    <tr><td>densità</td><td>massa ÷ volume</td><td>kg/m³</td></tr></table></div>`},
+   {t:"Come si scrivono le unità", h:`
+    <ul><li>Il simbolo va <b>dopo</b> il numero, con uno spazio: <b>5 kg</b>.</li>
+    <li>Niente punto dopo il simbolo: <b>20 s</b>, non “20 sec.”</li>
+    <li>Maiuscole e minuscole contano: <b>km</b> (non Km), <b>m</b> (non M o mt), <b>kg</b> (non Kg).</li>
+    <li>Il simbolo non ha plurale: <b>3 kg</b>, non “3 kgs”.</li></ul>
+    <div class="ex"><b>Attenzione:</b> M maiuscola vuol dire “mega” (un milione), m minuscola “metro” o “milli”. Cambia tutto!</div>`}
+  ],
+  tricks:[
+   {t:"Le 7 fondamentali in una frase", hand:"Luca Mangia Tre Torte, Carla Quattro Insalate", h:`<p>Le iniziali: <b>L</b>unghezza, <b>M</b>assa, <b>T</b>empo, <b>T</b>emperatura, <b>C</b>orrente, <b>Q</b>uantità di sostanza, <b>I</b>ntensità luminosa.</p>`},
+   {t:"Fondamentale o derivata?", hand:"Ha una formula? Allora è derivata!", h:`<p>Se per calcolarla devi fare un’operazione con altre grandezze (÷ o ×), è derivata. La velocità è spazio ÷ tempo → derivata.</p>`},
+   {t:"Misura o opinione?", hand:"Se due persone possono litigare sul risultato, non è una grandezza fisica", h:`<p>La lunghezza del banco è uguale per tutti. Quanto è bello il banco… dipende da chi lo guarda!</p>`},
+   {t:"I simboli sono “nomi propri”", hand:"kg, m, s: sempre minuscoli, senza punto, senza plurale", h:`<p>Scrivili sempre uguali, come la sigla di una provincia: TV non diventa “Tv.”</p>`}
+  ],
+  formulas:[["Misura","numero + unità (es. 5 kg)"],["Area","m²"],["Volume","m³"],["Velocità","m/s"],["Densità","kg/m³"]]
+},
+{ id:2, color:"#12945F", title:"Multipli, sottomultipli ed equivalenze", short:"Equivalenze",
+  sub:"La scaletta delle unità: lunghezza, superficie, volume, massa, tempo",
+  lessons:[
+   {t:"Multipli e sottomultipli", h:`
+    <p>Per non scrivere numeri lunghissimi si usano i <span class="hl">prefissi</span> davanti all’unità:</p>
+    <div class="tbl"><table><tr><th>Prefisso</th><th>Simbolo</th><th>Vale</th></tr>
+    <tr><td>kilo</td><td>k</td><td>× 1000</td></tr><tr><td>etto</td><td>h</td><td>× 100</td></tr>
+    <tr><td>deca</td><td>da</td><td>× 10</td></tr><tr><td><b>unità</b></td><td></td><td>× 1</td></tr>
+    <tr><td>deci</td><td>d</td><td>÷ 10</td></tr><tr><td>centi</td><td>c</td><td>÷ 100</td></tr>
+    <tr><td>milli</td><td>m</td><td>÷ 1000</td></tr></table></div>
+    <p class="small muted">Più grandi: mega (M) = un milione, giga (G) = un miliardo. Più piccoli: micro (µ) = un milionesimo.</p>`},
+   {t:"La scaletta della lunghezza", h:`
+    <div class="ladder"><div><span>km</span></div><div><span>hm</span></div><div><span>dam</span></div><div><span class="base">m</span></div><div><span>dm</span></div><div><span>cm</span></div><div><span>mm</span></div></div>
+    <p>Ogni gradino vale <b>× 10</b>. <b>Scendi</b> (verso unità più piccole) → <b>moltiplichi</b>. <b>Sali</b> → <b>dividi</b>.</p>
+    <div class="ex"><b>Esempio:</b> 3,5 km in m: scendi 3 gradini → × 1000 → <b>3500 m</b>.</div>
+    <p>Per la massa la scaletta è uguale: kg, hg, dag, <b>g</b>, dg, cg, mg. Per la capacità: kL, hL, daL, <b>L</b>, dL, cL, mL.</p>`},
+   {t:"Superficie: gradini da 100", h:`
+    <p>Per le aree (m²) ogni gradino vale <b>× 100</b>, cioè 2 zeri.</p>
+    <div class="ex"><b>Perché?</b> Un quadrato di 1 m di lato è lungo 10 dm per 10 dm: dentro ci stanno 10 × 10 = 100 dm².</div>
+    <div class="ex"><b>Esempio:</b> 4 m² in cm²: scendi 2 gradini → × 100 × 100 = × 10 000 → <b>40 000 cm²</b>.</div>`},
+   {t:"Volume: gradini da 1000", h:`
+    <p>Per i volumi (m³) ogni gradino vale <b>× 1000</b>, cioè 3 zeri: m³, dm³, cm³, mm³.</p>
+    <div class="ex"><b>Esempio:</b> 2 dm³ in cm³ → × 1000 → <b>2000 cm³</b>.</div>
+    <p>Volume e capacità si collegano così:</p>
+    <ul><li><b>1 dm³ = 1 L</b> (un cubo di 10 cm di lato contiene un litro)</li><li><b>1 cm³ = 1 mL</b></li><li><b>1 m³ = 1000 L</b></li></ul>`},
+   {t:"Il tempo non è decimale", h:`
+    <p>Il tempo non va di 10 in 10, ma di <b>60</b>:</p>
+    <ul><li>1 h = 60 min</li><li>1 min = 60 s</li><li>1 h = 3600 s</li></ul>
+    <div class="ex"><b>Esempio:</b> 1,5 h = 1,5 × 3600 = <b>5400 s</b>. Attenzione: 1,5 h è un’ora e mezza, <b>non</b> 1 h e 50 min!</div>
+    <p>Velocità: per passare da <b>km/h a m/s dividi per 3,6</b>; da m/s a km/h moltiplica per 3,6.</p>
+    <div class="ex"><b>Esempio:</b> 72 km/h ÷ 3,6 = <b>20 m/s</b>.</div>`}
+  ],
+  tricks:[
+   {t:"L’ordine dei prefissi", hand:"Ken Ha Dato Un Dolce a Cinzia e Marco", h:`<p><b>k</b>ilo, <b>h</b>etto (etto), <b>da</b> (deca), <b>U</b>nità, <b>d</b>eci, <b>c</b>enti, <b>m</b>illi. Dall’alto verso il basso.</p>`},
+   {t:"Su o giù?", hand:"Scendi la scala: il numero cresce", h:`<p>Unità più piccola = ce ne vogliono di più = numero più grande. 1 m = 100 cm: il centimetro è piccolo, quindi il numero è grande.</p>`},
+   {t:"Quanti zeri per gradino?", hand:"L’esponente ti dice gli zeri: m → 1, m² → 2, m³ → 3", h:`<p>Lunghezza: 1 zero per gradino. Superficie (²): 2 zeri. Volume (³): 3 zeri.</p>`},
+   {t:"Litri e cubi", hand:"Un litro è un cubo di 10 cm", h:`<p>Pensa a un cartone del latte: circa 1 L = 1 dm³. E 1 mL è un cubetto di 1 cm di lato, come un dado da gioco.</p>`},
+   {t:"km/h e m/s", hand:"Per andare forte (km/h) moltiplica per 3,6", h:`<p>I km/h sono sempre il numero più grande. 10 m/s × 3,6 = 36 km/h.</p>`}
+  ],
+  formulas:[["Lunghezza, massa, capacità","1 gradino = × 10"],["Superficie","1 gradino = × 100"],["Volume","1 gradino = × 1000"],["1 dm³","= 1 L"],["1 cm³","= 1 mL"],["1 h","= 60 min = 3600 s"],["km/h → m/s","÷ 3,6"]]
+},
+{ id:3, color:"#7C4DDB", title:"Notazione scientifica e ordini di grandezza", short:"Notazione scientifica",
+  sub:"Numeri enormi e minuscoli scritti in modo comodo",
+  lessons:[
+   {t:"Le potenze di 10", h:`
+    <p>10<sup>n</sup> è un 1 seguito da <b>n zeri</b>: 10<sup>3</sup> = 1000, 10<sup>6</sup> = 1 000 000.</p>
+    <p>Con l’esponente negativo è un numero piccolo: 10<sup>−1</sup> = 0,1; 10<sup>−3</sup> = 0,001.</p>
+    <div class="ex"><b>Regola:</b> 10<sup>−n</sup> ha la cifra 1 all’<b>n-esimo</b> posto dopo la virgola.</div>
+    <p>E 10<sup>0</sup> = 1.</p>`},
+   {t:"Notazione scientifica", h:`
+    <p>Un numero è in <span class="hl">notazione scientifica</span> quando è scritto così:</p>
+    <p style="text-align:center;font-size:1.3em"><b>a · 10<sup>n</sup></b></p>
+    <p>dove <b>a</b> è compreso tra 1 e 10 (1 incluso, 10 escluso) e <b>n</b> è un intero.</p>
+    <div class="ex"><b>Giusto:</b> 3,5 · 10<sup>4</sup><br><b>Sbagliato:</b> 35 · 10<sup>3</sup> (35 è più grande di 10) e 0,35 · 10<sup>5</sup> (0,35 è più piccolo di 1).</div>`},
+   {t:"Come si trasforma un numero", h:`
+    <p>Sposta la virgola finché davanti resta <b>una sola cifra diversa da zero</b>, e conta i salti.</p>
+    <div class="ex"><b>Numero grande:</b> 45 000 → 4,5 → la virgola salta 4 posti a sinistra → <b>4,5 · 10<sup>4</sup></b></div>
+    <div class="ex"><b>Numero piccolo:</b> 0,0032 → 3,2 → la virgola salta 3 posti a destra → <b>3,2 · 10<sup>−3</sup></b></div>`},
+   {t:"Calcolare con le potenze", h:`
+    <ul><li><b>Moltiplicazione:</b> moltiplichi i numeri e <b>sommi</b> gli esponenti.<br>(2 · 10<sup>3</sup>) · (4 · 10<sup>5</sup>) = 8 · 10<sup>8</sup></li>
+    <li><b>Divisione:</b> dividi i numeri e <b>sottrai</b> gli esponenti.<br>(9 · 10<sup>7</sup>) : (3 · 10<sup>2</sup>) = 3 · 10<sup>5</sup></li></ul>
+    <p class="small muted">Se il risultato ha il numero davanti ≥ 10, sistemalo: 12 · 10<sup>4</sup> = 1,2 · 10<sup>5</sup>.</p>`},
+   {t:"L’ordine di grandezza", h:`
+    <p>L’<span class="hl">ordine di grandezza</span> è la potenza di 10 più vicina al numero. Serve per fare stime veloci.</p>
+    <p>Scrivi il numero in notazione scientifica <b>a · 10<sup>n</sup></b>:</p>
+    <ul><li>se <b>a &lt; 5</b> → l’ordine è <b>10<sup>n</sup></b></li><li>se <b>a ≥ 5</b> → l’ordine è <b>10<sup>n+1</sup></b></li></ul>
+    <div class="ex"><b>Esempio:</b> 3,2 · 10<sup>4</sup> → 10<sup>4</sup>; 7,1 · 10<sup>4</sup> → 10<sup>5</sup>.</div>
+    <p class="small muted">Alcuni libri usano 3,16 invece di 5: controlla quale regola usa il tuo professore.</p>`}
+  ],
+  tricks:[
+   {t:"Il segno dell’esponente", hand:"Numero grande → esponente positivo. Numero piccolo (sotto 1) → esponente negativo", h:`<p>Prima di contare i salti, decidi il segno guardando il numero: 0,0007 è piccolo, quindi l’esponente sarà negativo.</p>`},
+   {t:"Contare i salti", hand:"Ogni salto della virgola = 1 nell’esponente", h:`<p>Metti il dito sulla virgola e saltella fino a dopo la prima cifra diversa da zero. Quanti salti? Quello è l’esponente.</p>`},
+   {t:"Prodotto e divisione", hand:"Per (×) le potenze si sommano, per (÷) si sottraggono", h:`<p>10<sup>3</sup> × 10<sup>2</sup> = 10<sup>5</sup> perché 1000 × 100 = 100 000: hai messo insieme gli zeri.</p>`},
+   {t:"Ordine di grandezza", hand:"Da 5 in su si arrotonda in su", h:`<p>Come con i voti: 6,5 diventa 7. Così 6 · 10<sup>3</sup> ha ordine 10<sup>4</sup>.</p>`}
+  ],
+  formulas:[["Notazione scientifica","a · 10ⁿ con 1 ≤ a < 10"],["Prodotto","10ᵃ · 10ᵇ = 10ᵃ⁺ᵇ"],["Divisione","10ᵃ : 10ᵇ = 10ᵃ⁻ᵇ"],["10⁰","= 1"],["Ordine di grandezza","a < 5 → 10ⁿ; a ≥ 5 → 10ⁿ⁺¹"]]
+},
+{ id:4, color:"#D46A00", title:"Strumenti di misura: portata e sensibilità", short:"Strumenti di misura",
+  sub:"Fin dove misura uno strumento e quanto è preciso",
+  lessons:[
+   {t:"Gli strumenti di misura", h:`
+    <p>Ogni grandezza ha i suoi strumenti:</p>
+    <ul><li><b>lunghezza:</b> righello, metro a nastro, calibro</li><li><b>massa:</b> bilancia</li><li><b>tempo:</b> cronometro</li><li><b>temperatura:</b> termometro</li></ul>
+    <p>Per scegliere lo strumento giusto guardiamo due caratteristiche: la <b>portata</b> e la <b>sensibilità</b>.</p>`},
+   {t:"La portata", h:`
+    <p>La <span class="hl">portata</span> è il <b>valore più grande</b> che lo strumento può misurare.</p>
+    <div class="ex"><b>Esempi:</b> un righello da 30 cm ha portata 30 cm; una bilancia da cucina che arriva a 5 kg ha portata 5 kg.</div>
+    <p>Se l’oggetto supera la portata, lo strumento non va bene (o devi fare più misure, sommando gli errori).</p>`},
+   {t:"La sensibilità", h:`
+    <p>La <span class="hl">sensibilità</span> è la <b>più piccola variazione</b> che lo strumento riesce a misurare: in pratica, il valore di <b>una tacca</b>.</p>
+    <div class="ex"><b>Esempio:</b> un righello con le tacche dei millimetri ha sensibilità 1 mm = 0,1 cm.</div>
+    <p>Come si calcola: <b>sensibilità = intervallo della scala ÷ numero di tacche (intervalli)</b>.</p>
+    <div class="ex"><b>Esempio:</b> scala da 0 a 50 cm con 500 intervalli → 50 ÷ 500 = <b>0,1 cm</b>.</div>`},
+   {t:"Più sensibile = tacca più piccola", h:`
+    <p>Uno strumento è <b>più sensibile</b> quando la sua sensibilità è un numero <b>più piccolo</b>: nota differenze minori.</p>
+    <div class="ex"><b>Esempio:</b> un calibro da 0,05 mm è più sensibile di un righello da 1 mm.</div>
+    <p>La misura si scrive con le cifre che lo strumento permette di leggere: con un righello da 1 mm scrivi <b>12,3 cm</b>, non 12,35 cm.</p>`},
+   {t:"Altre caratteristiche", h:`
+    <ul><li><b>Prontezza:</b> quanto velocemente lo strumento dà la misura (un termometro digitale è più pronto di quello a mercurio).</li>
+    <li><b>Strumenti analogici:</b> hanno una scala con le tacche e un indice.</li>
+    <li><b>Strumenti digitali:</b> mostrano direttamente le cifre; la sensibilità è l’ultima cifra che cambia.</li></ul>`}
+  ],
+  tricks:[
+   {t:"Portata", hand:"Portata = fin dove PORTA lo strumento", h:`<p>È il massimo, il fondo scala. Come la portata di un camion: oltre non ci sta.</p>`},
+   {t:"Sensibilità", hand:"Una persona sensibile nota anche le piccole cose", h:`<p>Uno strumento sensibile nota piccole differenze. Più la tacca è piccola, più è sensibile.</p>`},
+   {t:"Calcolo della sensibilità", hand:"Quanto è lunga la scala ÷ quante tacche", h:`<p>È come dividere una pizza: 50 cm divisi in 500 fette = ogni fetta 0,1 cm.</p>`},
+   {t:"Quante cifre scrivo?", hand:"L’ultima cifra della misura è quella della tacca", h:`<p>Se la sensibilità è 0,1 cm, la misura ha una cifra dopo la virgola in cm: 12,3 cm.</p>`}
+  ],
+  formulas:[["Portata","valore massimo misurabile"],["Sensibilità","intervallo della scala ÷ n° di intervalli"],["Più sensibile","sensibilità più piccola"]]
+},
+{ id:5, color:"#D63B3B", title:"Errori di misura", short:"Errori di misura",
+  sub:"Valore medio, errore assoluto, relativo e percentuale",
+  lessons:[
+   {t:"Ogni misura ha un errore", h:`
+    <p>Nessuna misura è perfetta: c’è sempre un’<span class="hl">incertezza</span>.</p>
+    <ul><li><b>Errori casuali:</b> a volte in più, a volte in meno (riflessi, posizione dell’occhio). Si riducono ripetendo la misura.</li>
+    <li><b>Errori sistematici:</b> sempre nello stesso verso (strumento tarato male, bilancia che non parte da zero).</li></ul>`},
+   {t:"Una sola misura", h:`
+    <p>Se misuri una volta sola, l’errore è la <b>sensibilità dello strumento</b>.</p>
+    <div class="ex"><b>Esempio:</b> righello con sensibilità 0,1 cm, leggi 23,4 cm → <b>(23,4 ± 0,1) cm</b>.</div>`},
+   {t:"Tante misure: il valore medio", h:`
+    <p>Se ripeti la misura più volte, il valore migliore è il <span class="hl">valore medio</span>: sommi tutte le misure e dividi per quante sono.</p>
+    <div class="ex"><b>Esempio:</b> 12,1 – 12,3 – 12,2 – 12,4 s → (12,1 + 12,3 + 12,2 + 12,4) ÷ 4 = <b>12,25 s</b></div>`},
+   {t:"Errore assoluto", h:`
+    <p>Con più misure, l’<span class="hl">errore assoluto</span> è la <b>semidispersione</b>: (valore massimo − valore minimo) ÷ 2.</p>
+    <div class="ex"><b>Esempio:</b> (12,4 − 12,1) ÷ 2 = <b>0,15 s</b> → risultato: (12,25 ± 0,15) s</div>
+    <p>Ha la stessa unità di misura della grandezza.</p>`},
+   {t:"Errore relativo e percentuale", h:`
+    <p>L’<span class="hl">errore relativo</span> dice quanto pesa l’errore rispetto alla misura: <b>Er = Ea ÷ valore medio</b>. Non ha unità.</p>
+    <p>L’<b>errore percentuale</b> è lo stesso moltiplicato per 100: <b>E% = Er × 100</b>.</p>
+    <div class="ex"><b>Esempio:</b> 0,15 ÷ 12,25 ≈ 0,012 → <b>1,2%</b></div>
+    <p>Più l’errore relativo è piccolo, <b>più la misura è precisa</b>.</p>`}
+  ],
+  tricks:[
+   {t:"Errore assoluto", hand:"Metà della distanza tra il più grande e il più piccolo", h:`<p>Max − min, poi diviso 2. Il risultato copre tutte le misure fatte.</p>`},
+   {t:"Errore relativo", hand:"Sbagliare di 1 cm su un banco o su un campo da calcio non è la stessa cosa!", h:`<p>Per questo si divide per la misura: conta quanto è grande l’errore <b>rispetto</b> a ciò che misuri.</p>`},
+   {t:"Come in ragioneria", hand:"L’errore percentuale è uno sconto al contrario", h:`<p>Er × 100 = percentuale, esattamente come calcoli il 3% di sconto su un prezzo.</p>`}
+  ],
+  formulas:[["Valore medio","somma delle misure ÷ numero di misure"],["Errore assoluto (1 misura)","= sensibilità"],["Errore assoluto (più misure)","(max − min) ÷ 2"],["Errore relativo","Er = Ea ÷ valore medio"],["Errore percentuale","E% = Er × 100"]]
+},
+{ id:6, color:"#0E8F9B", title:"Cifre significative e arrotondamenti", short:"Cifre significative",
+  sub:"Quali cifre contano e come arrotondare",
+  lessons:[
+   {t:"Cosa sono", h:`
+    <p>Le <span class="hl">cifre significative</span> sono le cifre di una misura che sono davvero state misurate (più l’ultima, incerta).</p>
+    <div class="ex"><b>Esempio:</b> 12,3 cm ha 3 cifre significative.</div>`},
+   {t:"Le regole degli zeri", h:`
+    <ul><li>Le cifre diverse da zero contano <b>sempre</b>.</li>
+    <li>Gli zeri <b>in mezzo</b> contano: 1002 → 4 cifre.</li>
+    <li>Gli zeri <b>all’inizio</b> non contano mai: 0,0045 → 2 cifre.</li>
+    <li>Gli zeri <b>alla fine dopo la virgola</b> contano: 3,00 → 3 cifre.</li></ul>
+    <div class="ex"><b>Per questo</b> 3,0 cm e 3,00 cm non sono la stessa misura: la seconda è più precisa.</div>`},
+   {t:"Arrotondare", h:`
+    <p>Per tenere solo alcune cifre, guarda la <b>prima cifra che togli</b>:</p>
+    <ul><li>se è <b>0, 1, 2, 3 o 4</b> → l’ultima cifra rimane uguale</li><li>se è <b>5, 6, 7, 8 o 9</b> → l’ultima cifra aumenta di 1</li></ul>
+    <div class="ex"><b>Esempio:</b> 3,14159 con 3 cifre → 3,14. 12,48 con 3 cifre → 12,5.</div>`},
+   {t:"Nei calcoli", h:`
+    <p>Quando moltiplichi o dividi delle misure, il risultato va scritto con <b>lo stesso numero di cifre significative della misura che ne ha meno</b>.</p>
+    <div class="ex"><b>Esempio:</b> 2,5 cm × 3,42 cm = 8,55 cm² → la misura “peggiore” ha 2 cifre → <b>8,6 cm²</b>.</div>`}
+  ],
+  tricks:[
+   {t:"Gli zeri", hand:"Zeri davanti: mai. Zeri in mezzo: sempre. Zeri in fondo dopo la virgola: sì", h:`<p>Leggi il numero da sinistra: comincia a contare dalla prima cifra diversa da zero.</p>`},
+   {t:"Arrotondamento", hand:"Da 5 in su si sale", h:`<p>Guardi solo la prima cifra che butti via, non le altre.</p>`},
+   {t:"Calcoli", hand:"Una catena è forte come il suo anello più debole", h:`<p>Il risultato non può essere più preciso della misura meno precisa.</p>`}
+  ],
+  formulas:[["Zeri iniziali","non contano"],["Zeri in mezzo","contano"],["Zeri finali dopo la virgola","contano"],["Arrotondamento","≥ 5 si arrotonda in su"],["Prodotto / divisione","cifre della misura meno precisa"]]
+},
+{ id:7, color:"#B4530A", title:"Densità e altre grandezze derivate", short:"Densità",
+  sub:"d = m / V, velocità, area e volume",
+  lessons:[
+   {t:"Che cos’è la densità", h:`
+    <p>La <span class="hl">densità</span> dice quanta <b>massa</b> c’è in un certo <b>volume</b>. Più materia “stretta” in poco spazio = più densità.</p>
+    <p style="text-align:center;font-size:1.35em"><b>d = m ÷ V</b></p>
+    <div class="ex"><b>Esempio:</b> un kg di piume e un kg di ferro hanno la stessa massa, ma le piume occupano molto più spazio: hanno densità minore.</div>`},
+   {t:"Le unità della densità", h:`
+    <p>Nel SI: <b>kg/m³</b>. Molto usato anche <b>g/cm³</b>.</p>
+    <div class="ex"><b>Regola:</b> 1 g/cm³ = 1000 kg/m³. Da g/cm³ a kg/m³ <b>moltiplichi per 1000</b>.</div>
+    <p>Utile anche: 1 g/cm³ = 1 kg/dm³ = 1 kg/L.</p>
+    <div class="tbl"><table><tr><th>Materiale</th><th>g/cm³</th><th>kg/m³</th></tr>
+    <tr><td>sughero</td><td>0,24</td><td>240</td></tr><tr><td>legno (abete)</td><td>0,45</td><td>450</td></tr>
+    <tr><td>olio d’oliva</td><td>0,92</td><td>920</td></tr><tr><td>acqua</td><td>1</td><td>1000</td></tr>
+    <tr><td>alluminio</td><td>2,7</td><td>2700</td></tr><tr><td>ferro</td><td>7,9</td><td>7900</td></tr>
+    <tr><td>rame</td><td>8,9</td><td>8900</td></tr><tr><td>piombo</td><td>11,3</td><td>11 300</td></tr>
+    <tr><td>oro</td><td>19,3</td><td>19 300</td></tr></table></div>`},
+   {t:"Trovare massa e volume", h:`
+    <p>Dalla formula d = m ÷ V ricavi le altre due:</p>
+    <ul><li><b>m = d × V</b></li><li><b>V = m ÷ d</b></li></ul>
+    <div class="ex"><b>Esempio:</b> 2 L di olio (d = 0,92 kg/L) → m = 0,92 × 2 = <b>1,84 kg</b>.</div>
+    <p>Prima di calcolare, controlla che le unità “vadano d’accordo” (g con cm³, kg con dm³ o m³).</p>`},
+   {t:"Galleggia o affonda?", h:`
+    <p>Un oggetto pieno <b>galleggia</b> in un liquido se la sua densità è <b>minore</b> di quella del liquido.</p>
+    <div class="ex"><b>Acqua: 1 g/cm³.</b> Sughero (0,24) e legno galleggiano, ferro (7,9) affonda. Il ghiaccio (0,92) galleggia: per questo gli iceberg stanno a galla.</div>`},
+   {t:"Altre grandezze derivate", h:`
+    <ul><li><b>Area</b> del rettangolo = base × altezza → m²</li>
+    <li><b>Volume</b> del cubo = lato × lato × lato → m³</li>
+    <li><b>Velocità</b> = spazio ÷ tempo → m/s. Da qui: spazio = v × t, tempo = s ÷ v</li></ul>
+    <div class="ex"><b>Esempio:</b> percorri 100 m in 20 s → v = 100 ÷ 20 = <b>5 m/s</b>.</div>`}
+  ],
+  tricks:[
+   {t:"Il triangolo della densità", tri:["m","d","V","massa","densità","volume"], hand:"Copri quello che cerchi!", h:`<p>Tocca la lettera che vuoi trovare: quello che resta ti dice l’operazione. Una sopra l’altra = dividi, una accanto all’altra = moltiplichi.</p>`},
+   {t:"Il triangolo della velocità", tri:["s","v","t","spazio","velocità","tempo"], hand:"Stessa magia per la velocità", h:`<p>Spazio in alto, velocità e tempo in basso.</p>`},
+   {t:"Galleggiamento", hand:"Meno di 1 g/cm³? Galleggia in acqua!", h:`<p>Il numero magico dell’acqua è 1 (in g/cm³) oppure 1000 (in kg/m³).</p>`},
+   {t:"Da g/cm³ a kg/m³", hand:"Aggiungi tre zeri", h:`<p>2,7 g/cm³ = 2700 kg/m³. Al contrario dividi per 1000.</p>`}
+  ],
+  formulas:[["Densità","d = m ÷ V"],["Massa","m = d × V"],["Volume","V = m ÷ d"],["1 g/cm³","= 1000 kg/m³ = 1 kg/L"],["Velocità","v = s ÷ t"],["Area rettangolo","A = b × h"],["Volume cubo","V = l³"]]
+},
+{ id:8, color:"#C42A73", title:"Proporzionalità diretta e inversa", short:"Proporzionalità",
+  sub:"Tabelle, grafici e problemi",
+  lessons:[
+   {t:"Proporzionalità diretta", h:`
+    <p>Due grandezze sono <span class="hl">direttamente proporzionali</span> se quando una raddoppia anche l’altra raddoppia. Il loro <b>rapporto</b> è costante:</p>
+    <p style="text-align:center;font-size:1.25em"><b>y ÷ x = k</b> &nbsp;→&nbsp; <b>y = k · x</b></p>
+    <div class="ex"><b>Esempio:</b> il prezzo delle mele: 1 kg = 1,50 €, 2 kg = 3 €, 3 kg = 4,50 €. k = 1,50 €/kg.</div>`},
+   {t:"Il grafico della diretta", h:`
+    <p>Il grafico è una <b>retta che passa per l’origine</b> (il punto 0,0).</p>
+    <p>Più k è grande, più la retta è ripida.</p>
+    <div class="ex"><b>In fisica:</b> la massa di un materiale è direttamente proporzionale al suo volume (k è la densità).</div>`},
+   {t:"Proporzionalità inversa", h:`
+    <p>Due grandezze sono <span class="hl">inversamente proporzionali</span> se quando una raddoppia l’altra si dimezza. Il loro <b>prodotto</b> è costante:</p>
+    <p style="text-align:center;font-size:1.25em"><b>x · y = k</b> &nbsp;→&nbsp; <b>y = k ÷ x</b></p>
+    <div class="ex"><b>Esempio:</b> 2 operai fanno un lavoro in 6 giorni, 4 operai in 3 giorni, 6 operai in 2 giorni. k = 12.</div>
+    <p>Il grafico è un ramo di <b>iperbole</b>: una curva che scende senza mai toccare gli assi.</p>`},
+   {t:"Come riconoscerle", h:`
+    <ul><li>Fai il <b>rapporto</b> y ÷ x: se è sempre uguale → <b>diretta</b>.</li>
+    <li>Fai il <b>prodotto</b> x · y: se è sempre uguale → <b>inversa</b>.</li>
+    <li>Se nessuno dei due è costante, non c’è proporzionalità.</li></ul>`}
+  ],
+  tricks:[
+   {t:"Diretta", hand:"Insieme su, insieme giù: si DIVIDE e viene sempre uguale", h:`<p>Più compri, più spendi.</p>`},
+   {t:"Inversa", hand:"Uno sale, l’altro scende: si MOLTIPLICA e viene sempre uguale", h:`<p>Più veloce vai, meno tempo ci metti.</p>`},
+   {t:"I grafici", hand:"Diretta = Dritta (retta). Inversa = curva", h:`<p>Diretta e dritta iniziano con la stessa lettera.</p>`}
+  ],
+  formulas:[["Diretta","y ÷ x = k → y = k · x (retta per l’origine)"],["Inversa","x · y = k → y = k ÷ x (iperbole)"]]
+},
+{ id:9, color:"#4B47D6", title:"Grandezze scalari e vettoriali", short:"Scalari e vettori",
+  sub:"Quando basta un numero e quando serve una freccia",
+  lessons:[
+   {t:"Scalari", h:`
+    <p>Una grandezza <span class="hl">scalare</span> è descritta completamente da <b>un numero con la sua unità</b>.</p>
+    <div class="ex"><b>Esempi:</b> massa (3 kg), tempo (10 s), temperatura (20 °C), volume, densità.</div>`},
+   {t:"Vettori", h:`
+    <p>Una grandezza <span class="hl">vettoriale</span> ha bisogno anche di una <b>direzione</b> e di un <b>verso</b>. Si disegna con una freccia.</p>
+    <ul><li><b>Modulo:</b> quanto è grande (la lunghezza della freccia)</li><li><b>Direzione:</b> la retta su cui sta</li><li><b>Verso:</b> da che parte punta la freccia</li></ul>
+    <div class="ex"><b>Esempi:</b> spostamento, velocità, forza. “Spingo con 10 N” non basta: verso dove?</div>`},
+   {t:"Sommare vettori", h:`
+    <ul><li><b>Stesso verso:</b> si sommano i moduli. 3 N + 4 N → 7 N</li>
+    <li><b>Verso opposto:</b> si sottraggono. 7 N e 4 N opposti → 3 N, nel verso del più grande</li>
+    <li><b>Perpendicolari:</b> si usa Pitagora. 3 N e 4 N → √(9 + 16) = 5 N</li></ul>
+    <p class="small muted">In generale si usa la regola del parallelogramma.</p>`}
+  ],
+  tricks:[
+   {t:"Scalare o vettore?", hand:"Ha senso chiedere “verso dove”? Allora è un vettore", h:`<p>“10 kg verso destra” non ha senso → la massa è scalare. “10 km/h verso nord” sì → la velocità è un vettore.</p>`},
+   {t:"Le tre cose del vettore", hand:"Modulo, Direzione, Verso: MDV", h:`<p>Come un indirizzo: quanto lontano, su quale strada, in che senso di marcia.</p>`}
+  ],
+  formulas:[["Stesso verso","R = a + b"],["Verso opposto","R = a − b (a > b)"],["Perpendicolari","R = √(a² + b²)"]]
+}
+];
+const DEFAULT_SELECTED = [1,2,3,4,7];
+
+// ===== GENERATORI DI ESERCIZI (sempre nuovi) =====
+const rnd=Math.random;
+const rint=(a,b)=>a+Math.floor(rnd()*(b-a+1));
+const pick=a=>a[Math.floor(rnd()*a.length)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const clean=n=>Number(Number(n).toPrecision(12));
+const NF=new Intl.NumberFormat("it-IT",{maximumFractionDigits:10});
+const fmt=n=>{n=clean(n);return NF.format(n).replace(/-/g,"−")};
+const pw=e=>`10<sup>${e<0?"−"+(-e):e}</sup>`;
+const sci=(m,e)=>`${fmt(m)} · ${pw(e)}`;
+const pickN=(a,n)=>shuffle(a).slice(0,n);
+
+function mc(q,correct,distr,explain){
+  const opts=[correct];for(const d of distr){if(!opts.includes(d))opts.push(d);if(opts.length>=4)break}
+  const s=shuffle(opts);return{type:"mc",q,options:s,answer:s.indexOf(correct),explain};
+}
+function num(q,ans,explain,o={}){return{type:"num",q,answer:clean(ans),explain,unit:o.unit||"",tol:o.tol??1e-6,neg:!!o.neg}}
+
+// ---------- 1. Grandezze ----------
+const FUND=[["la lunghezza","metro","m","il righello o il metro a nastro"],["la massa","kilogrammo","kg","la bilancia"],["il tempo","secondo","s","il cronometro"],["la temperatura","kelvin","K","il termometro"],["l’intensità di corrente","ampere","A","l’amperometro"],["la quantità di sostanza","mole","mol",""],["l’intensità luminosa","candela","cd",""]];
+const DERIV=[["l’area","metro quadrato","m²","lunghezza × lunghezza"],["il volume","metro cubo","m³","lunghezza × lunghezza × lunghezza"],["la velocità","metro al secondo","m/s","lunghezza ÷ tempo"],["la densità","kilogrammo al metro cubo","kg/m³","massa ÷ volume"]];
+const MEAS=["lunghezza","massa","temperatura","tempo","velocità","volume","area","densità"];
+const NOTMEAS=["bellezza","simpatia","coraggio","felicità","noia","fantasia","gentilezza","eleganza"];
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+const G1={
+ 1:[
+  ()=>{const c=pick(MEAS);return mc("Quale di queste è una <b>grandezza fisica</b>?",cap(c),pickN(NOTMEAS,3).map(cap),`La ${c} si può misurare con uno strumento e dà lo stesso risultato per tutti. Le altre sono opinioni.`)},
+  ()=>{const f=pick(FUND.slice(0,3));return mc(`Qual è l’unità di misura SI per ${f[0]}?`,f[1],shuffle(["metro","kilogrammo","secondo","litro","grammo","ora","centimetro"].filter(x=>x!==f[1])),`Nel Sistema Internazionale ${f[0]} si misura in <b>${f[1]}</b> (${f[2]}).`)},
+  ()=>{const f=pick(FUND.slice(0,4));return mc(`Con quale strumento misuri ${f[0]}?`,cap(f[3]),FUND.slice(0,4).filter(x=>x!==f).map(x=>cap(x[3])),`${cap(f[0])} si misura con ${f[3]}.`)},
+  ()=>mc("Una misura è completa quando c’è…","il numero e l’unità di misura",["solo il numero","solo l’unità di misura","il numero e lo strumento"],"Serve sempre il numero <b>e</b> l’unità: “1,2” da solo non vuol dire niente, “1,2 m” sì.")
+ ],
+ 2:[
+  ()=>{const f=pick(FUND.concat(DERIV));const all=FUND.concat(DERIV).map(x=>x[2]);return mc(`Qual è il simbolo dell’unità SI per ${f[0]}?`,f[2],shuffle(all.filter(x=>x!==f[2])),`${cap(f[0])} si misura in ${f[1]}, simbolo <b>${f[2]}</b>.`)},
+  ()=>{const isF=rnd()<.5;const f=isF?pick(FUND):pick(DERIV);return mc(`${cap(f[0])} è una grandezza…`,isF?"fondamentale":"derivata",[isF?"derivata":"fondamentale"],isF?`${cap(f[0])} è una delle 7 grandezze fondamentali del SI.`:`${cap(f[0])} si ottiene come ${f[3]}: è derivata.`)},
+  ()=>mc("Quante sono le grandezze fondamentali del Sistema Internazionale?","7",["3","5","10"],"Sono 7: lunghezza, massa, tempo, temperatura, corrente, quantità di sostanza, intensità luminosa. Ricorda: <i>Luca Mangia Tre Torte, Carla Quattro Insalate</i>."),
+  ()=>mc("Misurare una grandezza significa…","confrontarla con un’unità di misura e contare quante volte ci sta",["stimarla a occhio","descriverla a parole","scriverla con molti decimali"],"Misurare = confrontare con l’unità di misura scelta.")
+ ],
+ 3:[
+  ()=>{const s=pick([["5 kg",["5 Kg","5 kgr","5 kgs"]],["20 s",["20 sec.","20 S","20 sec"]],["3 m",["3 mt","3 M","3 mtr"]],["12 km",["12 Km","12 KM","12 kms"]],["250 g",["250 gr","250 G","250 g."]]]);return mc("Quale scrittura è <b>corretta</b>?",s[0],s[1],`Corretto: <b>${s[0]}</b>. Il simbolo è minuscolo, senza punto e senza plurale.`)},
+  ()=>{const d=pick(DERIV);return mc(`${cap(d[0])} si ottiene come…`,d[3],DERIV.filter(x=>x!==d).map(x=>x[3]),`${cap(d[0])} = ${d[3]}, quindi si misura in ${d[2]}.`)},
+  ()=>{const d=pick(DERIV);return mc(`Qual è l’unità SI per ${d[0]}?`,d[2],["m","kg","s","m²","m³","m/s","kg/m³","L","km/h","g/cm³"].filter(x=>x!==d[2]&&!(d[2]==="kg/m³"&&x==="g/cm³")&&!(d[2]==="m/s"&&x==="km/h")),`Nel SI ${d[0]} si misura in <b>${d[2]}</b> (${d[1]}).`)},
+  ()=>{const c=pick(["la velocità","il volume","la densità","l’area"]);return mc("Quale di queste <b>non</b> è una grandezza fondamentale?",cap(c),pickN(FUND,3).map(x=>cap(x[0])),`${cap(c)} è derivata: si calcola da altre grandezze.`)},
+  ()=>mc("Cosa vuol dire “5 Mm”?","5 megametri (5 milioni di metri)",["5 millimetri","5 metri","5 minuti"],"M maiuscola = mega = un milione. Il millimetro si scrive mm, con m minuscola.")
+ ]
+};
+
+// ---------- 2. Equivalenze ----------
+const FAM={
+ len:{u:["km","hm","dam","m","dm","cm","mm"],e:1,n:"lunghezza"},
+ mass:{u:["kg","hg","dag","g","dg","cg","mg"],e:1,n:"massa"},
+ cap:{u:["kL","hL","daL","L","dL","cL","mL"],e:1,n:"capacità"},
+ area:{u:["km²","hm²","dam²","m²","dm²","cm²","mm²"],e:2,n:"superficie"},
+ vol:{u:["m³","dm³","cm³","mm³"],e:3,n:"volume"}
+};
+const VALS1=[1,2,3,4,5,6,7,8,9,12,15,25,35,48,75,120,250];
+const VALS2=[3.5,0.5,0.8,1.25,2.4,0.06,4.7,0.35,12.5,0.007,6.25,1.8];
+function eqGen(famKey,maxD,vals){
+  const f=FAM[famKey];
+  for(let t=0;t<50;t++){
+    const i=rint(0,f.u.length-1);let j=rint(Math.max(0,i-maxD),Math.min(f.u.length-1,i+maxD));if(i===j)continue;
+    const v=pick(vals),k=f.e*(j-i),r=clean(v*Math.pow(10,k));
+    if(Math.abs(r)<1e-5||Math.abs(r)>1e9)continue;
+    const steps=Math.abs(j-i),down=j>i,fac=fmt(Math.pow(10,Math.abs(k)));
+    const per=f.e===1?"× 10":f.e===2?"× 100":"× 1000";
+    return num(`Trasforma: <b>${fmt(v)} ${f.u[i]}</b> = ? ${f.u[j]}`,r,
+      `Da ${f.u[i]} a ${f.u[j]} ${down?"scendi":"sali"} di <b>${steps}</b> gradin${steps>1?"i":"o"} (ogni gradino ${per}) → ${down?"moltiplichi":"dividi"} per <b>${fac}</b>.<br>${fmt(v)} ${f.u[i]} = <b>${fmt(r)} ${f.u[j]}</b>`,{unit:f.u[j]});
+  }
+  return eqGen("len",1,VALS1);
+}
+const G2={
+ 1:[()=>eqGen(pick(["len","mass","cap"]),2,VALS1),()=>eqGen(pick(["len","mass","cap"]),3,VALS1),
+    ()=>{const p=pick([["k","1000"],["h","100"],["da","10"],["d","0,1"],["c","0,01"],["m","0,001"]]);const all=["1000","100","10","0,1","0,01","0,001"];return mc(`Quanto vale il prefisso <b>${p[0]}</b> (es. ${p[0]}m)?`,`× ${p[1]}`,shuffle(all.filter(x=>x!==p[1])).map(x=>"× "+x),`${p[0]} = × ${p[1]}. Ricorda: <i>Ken Ha Dato Un Dolce a Cinzia e Marco</i>.`)}],
+ 2:[()=>eqGen(pick(["len","mass","cap"]),4,VALS2),()=>eqGen("area",2,VALS1.concat(VALS2)),()=>eqGen("vol",2,VALS1.concat(VALS2)),
+    ()=>{const f=pick(["area","vol"]);const z=f==="area"?"100":"1000";return mc(`Nella scaletta ${f==="area"?"della superficie (m²)":"del volume (m³)"} ogni gradino vale…`,`× ${z}`,["× 10","× 100","× 1000"].filter(x=>x!==`× ${z}`),`L’esponente ti dice gli zeri: ${f==="area"?"² → 2 zeri → × 100":"³ → 3 zeri → × 1000"}.`)}],
+ 3:[
+  ()=>{const c=pick([["dm³","L",1],["cm³","mL",1],["L","dm³",1],["mL","cm³",1],["m³","L",1000],["L","m³",0.001],["dm³","mL",1000],["cm³","L",0.001]]);const v=pick([2,3.5,0.75,12,250,1.5,40]);const r=clean(v*c[2]);return num(`Trasforma: <b>${fmt(v)} ${c[0]}</b> = ? ${c[1]}`,r,`Ricorda: 1 dm³ = 1 L e 1 cm³ = 1 mL (1 m³ = 1000 L).<br>${fmt(v)} ${c[0]} = <b>${fmt(r)} ${c[1]}</b>`,{unit:c[1]})},
+  ()=>{const c=pick([["h","min",60],["min","s",60],["h","s",3600]]);const v=pick([1,2,1.5,0.5,3,2.5,0.25,4]);const r=clean(v*c[2]);return num(`Trasforma: <b>${fmt(v)} ${c[0]}</b> = ? ${c[1]}`,r,`1 ${c[0]} = ${fmt(c[2])} ${c[1]} → ${fmt(v)} × ${fmt(c[2])} = <b>${fmt(r)} ${c[1]}</b>`,{unit:c[1]})},
+  ()=>{const c=pick([["s","min",60],["min","h",60],["s","h",3600]]);const r=pick([1,2,1.5,0.5,3,0.25]);const v=clean(r*c[2]);return num(`Trasforma: <b>${fmt(v)} ${c[0]}</b> = ? ${c[1]}`,r,`Sali verso unità più grandi → dividi: ${fmt(v)} ÷ ${fmt(c[2])} = <b>${fmt(r)} ${c[1]}</b>`,{unit:c[1]})},
+  ()=>{if(rnd()<.5){const v=pick([18,36,54,72,90,108,126]);return num(`Trasforma: <b>${v} km/h</b> = ? m/s`,v/3.6,`Da km/h a m/s dividi per 3,6: ${v} ÷ 3,6 = <b>${fmt(v/3.6)} m/s</b>`,{unit:"m/s"})}const v=pick([5,10,15,20,25,30]);return num(`Trasforma: <b>${v} m/s</b> = ? km/h`,v*3.6,`Da m/s a km/h moltiplica per 3,6: ${v} × 3,6 = <b>${fmt(v*3.6)} km/h</b>`,{unit:"km/h"})},
+  ()=>{const t=rnd()<.5;const v=pick([2,3.5,0.4,12]);return t?num(`Trasforma: <b>${fmt(v)} t</b> (tonnellate) = ? kg`,v*1000,`1 t = 1000 kg → <b>${fmt(v*1000)} kg</b>`,{unit:"kg"}):num(`Trasforma: <b>${fmt(v*1000)} kg</b> = ? t`,v,`1 t = 1000 kg → ${fmt(v*1000)} ÷ 1000 = <b>${fmt(v)} t</b>`,{unit:"t"})},
+  ()=>eqGen(pick(["area","vol"]),3,VALS2)
+ ]
+};
+
+// ---------- 3. Notazione scientifica ----------
+const MANT=[1.2,3,4.5,6.02,7,2.5,9.1,1.6,5,8.4,2,3.8];
+const sciStr=(m,e)=>`${fmt(m)} · ${pw(e)}`;
+const G3={
+ 1:[
+  ()=>{const m=pick(MANT),e=rint(2,7);return num(`Scrivi <b>${fmt(m*Math.pow(10,e))}</b> in notazione scientifica: ${fmt(m)} · 10<sup>?</sup><br>Quanto vale l’esponente?`,e,`La virgola salta di <b>${e}</b> posti verso sinistra → ${sciStr(m,e)}`,{neg:true})},
+  ()=>{const e=rint(2,6);return num(`Quanto vale ${pw(e)}?`,Math.pow(10,e),`${pw(e)} = 1 seguito da ${e} zeri = <b>${fmt(Math.pow(10,e))}</b>`)},
+  ()=>{const m=pick(MANT.filter(x=>x<9)),e=rint(2,6);const big=clean(m*10);return mc("Quale numero è scritto in notazione scientifica <b>corretta</b>?",sciStr(m,e),[sciStr(big,e-1),sciStr(clean(m/10),e+1),sciStr(clean(m*100),e-2)],`Il numero davanti deve stare tra 1 e 10: <b>${sciStr(m,e)}</b>. ${fmt(big)} è troppo grande, ${fmt(m/10)} troppo piccolo.`)},
+  ()=>mc("Quanto vale 10<sup>0</sup>?","1",["0","10","non esiste"],"Qualunque numero (diverso da 0) elevato alla 0 fa 1: 10<sup>0</sup> = 1.")
+ ],
+ 2:[
+  ()=>{const m=pick(MANT),e=-rint(2,6);return mc(`Scrivi <b>${fmt(m*Math.pow(10,e))}</b> in notazione scientifica.`,sciStr(m,e),[sciStr(m,-e),sciStr(clean(m*10),e-1),sciStr(m,e+1)],`Numero piccolo → esponente negativo. La virgola salta di ${-e} posti a destra → <b>${sciStr(m,e)}</b>`)},
+  ()=>{const m=pick(MANT),e=pick([-4,-3,-2,2,3,4,5]);const r=clean(m*Math.pow(10,e));return num(`Scrivi come numero normale: <b>${sciStr(m,e)}</b>`,r,`${e>0?`Sposta la virgola di ${e} posti a destra`:`Sposta la virgola di ${-e} posti a sinistra`} → <b>${fmt(r)}</b>`)},
+  ()=>{const a=pick([2,3,1.5,4]),b=pick([2,1.5,2.5]);const p=rint(-3,6),q=rint(-2,5);let m=clean(a*b),e=p+q;let fix="";if(m>=10){m=clean(m/10);e++;fix=` → si sistema in `}return mc(`Calcola: (${sciStr(a,p)}) × (${sciStr(b,q)})`,sciStr(m,e),[sciStr(m,p*q),sciStr(m,e+1),sciStr(clean(a+b),e)],`Moltiplichi i numeri (${fmt(a)} × ${fmt(b)} = ${fmt(a*b)}) e <b>sommi</b> gli esponenti (${p} + ${q} = ${p+q})${fix?fix+sciStr(m,e):""} → <b>${sciStr(m,e)}</b>`)}
+ ],
+ 3:[
+  ()=>{const pr=pick([[8,2],[6,3],[9,3],[4.8,1.2],[7.5,2.5],[6.4,1.6]]);const p=rint(3,9),q=rint(-3,4);const m=clean(pr[0]/pr[1]),e=p-q;return mc(`Calcola: (${sciStr(pr[0],p)}) : (${sciStr(pr[1],q)})`,sciStr(m,e),[sciStr(m,p+q),sciStr(m,e-1),sciStr(clean(pr[0]-pr[1]),e)],`Dividi i numeri (${fmt(pr[0])} : ${fmt(pr[1])} = ${fmt(m)}) e <b>sottrai</b> gli esponenti (${p} − (${q}) = ${e}) → <b>${sciStr(m,e)}</b>`)},
+  ()=>{const m=pick([1.5,2.3,3.9,4.2,5.1,6.7,8.8,7.2]),e=rint(-4,7);const o=m<5?e:e+1;return mc(`Qual è l’ordine di grandezza di <b>${sciStr(m,e)}</b>?`,pw(o),[pw(o===e?e+1:e),pw(o+1),pw(o-1)].filter((x,i,a)=>x!==pw(o)),`${fmt(m)} è ${m<5?"minore di 5 → resta":"maggiore o uguale a 5 → si arrotonda in su"}: ordine <b>${pw(o)}</b>`)},
+  ()=>{const it=pick([["dell’altezza di una persona (circa 1,7 m)",0,"m"],["dell’altezza del monte Everest (8849 m)",4,"m"],["del raggio della Terra (6,4 · 10<sup>6</sup> m)",7,"m"],["dello spessore di un capello (7 · 10<sup>−5</sup> m)",-4,"m"],["della massa di una mela (0,15 kg)",-1,"kg"],["dei secondi in un giorno (86 400 s)",5,"s"],["della distanza Terra-Luna (3,84 · 10<sup>8</sup> m)",8,"m"]]);return mc(`Qual è l’ordine di grandezza ${it[0]}?`,`${pw(it[1])} ${it[2]}`,[`${pw(it[1]+1)} ${it[2]}`,`${pw(it[1]-1)} ${it[2]}`,`${pw(it[1]+3)} ${it[2]}`],`Scrivi il valore in notazione scientifica e applica la regola del 5: <b>${pw(it[1])} ${it[2]}</b>`)},
+  ()=>{const c=pick([["km","m",3],["mm","m",-3],["cm","m",-2],["g","kg",-3],["µm","m",-6]]);const m=pick([3.2,4.5,1.8,6]);return mc(`Scrivi <b>${fmt(m)} ${c[0]}</b> in ${c[1]} con la notazione scientifica.`,`${sciStr(m,c[2])} ${c[1]}`,[`${sciStr(m,-c[2])} ${c[1]}`,`${sciStr(m,c[2]+1)} ${c[1]}`,`${sciStr(m,c[2]-1)} ${c[1]}`],`1 ${c[0]} = ${pw(c[2])} ${c[1]} → <b>${sciStr(m,c[2])} ${c[1]}</b>`)}
+ ]
+};
+
+// ---------- 4. Strumenti ----------
+const INSTR=[["calibro",0.05,"mm"],["righello",1,"mm"],["metro da sarto",10,"mm"],["micrometro",0.01,"mm"],["rotella metrica",10,"mm"]];
+const G4={
+ 1:[
+  ()=>mc("La <b>portata</b> di uno strumento è…","il valore più grande che può misurare",["il valore più piccolo che può misurare","il valore di una tacca","quanto è veloce a dare la misura"],"Portata = fin dove <b>porta</b> lo strumento, il fondo scala."),
+  ()=>mc("La <b>sensibilità</b> di uno strumento è…","la più piccola variazione che riesce a misurare",["il valore massimo che può misurare","il numero di tacche della scala","la sua lunghezza"],"Sensibilità = il valore di <b>una tacca</b>."),
+  ()=>{const P=pick([20,30,50,100]);return num(`Un righello va da 0 a <b>${P} cm</b>. Qual è la sua portata?`,P,`La portata è il valore massimo: <b>${P} cm</b>.`,{unit:"cm"})},
+  ()=>{const s=pickN(INSTR,3);const best=s.reduce((a,b)=>b[1]<a[1]?b:a);return mc("Quale strumento è <b>più sensibile</b>?",`${cap(best[0])} (${fmt(best[1])} ${best[2]})`,s.filter(x=>x!==best).map(x=>`${cap(x[0])} (${fmt(x[1])} ${x[2]})`),`Più sensibile = sensibilità più <b>piccola</b>: ${best[0]}, ${fmt(best[1])} ${best[2]}.`)}
+ ],
+ 2:[
+  ()=>{const P=pick([10,20,30,50,100,200]);const s=pick([0.1,0.2,0.5,1,2,5].filter(x=>P/x>=10&&Number.isInteger(clean(P/x))));const N=clean(P/s);return num(`Una scala va da 0 a <b>${P} cm</b> ed è divisa in <b>${fmt(N)} intervalli</b> uguali. Qual è la sensibilità?`,s,`Sensibilità = ${P} ÷ ${fmt(N)} = <b>${fmt(s)} cm</b>`,{unit:"cm"})},
+  ()=>{const L=clean(rint(50,250)/10);const two=clean(L+rint(1,9)/100);return mc(`Misuri un oggetto con un righello di sensibilità <b>1 mm</b>. Quale misura è scritta correttamente?`,`${fmt(L)} cm`,[`${fmt(two)} cm`,`${fmt(clean(two+0.003))} cm`,`circa ${Math.round(L)} cm`].filter(x=>x!==`${fmt(L)} cm`),`1 mm = 0,1 cm: puoi scrivere <b>una</b> cifra dopo la virgola (in cm): <b>${fmt(L)} cm</b>.`)},
+  ()=>{const P=pick([1,2,5]);const m=rnd()<.5?clean(P-0.5+rint(1,4)/10):clean(P+rint(1,3));const ok=m<=P;return mc(`Una bilancia ha portata <b>${P} kg</b>. Puoi pesare in una sola volta un oggetto di <b>${fmt(m)} kg</b>?`,ok?"Sì, è sotto la portata":"No, supera la portata",[ok?"No, supera la portata":"Sì, è sotto la portata"],ok?`${fmt(m)} kg è minore della portata ${P} kg: va bene.`:`${fmt(m)} kg è più della portata ${P} kg: la bilancia non ci arriva.`)}
+ ],
+ 3:[
+  ()=>{const it=pick([["lo spessore di una moneta","calibro (0,05 mm)"],["la lunghezza di un’aula","rotella metrica da 20 m (1 cm)"],["la massa di un anello d’oro","bilancia di precisione (0,01 g)"],["il tempo dei 100 metri","cronometro (0,01 s)"],["la lunghezza di un quaderno","righello da 30 cm (1 mm)"]]);const all=["calibro (0,05 mm)","rotella metrica da 20 m (1 cm)","bilancia di precisione (0,01 g)","cronometro (0,01 s)","righello da 30 cm (1 mm)"];return mc(`Quale strumento è il più adatto per misurare ${it[0]}?`,cap(it[1]),shuffle(all.filter(x=>x!==it[1])).map(cap),`Servono portata sufficiente e sensibilità adatta: <b>${it[1]}</b>.`)},
+  ()=>{const s=pick([0.1,0.5,1,0.01]);const u=pick(["cm","g","s"]);return mc(`Fai <b>una sola misura</b> con uno strumento di sensibilità ${fmt(s)} ${u}. Qual è l’errore della misura?`,`${fmt(s)} ${u}`,[`${fmt(s/2)} ${u}`,`${fmt(s*10)} ${u}`,"zero"],"Con una sola misura l’errore è uguale alla <b>sensibilità</b> dello strumento.")},
+  ()=>mc("La <b>prontezza</b> di uno strumento indica…","quanto velocemente dà la misura",["il valore massimo misurabile","il valore di una tacca","quanto pesa lo strumento"],"Prontezza = rapidità nel dare la misura (il termometro digitale è più pronto di quello a mercurio)."),
+  ()=>{const s=pick([[0.01,"g","una bilancia digitale che mostra 12,35 g"],[0.1,"°C","un termometro digitale che mostra 36,8 °C"],[0.01,"s","un cronometro che mostra 9,87 s"]]);return mc(`Qual è la sensibilità di ${s[2]}?`,`${fmt(s[0])} ${s[1]}`,[`${fmt(s[0]*10)} ${s[1]}`,`${fmt(s[0]/10)} ${s[1]}`,`1 ${s[1]}`].filter(x=>x!==`${fmt(s[0])} ${s[1]}`),`Negli strumenti digitali la sensibilità è il valore dell’<b>ultima cifra</b>: ${fmt(s[0])} ${s[1]}.`)}
+ ]
+};
+
+// ---------- 5. Errori ----------
+function measures(){const base=pick([12,8.5,24,3.2,15.6,45]);const n=pick([4,5]);const ms=[];for(let i=0;i<n;i++)ms.push(clean(base+rint(-3,3)/10));if(Math.max(...ms)===Math.min(...ms))ms[0]=clean(ms[0]+0.2);return ms}
+const avg=a=>a.reduce((x,y)=>x+y,0)/a.length;
+const G5={
+ 1:[
+  ()=>{const ms=measures();const m=avg(ms);return num(`Hai misurato: <b>${ms.map(fmt).join(" – ")} s</b>.<br>Qual è il valore medio?`,m,`Somma ÷ numero di misure: ${fmt(ms.reduce((a,b)=>a+b,0))} ÷ ${ms.length} = <b>${fmt(m)} s</b>`,{unit:"s",tol:0.005})},
+  ()=>{const L=clean(rint(100,400)/10),s=0.1;return mc(`Misuri ${fmt(L)} cm con un righello di sensibilità 0,1 cm. Come scrivi il risultato?`,`(${fmt(L)} ± 0,1) cm`,[`(${fmt(L)} ± 1) cm`,`${fmt(L)} cm esatti`,`(${fmt(L)} ± 0,01) cm`],"Una sola misura → errore = sensibilità: <b>± 0,1 cm</b>.")},
+  ()=>mc("Uno strumento tarato male che sbaglia sempre nello stesso verso produce errori…","sistematici",["casuali","relativi","percentuali"],"Gli errori sempre nello stesso verso sono <b>sistematici</b>. Quelli a caso, in più o in meno, sono casuali.")
+ ],
+ 2:[
+  ()=>{const ms=measures();const ea=(Math.max(...ms)-Math.min(...ms))/2;return num(`Misure: <b>${ms.map(fmt).join(" – ")} cm</b>.<br>Qual è l’errore assoluto?`,ea,`(max − min) ÷ 2 = (${fmt(Math.max(...ms))} − ${fmt(Math.min(...ms))}) ÷ 2 = <b>${fmt(ea)} cm</b>`,{unit:"cm",tol:0.001})},
+  ()=>{const ms=measures();const m=clean(avg(ms)),ea=clean((Math.max(...ms)-Math.min(...ms))/2);return mc(`Misure: <b>${ms.map(fmt).join(" – ")} g</b>. Come scrivi il risultato?`,`(${fmt(m)} ± ${fmt(ea)}) g`,[`(${fmt(m)} ± ${fmt(ea*2)}) g`,`(${fmt(Math.max(...ms))} ± ${fmt(ea)}) g`,`(${fmt(m)} ± 0,1) g`],`Valore medio ${fmt(m)} g, errore assoluto (max − min) ÷ 2 = ${fmt(ea)} g → <b>(${fmt(m)} ± ${fmt(ea)}) g</b>`)}
+ ],
+ 3:[
+  ()=>{const m=pick([20,25,40,50,80,12.5]),ea=pick([0.1,0.2,0.5,0.25]);const er=m&&ea/m;return num(`Una misura vale <b>(${fmt(m)} ± ${fmt(ea)}) cm</b>. Qual è l’errore relativo?`,er,`Er = Ea ÷ valore medio = ${fmt(ea)} ÷ ${fmt(m)} = <b>${fmt(clean(er))}</b> (senza unità)`,{tol:0.02})},
+  ()=>{const m=pick([20,25,40,50,80,12.5,10]),ea=pick([0.1,0.2,0.5,0.25]);const p=ea/m*100;return num(`Una misura vale <b>(${fmt(m)} ± ${fmt(ea)}) s</b>. Qual è l’errore percentuale?`,p,`E% = (Ea ÷ valore medio) × 100 = (${fmt(ea)} ÷ ${fmt(m)}) × 100 = <b>${fmt(clean(p))}%</b>`,{unit:"%",tol:0.02})},
+  ()=>{const a=[pick([10,20]),0.2],b=[pick([100,200]),0.5];return mc(`Quale misura è <b>più precisa</b>?<br>A: (${a[0]} ± ${fmt(a[1])}) cm &nbsp; B: (${b[0]} ± ${fmt(b[1])}) cm`,"B, perché ha l’errore relativo più piccolo",["A, perché ha l’errore assoluto più piccolo","Sono precise uguali","Non si può dire"],`Er(A) = ${fmt(a[1])} ÷ ${a[0]} = ${fmt(clean(a[1]/a[0]))}; Er(B) = ${fmt(b[1])} ÷ ${b[0]} = ${fmt(clean(b[1]/b[0]))}. Conta l’errore <b>relativo</b>: vince B.`)}
+ ]
+};
+
+// ---------- 6. Cifre significative ----------
+const CS=[["0,0045",2],["120,5",4],["3,00",3],["1002",4],["0,30",2],["7,05",3],["45",2],["0,0700",3],["6,020",4],["0,5",1],["10,01",4],["2,500",4]];
+const ROUND=[["3,14159",3,"3,14",["3,15","3,1","3,142"]],["0,004567",2,"0,0046",["0,0045","0,00457","0,005"]],["12,48",3,"12,5",["12,4","12,48","12"]],["2,951",2,"3,0",["2,9","3","2,95"]],["8,3449",3,"8,34",["8,35","8,3","8,345"]],["0,1256",2,"0,13",["0,12","0,126","0,1"]],["45,65",3,"45,7",["45,6","46","45,65"]]];
+const G6={
+ 1:[()=>{const c=pick(CS);return num(`Quante cifre significative ha <b>${c[0]}</b>?`,c[1],`Zeri davanti: non contano. Zeri in mezzo e zeri finali dopo la virgola: contano. <b>${c[0]}</b> → <b>${c[1]}</b> cifre significative.`)},
+    ()=>mc("Gli zeri <b>all’inizio</b> di un numero (es. 0,003) sono cifre significative?","No, mai",["Sì, sempre","Solo se sono più di due","Dipende dall’unità"],"Gli zeri iniziali servono solo a posizionare la virgola: non contano mai.")],
+ 2:[()=>{const r=pick(ROUND);return mc(`Arrotonda <b>${r[0]}</b> a <b>${r[1]}</b> cifre significative.`,r[2],r[3],`Guarda la prima cifra che togli: se è ≥ 5 arrotondi in su. Risultato: <b>${r[2]}</b>.`)},
+    ()=>{const c=pick(CS);return num(`Quante cifre significative ha <b>${c[0]}</b>?`,c[1],`<b>${c[0]}</b> → <b>${c[1]}</b> cifre significative.`)}],
+ 3:[()=>{const a=pick([2.5,1.8,3.4,4.2,6.1]),b=pick([3.42,2.15,1.23,5.06]);const p=a*b;const r=Number(p.toPrecision(2)).toFixed(p>=10?0:1).replace(".",",");return mc(`Un rettangolo misura <b>${fmt(a)} cm × ${fmt(b)} cm</b>. Come scrivi l’area?`,`${r} cm²`,[`${fmt(clean(p))} cm²`,`${Number(p.toPrecision(3)).toString().replace(".",",")} cm²`,`${Math.round(p)+1} cm²`].filter(x=>x!==`${r} cm²`),`${fmt(a)} × ${fmt(b)} = ${fmt(clean(p))}. La misura meno precisa (${fmt(a)}) ha 2 cifre → <b>${r} cm²</b>.`)},
+    ()=>mc("Moltiplichi 4,52 m (3 cifre) per 2,1 m (2 cifre). Con quante cifre significative scrivi il risultato?","2",["3","5","1"],"Si tengono le cifre della misura che ne ha <b>meno</b>: 2.")]
+};
+
+// ---------- 7. Densità ----------
+const MAT=[["sughero",0.24],["legno di abete",0.45],["olio d’oliva",0.92],["acqua",1],["alluminio",2.7],["ferro",7.9],["rame",8.9],["piombo",11.3],["oro",19.3]];
+const ART={"sughero":"del sughero","legno di abete":"del legno di abete","olio d’oliva":"dell’olio d’oliva","acqua":"dell’acqua","alluminio":"dell’alluminio","ferro":"del ferro","rame":"del rame","piombo":"del piombo","oro":"dell’oro"};
+const SOLID=MAT.filter(m=>!["olio d’oliva","acqua"].includes(m[0]));
+const G7={
+ 1:[
+  ()=>{const m=pick(MAT),V=pick([10,20,25,40,50,100]);const mass=clean(m[1]*V);return num(`Un oggetto ha massa <b>${fmt(mass)} g</b> e volume <b>${V} cm³</b>. Qual è la sua densità?`,m[1],`d = m ÷ V = ${fmt(mass)} ÷ ${V} = <b>${fmt(m[1])} g/cm³</b> (${m[0]})`,{unit:"g/cm³",tol:0.01})},
+  ()=>mc("Qual è la formula della densità?","d = m ÷ V",["d = m × V","d = V ÷ m","d = m + V"],"Densità = massa ÷ volume. Pensa al triangolo: m sopra, d e V sotto."),
+  ()=>mc("Qual è l’unità di misura SI della densità?","kg/m³",["g","m³/kg","kg"],"Nel SI la densità si misura in <b>kg/m³</b> (spesso anche in g/cm³).")
+ ],
+ 2:[
+  ()=>{const m=pick(MAT),V=pick([5,10,20,50,200]);const mass=clean(m[1]*V);return num(`Quanto pesa (massa) un pezzo di ${m[0]} di <b>${V} cm³</b>? (d = ${fmt(m[1])} g/cm³)`,mass,`m = d × V = ${fmt(m[1])} × ${V} = <b>${fmt(mass)} g</b>`,{unit:"g",tol:0.01})},
+  ()=>{const m=pick(SOLID),V=pick([10,20,25,50]);const mass=clean(m[1]*V);return num(`Un pezzo di ${m[0]} (d = ${fmt(m[1])} g/cm³) ha massa <b>${fmt(mass)} g</b>. Che volume occupa?`,V,`V = m ÷ d = ${fmt(mass)} ÷ ${fmt(m[1])} = <b>${V} cm³</b>`,{unit:"cm³",tol:0.01})},
+  ()=>{const m=pick(MAT);return num(`La densità ${ART[m[0]]} è <b>${fmt(m[1])} g/cm³</b>. Quanto vale in kg/m³?`,m[1]*1000,`Da g/cm³ a kg/m³ moltiplichi per 1000: <b>${fmt(m[1]*1000)} kg/m³</b>`,{unit:"kg/m³",tol:0.001})},
+  ()=>{const m=pick(SOLID.concat([["ghiaccio",0.92],["vetro",2.5]]));const g=m[1]<1;return mc(`Un oggetto pieno di <b>${m[0]}</b> (d = ${fmt(m[1])} g/cm³) messo in acqua…`,g?"galleggia":"affonda",[g?"affonda":"galleggia","resta a metà","dipende dalla forma"],`L’acqua ha d = 1 g/cm³. ${fmt(m[1])} è ${g?"minore":"maggiore"} di 1 → <b>${g?"galleggia":"affonda"}</b>.`)}
+ ],
+ 3:[
+  ()=>{const m=pick(MAT.filter(x=>x[0]!=="acqua")),V=pick([2,0.5,1.5,4]);const kg=clean(m[1]*V);return num(`Un oggetto ha massa <b>${fmt(kg)} kg</b> e volume <b>${fmt(V)} dm³</b>. Qual è la densità in kg/m³?`,m[1]*1000,`d = ${fmt(kg)} ÷ ${fmt(V)} = ${fmt(m[1])} kg/dm³. 1 kg/dm³ = 1000 kg/m³ → <b>${fmt(m[1]*1000)} kg/m³</b>`,{unit:"kg/m³",tol:0.01})},
+  ()=>{const m=pick(SOLID);const l=pick([2,3,4,5]);const V=l*l*l;const mass=clean(m[1]*V);return mc(`Un cubo pieno ha lato <b>${l} cm</b> e massa <b>${fmt(mass)} g</b>. Di che materiale è?`,cap(m[0]),pickN(SOLID.filter(x=>x!==m),3).map(x=>cap(x[0])),`V = ${l}³ = ${V} cm³; d = ${fmt(mass)} ÷ ${V} = ${fmt(m[1])} g/cm³ → <b>${m[0]}</b>.`)},
+  ()=>{const L=pick([2,1.5,3,5]);const kg=clean(0.92*L);return num(`Quanti kg pesano <b>${fmt(L)} L</b> di olio d’oliva? (d = 0,92 kg/L)`,kg,`m = d × V = 0,92 × ${fmt(L)} = <b>${fmt(kg)} kg</b>`,{unit:"kg",tol:0.01})},
+  ()=>{const s=pick([100,200,300,400,1500]),t=pick([20,25,40,50]);return num(`Percorri <b>${s} m</b> in <b>${t} s</b>. Qual è la velocità?`,s/t,`v = s ÷ t = ${s} ÷ ${t} = <b>${fmt(s/t)} m/s</b>`,{unit:"m/s",tol:0.01})},
+  ()=>{const v=pick([2,5,10,15]),t=pick([30,60,120]);return num(`Vai a <b>${v} m/s</b> per <b>${t} s</b>. Quanta strada fai?`,v*t,`s = v × t = ${v} × ${t} = <b>${v*t} m</b>`,{unit:"m"})}
+ ]
+};
+
+// ---------- 8. Proporzionalità ----------
+const G8={
+ 1:[()=>{const k=pick([2,3,4,5,1.5,2.5]);const xs=[1,2,3,4,5];const miss=rint(1,4);const ys=xs.map(x=>clean(k*x));return num(`Le grandezze sono <b>direttamente proporzionali</b>:<br>x: ${xs.join(" · ")}<br>y: ${ys.map((y,i)=>i===miss?"<b>?</b>":fmt(y)).join(" · ")}<br>Quanto vale il numero mancante?`,ys[miss],`y ÷ x = ${fmt(k)} sempre → y = ${fmt(k)} × ${xs[miss]} = <b>${fmt(ys[miss])}</b>`)},
+    ()=>mc("Se due grandezze sono direttamente proporzionali, cosa rimane costante?","il loro rapporto (y ÷ x)",["il loro prodotto (x · y)","la loro somma","la loro differenza"],"Diretta → rapporto costante. Inversa → prodotto costante.")],
+ 2:[()=>{const k=pick([12,24,36,60]);const xs=[1,2,3,4,6];const miss=rint(1,4);const ys=xs.map(x=>clean(k/x));return num(`Le grandezze sono <b>inversamente proporzionali</b>:<br>x: ${xs.join(" · ")}<br>y: ${ys.map((y,i)=>i===miss?"<b>?</b>":fmt(y)).join(" · ")}<br>Quanto vale il numero mancante?`,ys[miss],`x · y = ${k} sempre → y = ${k} ÷ ${xs[miss]} = <b>${fmt(ys[miss])}</b>`)},
+    ()=>{const d=rnd()<.5;return mc(`Il grafico di una proporzionalità <b>${d?"diretta":"inversa"}</b> è…`,d?"una retta che passa per l’origine":"un ramo di iperbole",[d?"un ramo di iperbole":"una retta che passa per l’origine","una retta orizzontale","una parabola"],d?"Diretta = dritta: retta per l’origine.":"Inversa: una curva (iperbole) che scende senza toccare gli assi.")}],
+ 3:[()=>{const p=pick([1.5,2,2.4,3.2]),a=pick([2,3,4]),b=pick([5,6,7]);return num(`${a} kg di mele costano <b>${fmt(clean(p*a))} €</b>. Quanto costano <b>${b} kg</b>?`,p*b,`Proporzionalità diretta: 1 kg costa ${fmt(clean(p*a))} ÷ ${a} = ${fmt(p)} € → ${b} kg costano <b>${fmt(clean(p*b))} €</b>`,{unit:"€",tol:0.001})},
+    ()=>{const a=pick([2,3,4]),g=pick([6,8,12]),b=pick([6,8,12].filter(x=>x!==a&&(a*g)%x===0));return num(`<b>${a} operai</b> finiscono un lavoro in <b>${g} giorni</b>. Quanti giorni servono a <b>${b} operai</b>?`,a*g/b,`Proporzionalità inversa: ${a} × ${g} = ${a*g} (costante) → ${a*g} ÷ ${b} = <b>${fmt(a*g/b)} giorni</b>`,{unit:"giorni"})},
+    ()=>{const it=pick([["la velocità e il tempo per fare lo stesso percorso","inversa"],["la massa e il volume di uno stesso materiale","diretta"],["il numero di quaderni comprati e la spesa","diretta"],["il numero di amici e la fetta di pizza di ognuno","inversa"]]);return mc(`Che tipo di proporzionalità c’è tra ${it[0]}?`,it[1],[it[1]==="diretta"?"inversa":"diretta","nessuna"],it[1]==="diretta"?"Una cresce e anche l’altra cresce nello stesso modo: <b>diretta</b>.":"Una cresce e l’altra cala in modo che il prodotto resti uguale: <b>inversa</b>.")}]
+};
+
+// ---------- 9. Vettori ----------
+const SCAL=["la massa","il tempo","la temperatura","il volume","la densità","l’energia"];
+const VETT=["lo spostamento","la velocità","la forza","l’accelerazione"];
+const G9={
+ 1:[()=>{const v=rnd()<.5;const g=pick(v?VETT:SCAL);return mc(`${cap(g)} è una grandezza…`,v?"vettoriale":"scalare",[v?"scalare":"vettoriale"],v?`${cap(g)} ha anche direzione e verso: è <b>vettoriale</b>.`:`Per ${g} basta un numero con l’unità: è <b>scalare</b>.`)},
+    ()=>mc("Per descrivere un vettore servono…","modulo, direzione e verso",["solo il modulo","modulo e unità di misura","direzione e colore"],"MDV: Modulo, Direzione, Verso.")],
+ 2:[()=>{const a=rint(2,15),b=rint(2,15);return num(`Due forze di <b>${a} N</b> e <b>${b} N</b> agiscono nella stessa direzione e nello <b>stesso verso</b>. Quanto vale la risultante?`,a+b,`Stesso verso → si sommano: ${a} + ${b} = <b>${a+b} N</b>`,{unit:"N"})},
+    ()=>{let a=rint(5,20),b=rint(2,a-1);return num(`Due forze di <b>${a} N</b> e <b>${b} N</b> hanno la stessa direzione ma <b>versi opposti</b>. Quanto vale la risultante?`,a-b,`Versi opposti → si sottraggono: ${a} − ${b} = <b>${a-b} N</b> (nel verso della forza più grande)`,{unit:"N"})}],
+ 3:[()=>{const t=pick([[3,4,5],[6,8,10],[5,12,13],[9,12,15],[8,15,17]]);return num(`Due forze <b>perpendicolari</b> valgono <b>${t[0]} N</b> e <b>${t[1]} N</b>. Quanto vale la risultante?`,t[2],`Pitagora: √(${t[0]}² + ${t[1]}²) = √${t[0]*t[0]+t[1]*t[1]} = <b>${t[2]} N</b>`,{unit:"N"})},
+    ()=>mc("Cammini 3 km verso nord e poi 3 km verso sud. Qual è il tuo <b>spostamento</b>?","0 km",["6 km","3 km","9 km"],"Lo spostamento è un vettore: i due tratti hanno versi opposti e si annullano. Hai <b>percorso</b> 6 km, ma ti sei <b>spostato</b> di 0 km.")]
+};
+
+const GEN={1:G1,2:G2,3:G3,4:G4,5:G5,6:G6,7:G7,8:G8,9:G9};
+function makeQuestion(topicId,level){return pick(GEN[topicId][level])()}
+function makeSet(topicIds,levels,n){
+  const out=[],seen=new Set();let guard=0;
+  while(out.length<n&&guard<400){guard++;const t=pick(topicIds),l=Array.isArray(levels)?levels[out.length%levels.length]:levels;
+    const q=makeQuestion(t,l);if(seen.has(q.q))continue;seen.add(q.q);q.topic=t;q.level=l;out.push(q)}
+  return out;
+}
+
+
+// ===== FISICAFACILE - logica dell'app =====
+const APP_VERSION="1.0";
+// >>> Incolla qui i dati del tuo progetto Firebase (vedi LEGGIMI) <<<
+const FIREBASE_CONFIG={
+  apiKey:"INSERISCI_API_KEY",
+  authDomain:"INSERISCI.firebaseapp.com",
+  projectId:"INSERISCI",
+  appId:"INSERISCI"
+};
+const LS_KEY="fisicafacile-v1";
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const topicById=id=>TOPICS.find(t=>t.id===+id);
+
+// ---------- stato ----------
+function blankTopic(){return{read:[],best:{1:0,2:0,3:0},medal:false,bestTest:0}}
+function blankState(){return{name:"Davide",theme:"auto",size:"normal",selected:DEFAULT_SELECTED.slice(),selAt:0,topics:{},stats:{done:0,ok:0},updatedAt:0}}
+function load(){try{const s=JSON.parse(localStorage.getItem(LS_KEY));if(s&&s.topics)return Object.assign(blankState(),s)}catch(e){}return blankState()}
+let S=load();
+function T(id){if(!S.topics[id])S.topics[id]=blankTopic();return S.topics[id]}
+function persist(){try{localStorage.setItem(LS_KEY,JSON.stringify(S))}catch(e){}}
+function save(){S.updatedAt=Date.now();persist();scheduleSync()}
+
+const starsOf=b=>b>=10?3:b>=8?2:b>=6?1:0;
+function topicPct(id){const t=T(id),tp=topicById(id);const r=Math.min(t.read.length,tp.lessons.length)/tp.lessons.length;
+  const st=[1,2,3].reduce((a,l)=>a+starsOf(t.best[l]||0),0)/9;return Math.round(r*30+st*50+(t.medal?20:0))}
+const selectedTopics=()=>TOPICS.filter(t=>S.selected.includes(t.id));
+function overallPct(){const s=selectedTopics();if(!s.length)return 0;return Math.round(s.reduce((a,t)=>a+topicPct(t.id),0)/s.length)}
+const starsHtml=n=>`<span class="stars" aria-label="${n} stelle su 3">${"★".repeat(n)}<span class="no">${"★".repeat(3-n)}</span></span>`;
+const ruler=(pct,color,big)=>`<div class="ruler${big?" big":""}" style="--tc:${color||"var(--yellow)"}" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><div class="fill" style="width:${pct}%"></div><span class="val">${pct}%</span></div>`;
+
+// ---------- icone ----------
+const IC={
+ home:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',
+ book:'<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5"/><path d="M9 7h6"/>',
+ formula:'<path d="M17 4H7l6 8-6 8h10"/>',
+ ruler:'<rect x="2" y="8" width="20" height="8" rx="1.5"/><path d="M6 8v3M10 8v4M14 8v3M18 8v4"/>',
+ gear:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>'
+};
+const icon=n=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]}</svg>`;
+const NAV=[["home","Home","home"],["argomenti","Argomenti","book"],["formule","Formulario","formula"],["progressi","Progressi","ruler"],["impostazioni","Impostazioni","gear"]];
+
+// ---------- navigazione ----------
+let quiz=null,lastResult=null,showAllFormulas=false,triState={};
+function go(h){if(location.hash==="#"+h)render();else location.hash=h}
+window.addEventListener("hashchange",()=>{render();window.scrollTo(0,0)});
+function route(){const p=location.hash.slice(1).split("/");return{name:p[0]||"home",a:p[1],b:p[2]}}
+
+function render(){
+  if(S.theme==="auto")delete document.documentElement.dataset.theme;else document.documentElement.dataset.theme=S.theme;
+  document.documentElement.dataset.size=S.size;
+  const r=route();let html="";
+  if(r.name==="quiz"&&!quiz){location.hash="home";return}
+  if(r.name==="risultato"&&!lastResult){location.hash="home";return}
+  switch(r.name){
+    case "argomenti":html=vTopics();break;
+    case "t":html=vTopic(+r.a,r.b||"impara");break;
+    case "quiz":html=vQuiz();break;
+    case "risultato":html=vResult();break;
+    case "formule":html=vFormule();break;
+    case "progressi":html=vProgress();break;
+    case "impostazioni":html=vSettings();break;
+    default:html=vHome();
+  }
+  $("#main").innerHTML=html;
+  const active=r.name==="t"?"argomenti":r.name==="quiz"||r.name==="risultato"?"":r.name;
+  $("#nav").innerHTML=NAV.map(n=>`<button data-go="${n[0]}" class="${active===n[0]?"act":""}" aria-label="${n[1]}">${icon(n[2])}<span>${n[1]}</span></button>`).join("");
+  $("#nav").style.display=r.name==="quiz"?"none":"";
+  renderSync();
+  const inp=$("#ans");if(inp&&!quiz.answered)inp.focus({preventScroll:true});
+}
+
+// ---------- HOME ----------
+function nextStep(){
+  for(const tp of selectedTopics()){const t=T(tp.id);
+    const unread=tp.lessons.findIndex((l,i)=>!t.read.includes(i));
+    if(unread>=0)return{tp,label:`Leggi la lezione: ${tp.lessons[unread].t}`,go:`t/${tp.id}/impara`};
+    for(const l of [1,2,3])if((t.best[l]||0)<8)return{tp,label:`Esercizi di livello ${l}`,act:`start:${tp.id}:${l}`};
+    if(!t.medal)return{tp,label:"Mini-verifica per la medaglia",act:`start:${tp.id}:test`};
+  }return null}
+function vHome(){
+  const sel=selectedTopics();const n=nextStep();
+  return `<div class="hello"><h1>Ciao${S.name?", "+esc(S.name):""}!</h1><p class="muted">Un passo alla volta: lezione, trucchi, esercizi.</p></div>
+  ${sel.length?`
+  <div class="card stack">
+    <div class="row"><h3 class="grow" style="margin:0">Il tuo programma</h3><span class="small muted">${sel.length} argoment${sel.length>1?"i":"o"}</span></div>
+    ${ruler(overallPct(),"var(--yellow)",true)}
+  </div>
+  ${n?`<h2>Continua da qui</h2>
+  <button class="topic next" style="--tc:${n.tp.color}" ${n.go?`data-go="${n.go}"`:`data-act="${n.act}"`}>
+    <div class="head" style="margin:0"><div class="tnum" style="--tc:${n.tp.color}">${n.tp.id}</div><div class="grow"><h3>${esc(n.label)}</h3><div class="sub">${n.tp.short}</div></div></div>
+  </button>`:`<div class="card" style="margin-top:16px"><h3>Hai completato tutto il programma!</h3><p class="muted">Tieniti in allenamento con il misto, oppure aggiungi altri argomenti.</p></div>`}
+  <h2>Allenamento misto</h2>
+  <div class="card row"><div class="grow"><b>10 domande</b><div class="small muted">da tutti i tuoi argomenti, livelli misti</div></div><button class="btn" data-act="start:mix">Inizia</button></div>
+  <h2>I tuoi argomenti</h2>
+  <div class="topics">${sel.map(topicCard).join("")}</div>`
+  :`<div class="card stack"><h3>Nessun argomento scelto</h3><p class="muted">Scegli gli argomenti da studiare per cominciare.</p><button class="btn" data-act="choose">Scegli gli argomenti</button></div>`}`;
+}
+function topicCard(tp){const t=T(tp.id);const st=[1,2,3].reduce((a,l)=>a+starsOf(t.best[l]||0),0);
+  return `<button class="topic" data-go="t/${tp.id}/impara" style="--tc:${tp.color}">
+   <div class="head"><div class="tnum">${tp.id}</div><div class="grow"><h3>${tp.short}</h3><div class="sub">${tp.sub}</div></div>${t.medal?'<span class="medal" title="Medaglia">🏅</span>':""}</div>
+   ${ruler(topicPct(tp.id),tp.color)}
+   <div class="row small muted" style="margin-top:8px"><span class="grow">Lezioni ${Math.min(t.read.length,tp.lessons.length)}/${tp.lessons.length}</span><span>${st}/9 ★</span></div>
+  </button>`}
+
+// ---------- ARGOMENTI ----------
+function vTopics(){const sel=selectedTopics();
+  return `<h1>Argomenti</h1><p class="muted">Qui vedi solo quelli che hai scelto. Puoi cambiarli quando vuoi.</p>
+  <button class="btn ghost wide" data-act="choose" style="margin:6px 0 16px">Scegli gli argomenti (${sel.length} su ${TOPICS.length})</button>
+  <div class="topics">${sel.map(topicCard).join("")||'<p class="muted">Nessun argomento scelto.</p>'}</div>`}
+
+function chooseSheet(){
+  const box=document.createElement("div");box.className="sheet-bg";
+  box.innerHTML=`<div class="sheet pop" role="dialog" aria-label="Scegli gli argomenti"><h2 style="margin-top:0">Quali argomenti vuoi studiare?</h2>
+   <div class="row" style="margin-bottom:10px"><button class="btn ghost grow" data-s="all">Tutti</button><button class="btn ghost grow" data-s="none">Nessuno</button></div>
+   <div class="stack">${TOPICS.map(t=>`<label class="check" style="--tc:${t.color}"><input type="checkbox" value="${t.id}" ${S.selected.includes(t.id)?"checked":""}><div class="tnum" style="width:34px;height:34px;--tc:${t.color}">${t.id}</div><div class="grow"><b>${t.short}</b><div class="small muted">${t.sub}</div></div></label>`).join("")}</div>
+   <div class="row" style="margin-top:16px"><button class="btn ghost grow" data-s="cancel">Annulla</button><button class="btn grow" data-s="ok">Salva la scelta</button></div></div>`;
+  box.addEventListener("click",e=>{const s=e.target.closest("[data-s]");if(e.target===box){box.remove();return}if(!s)return;const k=s.dataset.s;
+    const cbs=[...box.querySelectorAll("input")];
+    if(k==="all")cbs.forEach(c=>c.checked=true);if(k==="none")cbs.forEach(c=>c.checked=false);
+    if(k==="cancel")box.remove();
+    if(k==="ok"){S.selected=cbs.filter(c=>c.checked).map(c=>+c.value);S.selAt=Date.now();save();box.remove();toast("Argomenti salvati");render()}});
+  document.body.appendChild(box);
+}
+
+// ---------- PAGINA ARGOMENTO ----------
+function vTopic(id,tab){const tp=topicById(id);if(!tp)return vHome();const t=T(id);
+  const tabs=[["impara","Impara"],["trucchi","Trucchi"],["esercizi","Esercizi"]];
+  let body="";
+  if(tab==="trucchi")body=`<div class="stack">${tp.tricks.map((k,i)=>`<div class="trick"><h3>${k.t}</h3>${k.tri?triHtml(id,i,k.tri):""}<div class="hand">${k.hand}</div>${k.h}</div>`).join("")}</div>
+    <button class="btn wide" style="margin-top:18px" data-go="t/${id}/esercizi">Mettiti alla prova con gli esercizi</button>`;
+  else if(tab==="esercizi")body=vLevels(tp,t);
+  else body=vLesson(tp,t);
+  return `<button class="back" data-go="argomenti">‹ Argomenti</button>
+  <div class="thead" style="--tc:${tp.color}"><div class="tnum">${tp.id}</div><div><h1 style="margin:0;font-size:1.35em">${tp.title}</h1></div></div>
+  <div class="tabs" style="--tc:${tp.color}" role="tablist">${tabs.map(x=>`<button role="tab" class="${tab===x[0]?"act":""}" data-go="t/${id}/${x[0]}">${x[1]}</button>`).join("")}</div>
+  <div style="--tc:${tp.color}">${body}</div>`}
+
+let lessonIdx={};
+function vLesson(tp,t){
+  if(lessonIdx[tp.id]===undefined){const u=tp.lessons.findIndex((l,i)=>!t.read.includes(i));lessonIdx[tp.id]=u<0?0:u}
+  const i=lessonIdx[tp.id],L=tp.lessons[i],last=i===tp.lessons.length-1;
+  return `<div class="card lesson pop" key="${i}"><div class="step">Lezione ${i+1} di ${tp.lessons.length}${t.read.includes(i)?" · letta ✓":""}</div><h3>${L.t}</h3>${L.h}</div>
+  <div class="dots">${tp.lessons.map((l,k)=>`<i class="${t.read.includes(k)?"done":""} ${k===i?"cur":""}"></i>`).join("")}</div>
+  <div class="lnav">${i>0?`<button class="btn ghost" data-act="lprev:${tp.id}">Indietro</button>`:""}
+  <button class="btn" data-act="lok:${tp.id}">${last?"Ho capito, vai ai trucchi":"Ho capito, avanti"}</button></div>`}
+
+function triHtml(tid,i,tri){const k=tid+"-"+i,c=triState[k];
+  const [a,b,d,na,nb,nd]=tri;
+  const res=c===a?`${a} = ${b} × ${d}`:c===b?`${b} = ${a} ÷ ${d}`:c===d?`${d} = ${a} ÷ ${b}`:"Tocca una lettera";
+  const nm=c===a?na:c===b?nb:c===d?nd:"";
+  return `<div class="tri"><div class="shape"></div><div class="bar"></div><div class="mid"></div>
+   <button class="t ${c===a?"cov":""}" data-act="tri:${k}:${a}" aria-label="${na}">${a}</button>
+   <button class="l ${c===b?"cov":""}" data-act="tri:${k}:${b}" aria-label="${nb}">${b}</button>
+   <button class="r ${c===d?"cov":""}" data-act="tri:${k}:${d}" aria-label="${nd}">${d}</button></div>
+   <div class="trires">${res}</div>${nm?`<p class="small muted" style="text-align:center;margin-top:0">per trovare ${nm}</p>`:""}`}
+
+function vLevels(tp,t){const names={1:["Base","per partire"],2:["Medio","un po’ più difficile"],3:["Avanzato","come in verifica"]};
+  return `<p class="muted">Ogni giro ha 10 domande sempre diverse. 6 giuste = ★, 8 = ★★, 10 = ★★★.</p>
+  <div class="levels">${[1,2,3].map(l=>`<button class="level" data-act="start:${tp.id}:${l}"><div class="lv">${l}</div><div class="grow"><b>${names[l][0]}</b><div class="small muted">${names[l][1]}${t.best[l]?` · migliore ${t.best[l]}/10`:""}</div></div>${starsHtml(starsOf(t.best[l]||0))}</button>`).join("")}
+  <button class="level test" data-act="start:${tp.id}:test"><div class="lv" style="background:var(--tc);color:#fff">${t.medal?"🏅":"✎"}</div><div class="grow"><b>Mini-verifica</b><div class="small muted">10 domande di tutti i livelli · almeno 8 giuste per la medaglia${t.bestTest?` · migliore ${t.bestTest}/10`:""}</div></div></button></div>`}
+
+// ---------- QUIZ ----------
+function startQuiz(topic,level){
+  let qs;
+  if(topic==="mix"){const ids=S.selected.length?S.selected:DEFAULT_SELECTED;qs=makeSet(ids,[1,2,3],10)}
+  else if(level==="test")qs=makeSet([+topic],[1,2,2,3,3,1,2,3,2,3],10);
+  else qs=makeSet([+topic],+level,10);
+  quiz={topic,level,qs,i:0,score:0,answered:false,wrong:[],last:null};go("quiz");
+}
+function vQuiz(){const q=quiz.qs[quiz.i],n=quiz.qs.length;const tp=topicById(q.topic);
+  const head=quiz.topic==="mix"?"Allenamento misto":quiz.level==="test"?`Mini-verifica`:`Livello ${quiz.level}`;
+  let ans="";
+  if(q.type==="mc")ans=`<div class="opts">${q.options.map((o,k)=>{let c="";if(quiz.answered){if(k===q.answer)c="ok";else if(k===quiz.last)c="ko"}return `<button class="opt ${c}" data-act="pick:${k}" ${quiz.answered?"disabled":""}>${o}</button>`}).join("")}</div>`;
+  else ans=`<div class="numrow"><input id="ans" type="text" inputmode="decimal" autocomplete="off" placeholder="Scrivi il numero" value="${quiz.answered?esc(quiz.typed||""):""}" ${quiz.answered?"disabled":""} aria-label="Risposta">${q.unit?`<span class="unit">${q.unit}</span>`:""}</div>
+   ${quiz.answered?"":`<div class="keys">${q.neg?'<button data-act="key:-">−</button>':""}<button data-act="key:,">,</button><span class="small muted" style="align-self:center">Usa la virgola per i decimali</span></div>
+   <button class="btn wide" style="margin-top:12px" data-act="check">Controlla</button>`}`;
+  let fb="";
+  if(quiz.answered){const ok=quiz.lastOk;const right=q.type==="mc"?q.options[q.answer]:`${fmt(q.answer)}${q.unit?" "+q.unit:""}`;
+    fb=`<div class="fb ${ok?"ok":"ko"} pop"><h3>${ok?pick(["Giusto!","Esatto!","Perfetto!","Bravo!"]):"Non proprio"}</h3>${ok?"":`<p>Risposta corretta: <b>${right}</b></p>`}<p>${q.explain}</p></div>
+    <div class="qfoot"><button class="btn wide" data-act="next">${quiz.i<n-1?"Avanti":"Vedi il risultato"}</button></div>`}
+  return `<div class="qtop" style="--tc:${tp.color}"><button class="back" data-act="quit" aria-label="Esci">✕ Esci</button><div class="qbar"><i style="width:${(quiz.i+(quiz.answered?1:0))/n*100}%"></i></div><span class="qcount">${quiz.i+1}/${n}</span></div>
+  <div class="row" style="margin-bottom:10px"><span class="chip" style="background:${tp.color};color:#fff">${tp.short}</span><span class="small muted">${head}</span></div>
+  <div class="card"><div class="qtext">${q.q}</div>${ans}</div>${fb}`}
+
+function parseUser(str){
+  let s=String(str).trim().replace(/\s+/g,"").replace(/[−–]/g,"-");
+  s=s.replace(/[x×*·]10\^?\(?(-?\d+)\)?/i,"e$1").replace(/[a-zA-Z°%€²³\/µ]+$/,"");
+  const c=[];
+  if(s.includes(","))c.push(s.replace(/\./g,"").replace(",","."));
+  else if((s.match(/\./g)||[]).length>1)c.push(s.replace(/\./g,""));
+  else if(/^-?\d{1,3}\.\d{3}$/.test(s)){c.push(s);c.push(s.replace(".",""))}
+  else c.push(s);
+  return c.map(Number).filter(x=>s!==""&&isFinite(x));
+}
+function answer(ok){quiz.answered=true;quiz.lastOk=ok;S.stats.done++;if(ok){quiz.score++;S.stats.ok++}else quiz.wrong.push(quiz.qs[quiz.i]);persist();render()}
+function finishQuiz(){
+  const r={topic:quiz.topic,level:quiz.level,score:quiz.score,n:quiz.qs.length,wrong:quiz.wrong,newMedal:false,improved:false};
+  if(quiz.topic!=="mix"){const t=T(quiz.topic);
+    if(quiz.level==="test"){if(r.score>(t.bestTest||0))t.bestTest=r.score;if(r.score>=8&&!t.medal){t.medal=true;r.newMedal=true}}
+    else{if(r.score>(t.best[quiz.level]||0)){r.improved=starsOf(r.score)>starsOf(t.best[quiz.level]||0);t.best[quiz.level]=r.score}}}
+  save();lastResult=r;quiz=null;go("risultato");
+}
+function vResult(){const r=lastResult;const tp=r.topic==="mix"?null:topicById(r.topic);const st=starsOf(r.score);
+  const msg=r.score===r.n?"Tutto giusto, complimenti!":r.score>=8?"Ottimo lavoro!":r.score>=6?"Bene, ci sei quasi.":"Rileggi i trucchi e riprova: migliorerai.";
+  return `<div class="card result pop" style="--tc:${tp?tp.color:"var(--blue)"}">
+   <p class="muted" style="margin-top:0">${tp?tp.short:"Allenamento misto"}${r.level==="test"?" · mini-verifica":r.topic!=="mix"?` · livello ${r.level}`:""}</p>
+   <div class="score">${r.score}<span class="muted" style="font-size:.45em">/${r.n}</span></div>
+   ${r.level!=="test"&&r.topic!=="mix"?`<div style="margin:6px 0">${starsHtml(st)}</div>`:""}
+   ${r.newMedal?`<p style="font-size:2.4em;margin:6px 0">🏅</p><p><b>Hai conquistato la medaglia!</b></p>`:""}
+   <p>${msg}</p>${r.improved?'<p class="chip">Nuovo record di stelle</p>':""}
+   <div class="row" style="margin-top:14px"><button class="btn ghost grow" data-go="${tp?`t/${tp.id}/esercizi`:"home"}">${tp?"Torna all’argomento":"Torna alla Home"}</button><button class="btn grow" data-act="retry">Riprova</button></div></div>
+   ${r.wrong.length?`<h2>Da ripassare</h2><div class="stack">${r.wrong.map(q=>`<div class="card wrong"><p style="margin-top:0">${q.q}</p><p class="small"><b>Risposta: ${q.type==="mc"?q.options[q.answer]:fmt(q.answer)+(q.unit?" "+q.unit:"")}</b></p><p class="small muted" style="margin-bottom:0">${q.explain}</p></div>`).join("")}</div>`:""}`}
+
+// ---------- FORMULARIO ----------
+function vFormule(){const list=showAllFormulas?TOPICS:selectedTopics();
+  return `<h1>Formulario</h1><p class="muted">Le regole da ricordare, tutte in un posto.</p>
+  <div class="stack">${list.map(tp=>`<div class="card" style="border-left:6px solid ${tp.color}"><h3>${tp.short}</h3>${tp.formulas.map(f=>`<div class="formula"><span>${f[0]}</span><b>${f[1]}</b></div>`).join("")}</div>`).join("")}</div>
+  <button class="btn ghost wide" style="margin-top:16px" data-act="allf">${showAllFormulas?"Mostra solo i miei argomenti":"Mostra anche gli altri argomenti"}</button>`}
+
+// ---------- PROGRESSI ----------
+function vProgress(){const sel=selectedTopics();const pct=S.stats.done?Math.round(S.stats.ok/S.stats.done*100):0;
+  const medals=sel.filter(t=>T(t.id).medal).length;
+  return `<h1>Progressi</h1>
+  <div class="card stack"><h3 style="margin:0">Programma completato</h3>${ruler(overallPct(),"var(--yellow)",true)}
+   <div class="row small muted"><span class="grow">${S.stats.done} risposte date, ${pct}% giuste</span><span>${medals} 🏅 su ${sel.length}</span></div></div>
+  <h2>Per argomento</h2>
+  <div class="stack">${sel.map(tp=>{const t=T(tp.id);return `<div class="card" style="--tc:${tp.color}"><div class="row" style="margin-bottom:10px"><div class="tnum" style="width:34px;height:34px">${tp.id}</div><b class="grow">${tp.short}</b>${t.medal?"🏅":""}</div>
+   ${ruler(topicPct(tp.id),tp.color)}
+   <div class="row small" style="margin-top:10px;flex-wrap:wrap;gap:14px"><span>Lezioni ${Math.min(t.read.length,tp.lessons.length)}/${tp.lessons.length}</span>${[1,2,3].map(l=>`<span>Liv. ${l} ${starsHtml(starsOf(t.best[l]||0))}</span>`).join("")}</div></div>`}).join("")}</div>`}
+
+// ---------- IMPOSTAZIONI ----------
+function vSettings(){const seg=(k,opts)=>`<div class="seg">${opts.map(o=>`<button class="${S[k]===o[0]?"act":""}" data-act="set:${k}:${o[0]}">${o[1]}</button>`).join("")}</div>`;
+  let sync;
+  if(!fbConfigured())sync=`<p class="small muted">La sincronizzazione non è ancora attiva: mancano i dati di Firebase nel file. Per ora i progressi restano su questo dispositivo.</p>`;
+  else if(user)sync=`<p class="small">Accesso fatto come <b>${esc(user.email||"")}</b>. I progressi sono uguali su tutti i dispositivi.</p><button class="btn ghost wide" data-act="logout">Esci dall’account</button>`;
+  else sync=`<p class="small muted">Accedi con il tuo account Google per ritrovare i progressi su PC e cellulare.</p><button class="btn wide" data-act="login">Accedi con Google</button>`;
+  return `<h1>Impostazioni</h1><div class="stack">
+  <div class="card stack"><h3 style="margin:0">Il tuo nome</h3><input class="field" id="name" value="${esc(S.name)}" maxlength="30" placeholder="Come ti chiami?"></div>
+  <div class="card stack"><h3 style="margin:0">Argomenti da studiare</h3><p class="small muted" style="margin:0">${selectedTopics().map(t=>t.short).join(", ")||"Nessuno"}</p><button class="btn ghost wide" data-act="choose">Scegli gli argomenti</button></div>
+  <div class="card stack"><h3 style="margin:0">Sincronizzazione</h3>${sync}</div>
+  <div class="card stack"><h3 style="margin:0">Aspetto</h3><div class="small muted">Tema</div>${seg("theme",[["auto","Automatico"],["light","Chiaro"],["dark","Scuro"]])}<div class="small muted">Testo</div>${seg("size",[["normal","Normale"],["big","Grande"]])}</div>
+  <div class="card stack"><h3 style="margin:0">Ricomincia da zero</h3><p class="small muted" style="margin:0">Cancella lezioni lette, stelle e medaglie.</p><button class="btn ghost wide" style="color:var(--red)" data-act="reset">Azzera i progressi</button></div>
+  <p class="small muted" style="text-align:center">FisicaFacile versione ${APP_VERSION}</p></div>`}
+
+// ---------- eventi ----------
+document.addEventListener("click",e=>{
+  const g=e.target.closest("[data-go]");if(g){go(g.dataset.go);return}
+  const a=e.target.closest("[data-act]");if(!a)return;const [cmd,x,y]=a.dataset.act.split(":");
+  switch(cmd){
+    case "start":startQuiz(x,y);break;
+    case "choose":chooseSheet();break;
+    case "lok":{const id=+x,t=T(id),tp=topicById(id),i=lessonIdx[id];if(!t.read.includes(i)){t.read.push(i);save()}
+      if(i<tp.lessons.length-1){lessonIdx[id]=i+1;render();window.scrollTo(0,0)}else{go(`t/${id}/trucchi`)}break}
+    case "lprev":lessonIdx[+x]=Math.max(0,lessonIdx[+x]-1);render();window.scrollTo(0,0);break;
+    case "tri":triState[x]=triState[x]===y?null:y;render();break;
+    case "pick":if(!quiz.answered){quiz.last=+x;answer(+x===quiz.qs[quiz.i].answer)}break;
+    case "key":{const inp=$("#ans");if(!inp)break;if(x==="-")inp.value=inp.value.startsWith("-")?inp.value.slice(1):"-"+inp.value;else inp.value+=",";inp.focus();break}
+    case "check":checkNum();break;
+    case "next":if(quiz.i<quiz.qs.length-1){quiz.i++;quiz.answered=false;quiz.last=null;quiz.typed="";render();window.scrollTo(0,0)}else finishQuiz();break;
+    case "quit":if(confirm("Vuoi uscire? Le risposte di questo giro non verranno salvate.")){const t=quiz.topic;quiz=null;go(t==="mix"?"home":`t/${t}/esercizi`)}break;
+    case "retry":{const r=lastResult;startQuiz(r.topic,r.level);break}
+    case "allf":showAllFormulas=!showAllFormulas;render();break;
+    case "set":S[x]=y;save();render();break;
+    case "login":login();break;
+    case "logout":if(fb)fb.auth.signOut();break;
+    case "reset":if(confirm("Sicuro? Lezioni, stelle e medaglie verranno cancellate.")){const keep={name:S.name,theme:S.theme,size:S.size,selected:S.selected,selAt:S.selAt};S=Object.assign(blankState(),keep);S.resetAt=Date.now();save();toast("Progressi azzerati");render()}break;
+  }
+});
+document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.id==="ans"){e.preventDefault();checkNum()}});
+document.addEventListener("change",e=>{if(e.target.id==="name"){S.name=e.target.value.trim();save();toast("Nome salvato")}});
+function checkNum(){const inp=$("#ans");if(!inp||quiz.answered)return;const q=quiz.qs[quiz.i];const c=parseUser(inp.value);
+  if(!c.length){toast("Scrivi un numero");inp.focus();return}
+  quiz.typed=inp.value;const a=q.answer;const ok=c.some(v=>Math.abs(v-a)<=Math.max(q.tol*Math.abs(a),1e-9));answer(ok)}
+let toastT;function toast(m){let el=$(".toast");if(!el){el=document.createElement("div");el.className="toast";el.setAttribute("role","status");document.body.appendChild(el)}el.textContent=m;clearTimeout(toastT);toastT=setTimeout(()=>el.remove(),2200)}
+
+// ---------- sincronizzazione Firebase ----------
+let fb=null,user=null,syncTimer=null,syncErr=false;
+function fbConfigured(){return FIREBASE_CONFIG.apiKey&&!FIREBASE_CONFIG.apiKey.startsWith("INSERISCI")}
+function loadScript(src){return new Promise((ok,ko)=>{const s=document.createElement("script");s.src=src;s.onload=ok;s.onerror=ko;document.head.appendChild(s)})}
+async function initFirebase(){
+  if(!fbConfigured())return;
+  try{const v="10.12.2",b=`https://www.gstatic.com/firebasejs/${v}/`;
+    await loadScript(b+"firebase-app-compat.js");await loadScript(b+"firebase-auth-compat.js");await loadScript(b+"firebase-firestore-compat.js");
+    firebase.initializeApp(FIREBASE_CONFIG);fb={auth:firebase.auth(),db:firebase.firestore()};
+    fb.auth.getRedirectResult().catch(()=>{});
+    fb.auth.onAuthStateChanged(async u=>{user=u;if(u)await pull();render()});
+  }catch(e){syncErr=true;renderSync()}
+}
+function login(){if(!fb){toast("Sincronizzazione non disponibile, controlla la connessione");return}
+  const p=new firebase.auth.GoogleAuthProvider();
+  fb.auth.signInWithPopup(p).catch(err=>{if(/popup/i.test(err.code||""))fb.auth.signInWithRedirect(p);else toast("Accesso non riuscito: riprova")})}
+const docRef=()=>fb.db.collection("studenti").doc(user.uid);
+function merge(a,b){
+  if(!b||!b.topics)return a;const r=JSON.parse(JSON.stringify(a));
+  if((b.resetAt||0)>(a.resetAt||0)){return Object.assign(blankState(),b,{theme:a.theme,size:a.size})}
+  if((a.resetAt||0)>(b.resetAt||0))return r;
+  for(const id in b.topics){const x=r.topics[id]||blankTopic(),y=b.topics[id];x.best=x.best||{1:0,2:0,3:0};
+    x.read=[...new Set([...(x.read||[]),...(y.read||[])])];
+    for(const l of [1,2,3])x.best[l]=Math.max(x.best[l]||0,(y.best||{})[l]||0);
+    x.medal=!!(x.medal||y.medal);x.bestTest=Math.max(x.bestTest||0,y.bestTest||0);r.topics[id]=x}
+  if((b.selAt||0)>(a.selAt||0)){r.selected=b.selected;r.selAt=b.selAt}
+  if((b.updatedAt||0)>(a.updatedAt||0)&&b.name)r.name=b.name;
+  r.stats={done:Math.max(a.stats.done,(b.stats||{}).done||0),ok:Math.max(a.stats.ok,(b.stats||{}).ok||0)};
+  r.updatedAt=Math.max(a.updatedAt||0,b.updatedAt||0);return r}
+async function pull(){if(!user)return;try{const d=await docRef().get();if(d.exists){S=merge(S,d.data().stato);persist()}await push();syncErr=false}catch(e){syncErr=true}renderSync()}
+async function push(){if(!user)return;const {theme,size,...rest}=S;
+  try{await docRef().set({stato:rest,aggiornato:firebase.firestore.FieldValue.serverTimestamp()});syncErr=false}catch(e){syncErr=true}renderSync()}
+function scheduleSync(){if(!user)return;clearTimeout(syncTimer);syncTimer=setTimeout(push,1200)}
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&user&&!quiz)pull().then(render)});
+function renderSync(){const b=$("#sync");if(!b)return;let dot="off",txt="Solo qui";
+  if(user){dot=syncErr?"":"on";txt=syncErr?"Non sincronizzato":"Sincronizzato"}else if(fbConfigured())txt="Accedi";
+  b.innerHTML=`<span class="dot ${dot}"></span>${txt}`}
+
+// ---------- avvio ----------
+if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
+render();initFirebase();
+
+</script>
+</body>
+</html>
