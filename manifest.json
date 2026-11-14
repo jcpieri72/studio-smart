@@ -1,15 +1,19 @@
 {
-  "name": "FisicaFacile",
-  "short_name": "FisicaFacile",
-  "description": "Grandezze fisiche: lezioni, trucchi ed esercizi",
+  "name": "Studio Smart",
+  "short_name": "Studio Smart",
+  "description": "Tutor, agenda, voti e ripasso",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#F6F8FB",
-  "theme_color": "#2457D6",
+  "background_color": "#F4F5F7",
+  "theme_color": "#172033",
   "lang": "it",
   "icons": [
     {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
     {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+  ],
+  "shortcuts": [
+    {"name": "Chiedi al tutor", "short_name": "Tutor", "url": "./#tutor", "icons": [{"src": "icon-192.png", "sizes": "192x192"}]},
+    {"name": "Nuovo compito", "short_name": "Compito", "url": "./#agenda/compiti", "icons": [{"src": "icon-192.png", "sizes": "192x192"}]}
   ]
 }

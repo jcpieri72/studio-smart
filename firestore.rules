@@ -1,0 +1,37 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // >>> Sostituisci con la TUA email (quella del genitore), in minuscolo <<<
+    function isGenitore() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email == 'EMAIL_GENITORE';
+    }
+    function isStudente(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    match /studenti/{uid} {
+      // dati dello studente: li scrive solo lui, li legge anche il genitore
+      allow read: if isStudente(uid) || isGenitore();
+      allow write: if isStudente(uid);
+
+      // copia delle conversazioni e foto dei compiti dello studente
+      match /chat/{id} { allow read: if isStudente(uid) || isGenitore(); allow write: if isStudente(uid); }
+      match /foto/{id} { allow read, write: if isStudente(uid); }
+
+      // impostazioni decise dal genitore (tetto, orari, premio, attività)
+      match /genitore/{doc} { allow read: if isStudente(uid) || isGenitore(); allow write: if isGenitore(); }
+
+      // registro completo del tutor: lo scrive solo il ponte, lo studente non può né leggerlo né cancellarlo
+      match /log/{id} { allow read: if isGenitore(); allow write: if false; }
+
+      // contatori e consumi: solo il ponte scrive
+      match /sistema/{doc} { allow read: if isGenitore(); allow write: if false; }
+    }
+
+    // telefoni del genitore che ricevono le notifiche
+    match /genitori/{uid} { allow read, write: if isGenitore() && request.auth.uid == uid; }
+  }
+}

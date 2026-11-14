@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Codice genitore</title>
+<style>
+body{font-family:system-ui,sans-serif;max-width:520px;margin:40px auto;padding:0 16px;color:#172033;background:#F4F5F7}
+input,button{font:inherit;width:100%;padding:12px;border-radius:12px;border:1px solid #D5D9E2;box-sizing:border-box;margin-top:8px}
+button{background:#3451D1;color:#fff;border:0;font-weight:700}
+code{display:block;word-break:break-all;background:#fff;border:1px solid #E3E6EC;border-radius:12px;padding:12px;margin-top:12px}
+</style>
+</head>
+<body>
+<h1>Codice genitore</h1>
+<p>Scrivi l’email Google con cui entrerai nell’area genitore. Il calcolo avviene solo su questo dispositivo: l’email non viene inviata da nessuna parte.</p>
+<input id="e" type="email" placeholder="tuaemail@gmail.com" aria-label="Email del genitore">
+<button id="b">Calcola il codice</button>
+<code id="out">Il codice comparirà qui</code>
+<p>Copialo in <b>config.js</b> al posto delle virgolette vuote di <b>genitoreHash</b>.</p>
+<script>
+document.getElementById("b").onclick=async()=>{const t=document.getElementById("e").value.trim().toLowerCase();if(!t)return;
+const h=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t));
+document.getElementById("out").textContent=[...new Uint8Array(h)].map(x=>x.toString(16).padStart(2,"0")).join("")};
+</script>
+</body>
+</html>
