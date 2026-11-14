@@ -226,6 +226,13 @@ textarea.field{min-height:90px;resize:vertical}
 .prova-bar button{border:1px solid var(--warm-line);background:var(--card);color:var(--warm);border-radius:10px;padding:7px 12px;font-weight:800}
 .gbtns{display:flex;gap:8px;flex-wrap:wrap}
 
+.swatch{width:42px;height:42px;border-radius:50%;border:3px solid var(--card);box-shadow:0 0 0 1px var(--line);color:#fff;display:grid;place-items:center;padding:0}
+.swatch.on{box-shadow:0 0 0 3px var(--ink)}
+.upd-bar{position:fixed;left:50%;transform:translateX(-50%);top:calc(10px + env(safe-area-inset-top,0px));z-index:55;display:flex;align-items:center;gap:12px;background:var(--dark);color:#fff;border-radius:14px;padding:10px 12px 10px 16px;font-size:.88em;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:92vw}
+.upd-bar button{border:0;border-radius:10px;background:var(--pri);color:#fff;font-weight:800;padding:8px 14px}
+
+.toast .undo{margin-left:10px;border:0;background:none;color:var(--pri-soft);font-weight:800;text-decoration:underline;padding:0}
+
 </style>
 <script src="config.js"></script>
 </head>
@@ -757,11 +764,11 @@ function makeSet(topicIds,levels,n){
 
 
 // ===== STUDIO SMART – nucleo: dati, sincronizzazione, utilità =====
-const APP_VERSION="2.0";
+const APP_VERSION="2.1";
 const CFG=Object.assign({firebase:{},ponteUrl:"",vapidKey:"",genitoreHash:""},window.STUDIO_CONFIG||{});
 const MATERIE=["Italiano","Storia","Inglese","Tedesco","Matematica","Diritto ed economia","Economia aziendale","Informatica","Geografia","Scienze della Terra e Biologia","Fisica"];
 const MCOL={"Italiano":"#B42350","Storia":"#9A4316","Inglese":"#1D5FA8","Tedesco":"#6B3FA0","Matematica":"#3451D1","Diritto ed economia":"#556B12","Economia aziendale":"#0F766E","Informatica":"#0B6E99","Geografia":"#2F7D32","Scienze della Terra e Biologia":"#7A5C12","Fisica":"#8A5A00","Altro":"#5B6577"};
-const mcol=m=>MCOL[m]||"#5B6577";
+const mcol=m=>(typeof S!=="undefined"&&S&&S.coloriMaterie&&S.coloriMaterie[m])||MCOL[m]||"#5B6577";
 const LS_BASE="studiosmart-v2";let LS=LS_BASE,prova=false;
 const RESETTABILI=["compiti","voti","orario","errori","glossario","schede","tempo","fis","piani","obiettiviVoto","assegnatiFatti","stat"];
 const $=s=>document.querySelector(s);
@@ -791,13 +798,14 @@ function blank(){return{v:2,nome:"Davide",tutorNome:"Orione",tutorSimbolo:0,tema
   fis:{selected:[1,2,3,4,7],topics:{},stats:{done:0,ok:0}},
   orario:{ore:["8:00","9:00","10:00","11:00","12:00","13:00"],giorni:{1:[],2:[],3:[],4:[],5:[],6:[]},mod:0},
   compiti:[],voti:[],glossario:[],schede:[],piani:{},errori:{},tempo:{},obiettiviVoto:{},assegnatiFatti:[],del:{},
-  stat:{tutor:0,corretti:0},resets:{},updatedAt:0}}
+  stat:{tutor:0,corretti:0},resets:{},colore:"blu",coloriMaterie:{},avatar:null,avatarTipo:"lettera",avatarSimbolo:0,oraSera:"18:00",seraOn:true,updatedAt:0}}
 function load(){try{const s=JSON.parse(localStorage.getItem(LS));if(s&&s.v===2)return Object.assign(blank(),s)}catch(e){}return blank()}
 let S=load();
 let IMP={tetto:60,obiettivoMin:20,premio:"",premioSessioni:5,assegnati:[],oraFine:"",oraInizio:""}; // impostazioni del genitore
 function persist(){try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}}
 function save(){S.updatedAt=now();persist();scheduleSync()}
-function delItem(list,id){S[list]=S[list].filter(x=>x.id!==id);S.del[id]=now();save()}
+function delItem(list,id){const it=S[list].find(x=>x.id===id),pian=S.piani[id];S[list]=S[list].filter(x=>x.id!==id);S.del[id]=now();save();
+  if(it)toastUndo("Eliminato.",()=>{delete S.del[id];it.mod=now();S[list].push(it);if(pian)S.piani[id]=pian;save();render()})}
 
 // fusione tra dispositivi
 function mergeList(a,b,del){const m=new Map();for(const x of a||[])m.set(x.id,x);for(const y of b||[]){const x=m.get(y.id);if(!x||(y.mod||0)>(x.mod||0))m.set(y.id,y)}return [...m.values()].filter(x=>!del[x.id])}
@@ -806,7 +814,7 @@ function merge(a,b){
   const r=JSON.parse(JSON.stringify(a));
   r.del=Object.assign({},b.del||{},a.del||{});
   for(const k of ["compiti","voti","glossario","schede"])r[k]=mergeList(a[k],b[k],r.del);
-  if((b.prefMod||0)>(a.prefMod||0)){for(const k of ["nome","tutorNome","tutorSimbolo","obiettiviVoto"])r[k]=b[k];r.fis.selected=b.fis.selected;r.prefMod=b.prefMod}
+  if((b.prefMod||0)>(a.prefMod||0)){for(const k of ["nome","tutorNome","tutorSimbolo","obiettiviVoto","colore","coloriMaterie","avatar","avatarTipo","avatarSimbolo","oraSera","seraOn"])if(b[k]!==undefined)r[k]=b[k];r.fis.selected=b.fis.selected;r.prefMod=b.prefMod}
   if((b.orario&&b.orario.mod||0)>(a.orario.mod||0))r.orario=b.orario;
   for(const id in (b.fis&&b.fis.topics)||{}){const x=r.fis.topics[id]||{read:[],best:{1:0,2:0,3:0},done:false,bestTest:0},y=b.fis.topics[id];
     x.read=[...new Set([...(x.read||[]),...(y.read||[])])];x.best=x.best||{};for(const l of [1,2,3])x.best[l]=Math.max(x.best[l]||0,(y.best||{})[l]||0);
@@ -862,6 +870,7 @@ function promemoriaList(st){st=st||S;const out=[];
   for(const c of st.compiti){if(c.fatto||!c.promemoria)continue;out.push({id:c.id+"@"+c.promemoria,at:new Date(c.promemoria).toISOString(),titolo:c.tipo==="verifica"?"Verifica in arrivo":"Promemoria compiti",testo:`${c.materia}: ${c.testo}`.slice(0,140)})}
   for(const k in st.piani){const p=st.piani[k];const c=st.compiti.find(x=>x.id===k);if(!c||c.fatto)continue;
     for(const g of p.giorni||[]){if(g.fatto)continue;const at=parseD(g.data);at.setHours(16,30,0,0);out.push({id:k+"@piano@"+g.data,at:at.toISOString(),titolo:`Piano per la verifica di ${c.materia}`,testo:g.attivita.slice(0,140)})}}
+  out.push(...seraList(st));
   const lim=now()-864e5;return out.filter(p=>Date.parse(p.at)>lim).slice(0,80)}
 async function push(){if(!user||ruolo!=="studente")return;
   try{const d=await myDoc().get();if(d.exists&&d.data().json){S=merge(S,JSON.parse(d.data().json));persist()}
@@ -977,12 +986,12 @@ function route(){const p=location.hash.slice(1).split("/");return{name:p[0]||"ho
 function go(h){if(location.hash==="#"+h)render();else location.hash=h}
 addEventListener("hashchange",()=>{render();scrollTo(0,0)});
 const md=t=>esc(t).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>");
-function applyTheme(){const r=document.documentElement;if(S.tema==="auto")delete r.dataset.theme;else r.dataset.theme=S.tema;r.dataset.size=S.testo}
+function applyTheme(){const r=document.documentElement;if(S.tema==="auto")delete r.dataset.theme;else r.dataset.theme=S.tema;r.dataset.size=S.testo;applyAccent()}
 
 // ===== STUDIO SMART – schermate dello studente =====
 let quiz=null,lastResult=null,gq=null,pendingAsk=null,agDay=null,agWeek=null,flashI=0,flashShow=false,lessonIdx={},triState={};
 const NAV=[["home","Home","home"],["tutor","Tutor","chat"],["agenda","Agenda","cal"],["studio","Studio","book"],["profilo","Profilo","user"]];
-const navHtml=act=>`<nav class="nav" aria-label="Menu"><div class="brandside"><div class="logo">${LOGO}</div>Studio Smart</div>${NAV.map(n=>`<button data-go="${n[0]}" class="${act===n[0]?"act":""}">${ic(n[2])}<span>${n[1]}</span></button>`).join("")}</nav>`;
+const navHtml=act=>`<nav class="nav" aria-label="Menu"><div class="brandside"><div class="logo">${LOGO}</div>Studio Smart ${verChip()}</div>${NAV.map(n=>`<button data-go="${n[0]}" class="${act===n[0]?"act":""}">${ic(n[2])}<span>${n[1]}</span></button>`).join("")}</nav>`;
 function saluto(){const h=new Date().getHours();return h<6?"Buonanotte":h<13?"Buongiorno":h<18?"Buon pomeriggio":"Buonasera"}
 
 // ---------- utilità didattiche ----------
@@ -1010,7 +1019,7 @@ function vHome(){
   const verifiche=aperti.filter(c=>c.tipo!=="compito"&&c.scadenza>=oggi&&diffDays(oggi,c.scadenza)<=10);
   const ass=(IMP.assegnati||[]).filter(a=>!S.assegnatiFatti.includes(a.id));
   const min=Math.round(S.tempo[oggi]||0),ob=obiettivo(),fila=giorniDiFila(),err=erroriTop(1)[0],sch=schedeDaFare().length,pr=premio();
-  return `<div class="top"><div class="brand"><div class="logo">${LOGO}</div>Studio Smart</div><button class="avatar" data-go="profilo" aria-label="Profilo">${esc((S.nome||"D")[0].toUpperCase())}</button></div>
+  return `<div class="top"><div class="brand"><div class="logo">${LOGO}</div>Studio Smart ${verChip()}</div><button class="avatar" data-go="profilo" aria-label="Profilo" style="padding:0;overflow:hidden">${avatarHtml(38)}</button></div>
   ${fbConfigured()&&!user?`<div class="card warn row"><div class="grow"><p class="b">Accedi con il tuo account Google</p><p class="small muted">Serve per il tutor e per ritrovare tutto su PC e telefono.</p></div><button class="btn sm" data-act="login">Accedi</button></div>`:""}
   <div><p class="small muted b">${esc(dataLunga(oggi).replace(/^./,c=>c.toUpperCase()))}</p><h1 style="margin-top:2px">${saluto()}, ${esc(S.nome||"")}</h1></div>
   <form class="dark" data-form="ask" style="display:flex;flex-direction:column;gap:14px">
@@ -1027,7 +1036,7 @@ function vHome(){
     return `<div class="card stack"><div class="row"><span class="chip warm">${v.tipo==="verifica"?"Verifica":"Interrogazione"} di ${esc(v.materia)} · ${quando(v.scadenza)}</span><span class="grow"></span><span class="xs muted b">${diffDays(oggi,v.scadenza)} giorni</span></div>
     ${g?`<p class="b">Oggi: ${esc(g.attivita)}</p><p class="small muted">${g.minuti||20} minuti</p><button class="btn soft wide" data-go="piano/${v.id}">Apri il piano di oggi</button>`:p?`<p class="small muted">Piano di studio pronto.</p><button class="btn soft wide" data-go="piano/${v.id}">Apri il piano</button>`:`<p class="small muted">${esc(v.testo)}</p><button class="btn soft wide" data-act="piano:${v.id}">Crea il piano di studio</button>`}</div>`}).join("")}
   <div class="grid2">
-    <div class="card stack"><p class="xs b muted">Obiettivo di oggi</p><p class="xb" style="font-size:1.4em">${min}<span class="small muted"> / ${ob} min</span></p><div class="bar"><i style="width:${Math.min(100,min/ob*100)}%"></i></div><p class="xs muted">${fila?`${fila} giorn${fila>1?"i":"o"} di fila`:"Inizia la serie oggi"}</p></div>
+    <div class="card stack"><p class="xs b muted">Obiettivo di oggi</p><p class="xb" style="font-size:1.4em">${min}<span class="small muted"> / ${ob} min</span></p><div class="bar"><i style="width:${Math.min(100,min/ob*100)}%"></i></div><p class="xs muted">${fila?`${fila} giorn${fila>1?"i":"o"} di fila`:"Inizia la serie oggi"}</p><button class="btn soft sm" data-go="timer">Avvia il timer</button></div>
     <button class="card stack" style="text-align:left" ${err?`data-act="rip:${esc(err.k)}"`:`data-go="studio"`}><p class="xs b muted">Ripasso su misura</p>${err?`<p class="b" style="line-height:1.3">${esc(err.argomento||err.materia)}</p><p class="xs muted">${esc(err.materia)} · ${err.n} error${err.n>1?"i":"e"}</p>`:`<p class="b" style="line-height:1.3">Ancora nessun errore</p><p class="xs muted">Si riempie usando il tutor</p>`}</button>
   </div>
   ${sch?`<div class="card row"><div class="grow"><p class="b">${sch} sched${sch>1?"e":"a"} da ripassare</p><p class="small muted">Parole, definizioni e formule da non dimenticare</p></div><button class="btn sm" data-go="schede">Ripassa</button></div>`:""}
@@ -1238,13 +1247,17 @@ function vProfilo(){const seg=(k,o)=>`<div class="seg">${o.map(x=>`<button class
   let acc;if(!fbConfigured())acc=`<p class="small muted">Collegamento non ancora configurato: i dati restano su questo dispositivo.</p>`;
   else if(user)acc=`<p class="small">Accesso come <b>${esc(user.email||"")}</b>. ${syncErr?"Sincronizzazione non riuscita: controlla internet.":"Tutto sincronizzato su PC e telefono."}</p><button class="btn ghost wide" data-act="logout">Esci dall’account</button>`;
   else acc=`<p class="small muted">Accedi per usare il tutor e ritrovare tutto su ogni dispositivo.</p><button class="btn wide" data-act="login">Accedi con Google</button>`;
-  return `<h1>Profilo</h1>
-  <div class="card stack"><label class="flabel" for="pn">Il tuo nome</label><input class="field" id="pn" value="${esc(S.nome)}" maxlength="20"></div>
+  return `<div class="top"><h1>Profilo</h1>${verChip()}</div>
+  <div class="card stack"><div class="row"><span class="avatar" style="width:64px;height:64px;font-size:1.6em;overflow:hidden">${avatarHtml(64)}</span><div class="grow"><label class="flabel" for="pn">Il tuo nome</label><input class="field" id="pn" value="${esc(S.nome)}" maxlength="20"></div></div>
+   <p class="flabel">Immagine del profilo</p><div class="seg">${[["lettera","Iniziale"],["simbolo","Simbolo"],["foto","Foto"]].map(x=>`<button class="${(S.avatarTipo||"lettera")===x[0]?"act":""}" data-act="avtipo:${x[0]}">${x[1]}</button>`).join("")}</div>
+   ${S.avatarTipo==="simbolo"?`<div class="row">${SIMBOLI.map((x,i)=>`<button class="tutor-av" style="background:var(--pri-soft);color:var(--pri-ink);${(S.avatarSimbolo||0)===i?"outline:3px solid var(--pri);outline-offset:2px":""}" data-act="avsym:${i}" aria-label="Simbolo ${i+1}">${simbolo(i)}</button>`).join("")}</div>`:""}
+   ${S.avatarTipo==="foto"?`<button class="btn ghost" data-act="avfoto">${ic("cam",18)} ${S.avatar?"Cambia foto":"Scegli una foto"}</button>`:""}</div>
   <div class="card stack"><p class="b">Il tuo tutor</p><label class="flabel" for="tn">Nome</label><input class="field" id="tn" value="${esc(S.tutorNome)}" maxlength="20">
    <p class="flabel">Simbolo</p><div class="row">${SIMBOLI.map((s,i)=>`<button class="tutor-av" style="${S.tutorSimbolo===i?"outline:3px solid var(--pri);outline-offset:2px":""}" data-act="sym:${i}" aria-label="Simbolo ${i+1}">${simbolo(i)}</button>`).join("")}</div></div>
   <div class="card stack"><p class="b">Account</p>${acc}</div>
-  <div class="card stack"><p class="b">Notifiche</p><p class="small muted">Promemoria dei compiti e del piano di studio sul telefono.</p><button class="btn ghost wide" data-act="notif">Attiva le notifiche</button></div>
-  <div class="card stack"><p class="b">Aspetto</p><p class="flabel">Tema</p>${seg("tema",[["auto","Automatico"],["light","Chiaro"],["dark","Scuro"]])}<p class="flabel">Testo</p>${seg("testo",[["normal","Normale"],["big","Grande"]])}</div>
+  <div class="card stack"><p class="b">Notifiche</p><p class="small muted">Promemoria dei compiti e del piano di studio sul telefono.</p><button class="btn ghost wide" data-act="notif">Attiva le notifiche</button>
+   <label class="row" style="cursor:pointer"><input type="checkbox" id="seraOn" ${S.seraOn!==false?"checked":""} style="width:22px;height:22px;accent-color:var(--pri)"><span class="grow small b">Promemoria serale con i compiti di domani</span><input class="field" type="time" id="oraSera" value="${esc(S.oraSera||"18:00")}" style="width:110px;min-height:40px" aria-label="Ora del promemoria serale"></label></div>
+  <div class="card stack"><p class="b">Aspetto</p><p class="flabel">Colore dell’app</p>${swatches(S.colore||"blu","colore")}<button class="btn ghost" data-act="matcol">Colori delle materie</button><p class="flabel">Tema</p>${seg("tema",[["auto","Automatico"],["light","Chiaro"],["dark","Scuro"]])}<p class="flabel">Testo</p>${seg("testo",[["normal","Normale"],["big","Grande"]])}</div>
   <div class="card stack"><button class="btn ghost wide" data-go="storico">Conversazioni precedenti con il tutor</button><p class="xs muted">Le conversazioni vengono salvate per i tuoi progressi.</p></div>
   <p class="xs muted" style="text-align:center">Studio Smart versione ${APP_VERSION}</p>`}
 
@@ -1403,7 +1416,7 @@ function tutorAct(cmd,x,y){const s=T.sess;
 // ===== STUDIO SMART – area genitore =====
 const G={stud:[],cur:null,dati:null,imp:{},log:[],stato:{},caricato:false,
  async init(){try{const q=await fb.db.collection("studenti").get();
-   this.stud=q.docs.filter(d=>d.data().json).map(d=>({uid:d.id,email:d.data().email||"",prova:d.id===user.uid,nome:d.id===user.uid?"Account di prova":(d.data().nome||"Studente"),agg:d.data().aggiornato}));
+   this.stud=q.docs.filter(d=>d.data().json).map(d=>({uid:d.id,email:d.data().email||"",prova:d.id===user.uid,nome:d.id===user.uid?"Prova (papà)":(d.data().nome||"Studente"),agg:d.data().aggiornato}));
    this.stud.sort((a,b)=>a.prova-b.prova);
    const scelto=localStorage.getItem("ss-g-stud");this.cur=(this.stud.find(s=>s.uid===scelto)||this.stud.find(s=>!s.prova)||this.stud[0]||null);
    if(this.cur)await this.carica()}catch(e){toast("Non riesco a leggere i dati: controlla le regole di Firebase",5000)}this.caricato=true},
@@ -1420,7 +1433,7 @@ const G={stud:[],cur:null,dati:null,imp:{},log:[],stato:{},caricato:false,
  async svuota(coll){const ref=this.ref().collection(coll);for(let i=0;i<20;i++){const q=await ref.limit(300).get();if(q.empty)break;const b=fb.db.batch();q.docs.forEach(d=>b.delete(d.ref));await b.commit()}}
 };
 const GNAV=[["g","Panoramica","chart"],["g/chat","Conversazioni","chat"],["g/segn","Segnalazioni","flag"],["g/dati","Dati","list"],["g/imp","Impostazioni","gear"]];
-const gnav=act=>`<nav class="nav" aria-label="Menu genitore"><div class="brandside"><div class="logo">${LOGO}</div>Area genitore</div>${GNAV.map(n=>`<button data-go="${n[0]}" class="${act===n[0]?"act":""}">${ic(n[2])}<span>${n[1]}</span></button>`).join("")}</nav>`;
+const gnav=act=>`<nav class="nav" aria-label="Menu genitore"><div class="brandside"><div class="logo">${LOGO}</div>Area genitore ${verChip()}</div>${GNAV.map(n=>`<button data-go="${n[0]}" class="${act===n[0]?"act":""}">${ic(n[2])}<span>${n[1]}</span></button>`).join("")}</nav>`;
 
 // ---------- blocco con impronta o PIN ----------
 const LOCK="ss-lock";
@@ -1441,7 +1454,7 @@ function vLock(){const cfg=lockCfg();return `<div class="lock"><div class="logo"
 
 // ---------- intestazione ----------
 function gHead(t,back){const s=G.cur;return `${back?`<button class="back" data-act="gback">${ic("back",18)} Indietro</button>`:""}
- <div class="top"><div><p class="xs b muted">AREA GENITORE${s?" · "+esc(s.nome):""}</p><h1>${t}</h1></div><div class="gbtns">${G.stud.length>1?`<button class="btn ghost sm" data-act="gstud">Cambia</button>`:""}<button class="btn ghost sm" data-act="greload">Aggiorna</button></div></div>`}
+ <div class="top"><div><p class="xs b muted">AREA GENITORE${s?" · "+esc(s.nome):""}</p><h1>${t}</h1></div><div class="gbtns">${verChip()}${G.stud.length>1?`<button class="btn ghost sm" data-act="gstud">Cambia</button>`:""}<button class="btn ghost sm" data-act="greload">Aggiorna</button></div></div>`}
 const provaCard=()=>`<div class="card row" style="flex-wrap:wrap"><div class="grow" style="min-width:200px"><p class="b">Prova l’app come Davide</p><p class="small muted">Apri l’app studente con il tuo account di prova: dati e conversazioni restano separati da quelli di Davide.</p></div><button class="btn" data-act="gprova">${ic("user",18)} Prova come Davide</button></div>`;
 function gVuoto(t,back){return `${gHead(t,back)}<div class="card stack"><p class="b">Nessuno studente collegato</p><p class="small muted">Fai accedere Davide con il suo account Google nell’app sul suo telefono: i suoi dati compariranno qui.</p></div>${provaCard()}`}
 
@@ -1477,6 +1490,7 @@ function gPanoramica(){if(!G.cur)return gVuoto("Area genitore");const D=G.dati,o
   ${ritardo.length?`<div class="card stack warn"><p class="b">Compiti in ritardo</p>${ritardo.map(c=>`<p class="small"><b>${esc(c.materia)}</b>: ${esc(c.testo)} <span class="muted">(era per ${quando(c.scadenza)})</span></p>`).join("")}</div>`:""}
   ${ass.length?`<div class="card stack"><p class="b">Attività assegnate</p>${ass.map(a=>`<div class="row"><span class="chip ${D.assegnatiFatti.includes(a.id)?"ok":"warm"}">${D.assegnatiFatti.includes(a.id)?"Fatto":"Da fare"}</span><span class="small grow">${esc(a.testo)}</span></div>`).join("")}</div>`:""}
   ${G.imp.premio?`<div class="card stack"><p class="b">Premio: ${esc(G.imp.premio)}</p><p class="small muted">Giorni con obiettivo raggiunto questa settimana: ${(()=>{const d=new Date(),off=(d.getDay()+6)%7;let n=0;for(let i=0;i<=off;i++)if((D.tempo[addDays(oggi,-i)]||0)>=ob)n++;return n})()} su ${G.imp.premioSessioni||5}</p></div>`:""}
+  <button class="btn ghost wide" data-act="greport">${ic("list",18)} Resoconto del mese da stampare</button>
   <div class="card stack"><p class="b">Credito del tutor</p><p class="small">Questo mese: ${uso.n||0} richieste, circa <b>${(uso.dollari||0).toFixed(2).replace(".",",")} $</b> (stima).</p><p class="xs muted">Il saldo esatto è sulla Claude Console (platform.claude.com).</p></div>
   ${provaCard()}`}
 
@@ -1484,7 +1498,7 @@ function gPanoramica(){if(!G.cur)return gVuoto("Area genitore");const D=G.dati,o
 function gChat(soloSegn){const t=soloSegn?"Segnalazioni":"Conversazioni";if(!G.cur)return gVuoto(t,true);
   const L=G.log.filter(l=>!String(l.modo).startsWith("genera")&&(!soloSegn||l.segnalazione));
   const perGiorno={};for(const l of L){const d=ymd(new Date(l.ms));(perGiorno[d]=perGiorno[d]||[]).push(l)}
-  const nomeMod=m=>(MODI.find(x=>x[0]===m)||["","Tutor"])[1];const chi=G.cur.prova?"Prova":esc(G.cur.nome);
+  const nomeMod=m=>(MODI.find(x=>x[0]===m)||["","Tutor"])[1];const chi=G.cur.prova?"Prova (papà)":esc(G.cur.nome);
   return `${gHead(t,true)}
   ${soloSegn?`<p class="small muted">Richieste di farsi fare i compiti e argomenti delicati. Il tutor non dà mai le soluzioni e su temi delicati invita a parlarne con voi.</p>`:`<p class="small muted">Tutto quello che è stato scritto al tutor e le risposte, dalle più recenti. Questo registro lo scrive il ponte e dall’app studente non si può cancellare.</p>`}
   ${Object.keys(perGiorno).length?Object.keys(perGiorno).sort().reverse().map(d=>`<p class="label">${esc(dataLunga(d))}</p><div class="stack">${perGiorno[d].map(l=>`<div class="card stack ${l.segnalazione?"warn":""}">
@@ -1505,6 +1519,7 @@ function gDati(){if(!G.cur)return gVuoto("Dati",true);const D=G.dati;
   const fisN=Object.keys(D.fis.topics||{}).length;const usati=G.stato.giorno===today()?G.stato.n||0:0;
   return `${gHead("Dati",true)}
   <p class="small muted">${G.cur.prova?"Dati dell’account di prova.":`Dati di ${esc(G.cur.nome)}.`} Le modifiche arrivano anche sull’app studente al prossimo aggiornamento, e quello che cancelli non ricompare.</p>
+  <div class="card stack"><p class="b">Copia di sicurezza</p><p class="small muted">Salva tutti i dati in un file sul computer, da ripristinare se cancelli qualcosa per errore.</p><div class="grid2"><button class="btn ghost" data-act="gbackup">Scarica una copia</button><button class="btn ghost" data-act="grestore">Ripristina</button></div></div>
   ${sez("compiti","Compiti e verifiche",D.compiti.length,"",comp.length?`<div class="list" style="margin:0 -16px">${comp.map(c=>`<div class="row"><div class="grow"><p class="xs b" style="color:${mcol(c.materia)}">${esc(c.materia)} · ${esc(c.tipo)} · ${esc(dataBreve(c.scadenza))}${c.fatto?" · fatto":""}</p><p class="small b">${esc(c.testo)}</p></div>${rigaBtn("gcomp:"+c.id,"gdelc:"+c.id)}</div>`).join("")}</div>`:"")}
   ${sez("voti","Voti",D.voti.length,"",voti.length?`<div class="list" style="margin:0 -16px">${voti.map(v=>`<div class="row"><div class="grow"><p class="small b">${esc(v.materia)} · ${fmtVoto(v.voto)}</p><p class="xs muted">${esc(dataBreve(v.data))} · ${esc(v.tipo)}${v.nota?" · "+esc(v.nota):""}</p></div>${rigaBtn("gvoto:"+v.id,"gdelv:"+v.id)}</div>`).join("")}</div>`:"")}
   ${sez("errori","Quaderno degli errori",errs.length,"",errs.length?`<div class="list" style="margin:0 -16px">${errs.slice(0,60).map(([k,e],i)=>`<div class="row"><div class="grow"><p class="small b">${esc(e.materia)} · ${esc(e.argomento||"")}</p><p class="xs muted">${esc(e.errore)} · ${e.n} volt${e.n>1?"e":"a"}</p></div>${rigaBtn("","gdele:"+i)}</div>`).join("")}</div>`:"")}
@@ -1519,7 +1534,7 @@ function gDati(){if(!G.cur)return gVuoto("Dati",true);const D=G.dati;
 const NOMI_RES={compiti:"tutti i compiti",voti:"tutti i voti",errori:"il quaderno degli errori",orario:"l’orario",glossario:"glossario e schede",tempo:"il tempo di studio",fis:"i progressi di fisica",piani:"i piani di studio",log:"tutte le conversazioni",contatori:"il conteggio dei messaggi di oggi",tutto:"TUTTI i dati"};
 async function gReset(k){const chi=G.cur.prova?"dell’account di prova":"di "+G.cur.nome;
   if(!confirm(`Cancellare ${NOMI_RES[k]} ${chi}? Non si può annullare.`))return;
-  if(k==="tutto"&&!confirm("Sei proprio sicuro? Verranno cancellati tutti i dati."))return;
+  if(k==="tutto"){if(!confirm("Sei proprio sicuro? Verranno cancellati tutti i dati."))return;if(confirm("Vuoi prima scaricare una copia di sicurezza? (consigliato)"))scaricaCopia()}
   toast("Cancello…",8000);const D=G.dati,t=now(),B=blank();
   const doKey=key=>{if(["compiti","voti","glossario","schede"].includes(key))for(const x of D[key])D.del[x.id]=t;
     if(key==="fis")D.fis=Object.assign(JSON.parse(JSON.stringify(B.fis)),{selected:D.fis.selected});else D[key]=JSON.parse(JSON.stringify(B[key]));
@@ -1531,10 +1546,10 @@ async function gReset(k){const chi=G.cur.prova?"dell’account di prova":"di "+G
     else{doKey(k);if(k==="glossario")doKey("schede");await G.salvaDati()}
     await G.carica();toast("Fatto")}catch(e){toast("Non riuscito: aggiorna le regole di Firebase",5000)}
   render()}
-async function gDelItem(lista,id){if(!confirm("Eliminare questo elemento?"))return;const D=G.dati;D[lista]=D[lista].filter(x=>x.id!==id);D.del[id]=now();if(lista==="compiti")delete D.piani[id];
-  try{await G.salvaDati();toast("Eliminato")}catch(e){toast("Non riuscito: aggiorna le regole di Firebase",5000)}render()}
-async function gDelErr(i){const k=window._gerr[i];if(!k||!confirm("Eliminare questo errore dal quaderno?"))return;G.dati.errori[k].n=0;G.dati.errori[k].ultimo=now();
-  try{await G.salvaDati();toast("Eliminato")}catch(e){toast("Non riuscito",4000)}render()}
+async function gDelItem(lista,id){const D=G.dati;const it=D[lista].find(x=>x.id===id),pian=D.piani[id];if(!it)return;D[lista]=D[lista].filter(x=>x.id!==id);D.del[id]=now();if(lista==="compiti")delete D.piani[id];
+  try{await G.salvaDati();render();toastUndo("Eliminato.",async()=>{delete D.del[id];it.mod=now();D[lista].push(it);if(pian)D.piani[id]=pian;await G.salvaDati();render();toast("Ripristinato")})}catch(e){toast("Non riuscito: aggiorna le regole di Firebase",5000);render()}}
+async function gDelErr(i){const k=window._gerr[i];if(!k)return;const e=G.dati.errori[k],n=e.n;e.n=0;e.ultimo=now();
+  try{await G.salvaDati();render();toastUndo("Eliminato.",async()=>{e.n=n;e.ultimo=now();await G.salvaDati();render();toast("Ripristinato")})}catch(er){toast("Non riuscito",4000);render()}}
 function gEditCompito(id){const c=Object.assign({},G.dati.compiti.find(x=>x.id===id));if(!c.id)return;
   sheet(`<h2>Modifica compito</h2><div><label class="flabel" for="gcm">Materia</label><select class="field" id="gcm">${selMaterie(c.materia)}</select></div>
    <div><label class="flabel" for="gct">Testo</label><textarea class="field" id="gct">${esc(c.testo)}</textarea></div>
@@ -1565,6 +1580,8 @@ function gImp(){const I=G.imp,cfg=lockCfg()||{};
    ${(I.assegnati||[]).map(a=>`<div class="row"><span class="chip ${G.dati.assegnatiFatti.includes(a.id)?"ok":"warm"}">${G.dati.assegnatiFatti.includes(a.id)?"Fatto":"Da fare"}</span><span class="small grow">${esc(a.testo)}${a.entro?` · entro ${quando(a.entro)}`:""}</span><button class="icon-btn" style="width:38px;height:38px;color:var(--bad)" data-act="gdel:${a.id}" aria-label="Elimina">${ic("trash",18)}</button></div>`).join("")}
    <form data-form="gass" class="stack"><input class="field" id="ga" placeholder="Es. ripassa il capitolo 3 di storia" required><div class="grid2"><select class="field" id="gam">${selMaterie("","<option value=''>Materia</option>")}</select><input class="field" id="gae" type="date" aria-label="Entro il"></div><button class="btn ghost" type="submit">${ic("plus",16)} Assegna</button></form></div>`:""}
   ${provaCard()}
+  <div class="card stack"><p class="b">Verifica collegamento</p><p class="small muted">Controlla Firebase, ponte Cloudflare e credito di Claude, e ti dice cosa sistemare.</p><button class="btn ghost wide" data-act="gverifica">${ic("shield",18)} Verifica ora</button></div>
+  <div class="card stack"><p class="b">Colore dell’area genitore</p>${swatches(coloreAttivo(),"gcol")}</div>
   <div class="card stack"><p class="b">Notifiche su questo telefono</p><p class="small muted">Ricevi un avviso quando c’è una segnalazione.</p><button class="btn ghost wide" data-act="notif">Attiva le notifiche</button></div>
   <div class="card stack"><p class="b">Blocco dell’area genitore</p><p class="small muted">${cfg.cred||cfg.pin?"Attivo":"Non attivo"}: chiede impronta o PIN quando apri l’area dopo 10 minuti.</p>
    <div class="grid2"><button class="btn ghost" data-act="gsetimpronta">${cfg.cred?"Rifai impronta":"Usa l’impronta"}</button><button class="btn ghost" data-act="gsetpin">${cfg.pin?"Cambia PIN":"Imposta un PIN"}</button></div>
@@ -1588,6 +1605,11 @@ async function gAct(cmd,x){if(ruolo!=="genitore")return false;switch(cmd){
   case "gstud":sheet(`<h2>Di chi vuoi vedere i dati?</h2>${G.stud.map(s=>`<button class="btn ${s.uid===G.cur.uid?"":"ghost"} wide" data-s="${s.uid}">${esc(s.nome)}${s.prova?"":" · "+esc(s.email)}</button>`).join("")}`,async(k,bg)=>{G.cur=G.stud.find(s=>s.uid===k);localStorage.setItem("ss-g-stud",k);bg.remove();await G.carica();render()});return true;
   case "gdel":G.imp.assegnati=(G.imp.assegnati||[]).filter(a=>a.id!==x);await G.salvaImp();render();return true;
   case "gres":gReset(x);return true;
+  case "gverifica":gVerifica();return true;
+  case "gbackup":scaricaCopia();return true;
+  case "grestore":ripristinaCopia();return true;
+  case "greport":resocontoMese();return true;
+  case "gcol":localStorage.setItem("ss-gcolore",x);applyAccent();render();return true;
   case "gdelc":gDelItem("compiti",x);return true;
   case "gdelv":gDelItem("voti",x);return true;
   case "gdele":gDelErr(+x);return true;
@@ -1605,6 +1627,123 @@ async function gForm(f){
   if(f==="gass"){const t=$("#ga").value.trim();if(!t)return true;G.imp.assegnati=(G.imp.assegnati||[]).concat({id:uid8(),testo:t,materia:$("#gam").value,entro:$("#gae").value,creato:now()});
     try{await G.salvaImp();toast("Attività assegnata");render()}catch(e){toast("Non salvato")}return true}
   return false}
+
+// ===== STUDIO SMART – novità v2.1 =====
+const NOVITA=[
+ ["2.1","14 novembre 2026",["Numero di versione e questo elenco delle novità","Avviso quando c’è una nuova versione da caricare","Colore dell’app e colori delle materie personalizzabili","Foto o simbolo del profilo","Promemoria serale con i compiti di domani","Timer di concentrazione da 25 minuti","Area genitore: prova come Davide, gestione dei dati, verifica del collegamento, copia di sicurezza, annulla, resoconto del mese"]],
+ ["2.0","14 novembre 2026",["Studio Smart: tutor per tutte le materie, agenda con orario, compiti e voti, area genitore"]],
+ ["1.0","12 novembre 2026",["FisicaFacile: lezioni, trucchi ed esercizi di fisica"]]];
+const verChip=()=>`<button class="chip" data-act="novita" aria-label="Versione ${APP_VERSION}, mostra le novità" style="min-height:26px;padding:0 9px;border:1px solid var(--line);background:var(--card);color:var(--ink2)">v${APP_VERSION}</button>`;
+function mostraNovita(){sheet(`<h2>Novità</h2>${NOVITA.map(n=>`<div class="card stack"><p class="b">Versione ${n[0]} <span class="small muted">· ${n[1]}</span></p><ul style="margin:0;padding-left:1.2em">${n[2].map(x=>`<li class="small" style="margin:3px 0">${x}</li>`).join("")}</ul></div>`).join("")}<button class="btn wide" data-s="x">Chiudi</button>`,(k,bg)=>bg.remove())}
+
+// ---------- avviso nuova versione ----------
+let nuovaVersione=null;
+async function controllaVersione(){if(location.protocol!=="https:"||!navigator.onLine)return;
+  try{const r=await fetch("index.html?v="+now(),{cache:"no-store"});const t=await r.text();const m=t.match(/const APP_VERSION="([^"]+)"/);
+    if(m&&m[1]!==APP_VERSION&&nuovaVersione!==m[1]){nuovaVersione=m[1];mostraAvvisoVersione()}}catch(e){}}
+function mostraAvvisoVersione(){if($(".upd-bar"))return;const el=document.createElement("div");el.className="upd-bar";
+  el.innerHTML=`<span class="grow">È disponibile la versione ${esc(nuovaVersione)}</span><button data-act="aggiorna">Aggiorna</button>`;document.body.appendChild(el)}
+setInterval(controllaVersione,30*60e3);document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")controllaVersione()});setTimeout(controllaVersione,5000);
+async function aggiornaApp(){try{if(navigator.serviceWorker){const regs=await navigator.serviceWorker.getRegistrations();for(const r of regs)await r.update()}const k=await caches.keys();for(const x of k)await caches.delete(x)}catch(e){}location.reload()}
+
+// ---------- colori ----------
+const PALETTE={
+ blu:{n:"Blu",l:["#3451D1","#26399B","#E3E8FB"],d:["#7E98F2","#B4C4FA","#243156"]},
+ petrolio:{n:"Verde petrolio",l:["#0F766E","#0B5A54","#DDF2EF"],d:["#4CC9AE","#9BE3D3","#163A35"]},
+ viola:{n:"Viola",l:["#6B3FA0","#552F82","#EEE6F8"],d:["#B795E8","#D7C4F4","#33264A"]},
+ arancio:{n:"Arancio",l:["#C2410C","#9A3412","#FCE9DE"],d:["#F2A877","#F8CBAE","#3A2618"]},
+ mattone:{n:"Rosso mattone",l:["#B42318","#8F1B12","#FBE7E5"],d:["#F59A8E","#F9C3BB","#3E1F1C"]},
+ grafite:{n:"Grafite",l:["#374151","#1F2937","#E5E7EB"],d:["#C3CAD6","#E2E6EC","#2A3344"]}};
+function coloreAttivo(){return ruolo==="genitore"?(localStorage.getItem("ss-gcolore")||"blu"):(S.colore||"blu")}
+function applyAccent(){const p=PALETTE[coloreAttivo()]||PALETTE.blu;let st=$("#accent");if(!st){st=document.createElement("style");st.id="accent";document.head.appendChild(st)}
+  const v=a=>`--pri:${a[0]};--pri-ink:${a[1]};--pri-soft:${a[2]};`;
+  st.textContent=`:root{${v(p.l)}}:root[data-theme="dark"]{${v(p.d)}}@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){${v(p.d)}}}`}
+const swatches=(attivo,act)=>`<div class="row wrap">${Object.entries(PALETTE).map(([k,p])=>`<button class="swatch ${attivo===k?"on":""}" data-act="${act}:${k}" aria-label="${p.n}" title="${p.n}" style="background:${p.l[0]}">${attivo===k?ic("check",18):""}</button>`).join("")}</div>`;
+
+// ---------- foto profilo ----------
+function avatarHtml(size){const s=size||38;
+  if(S.avatarTipo==="foto"&&S.avatar)return `<img src="data:image/jpeg;base64,${S.avatar}" alt="" style="width:${s}px;height:${s}px;border-radius:50%;object-fit:cover;display:block">`;
+  if(S.avatarTipo==="simbolo")return `<span style="color:var(--pri-ink)">${simbolo(S.avatarSimbolo||0,Math.round(s*.55))}</span>`;
+  return esc((S.nome||"D")[0].toUpperCase())}
+function miniatura(b64){return new Promise(ok=>{const im=new Image();im.onload=()=>{const z=240,c=document.createElement("canvas");c.width=c.height=z;const k=Math.max(z/im.width,z/im.height),w=im.width*k,h=im.height*k;c.getContext("2d").drawImage(im,(z-w)/2,(z-h)/2,w,h);ok(c.toDataURL("image/jpeg",.7).split(",")[1])};im.onerror=()=>ok(null);im.src="data:image/jpeg;base64,"+b64})}
+
+// ---------- promemoria serale ----------
+function seraList(st){if(st.seraOn===false)return[];const out=[];const [h,m]=(st.oraSera||"18:00").split(":").map(Number);
+  for(let i=0;i<7;i++){const giorno=addDays(today(),i),dom=addDays(giorno,1);const cs=(st.compiti||[]).filter(c=>!c.fatto&&c.scadenza===dom);if(!cs.length)continue;
+    const at=parseD(giorno);at.setHours(h||18,m||0,0,0);const ver=cs.filter(c=>c.tipo!=="compito");
+    out.push({id:"sera@"+giorno+"@"+cs.length,at:at.toISOString(),titolo:ver.length?`Domani: ${ver[0].tipo} di ${ver[0].materia}`:`Domani: ${cs.length} compit${cs.length>1?"i":"o"} da consegnare`,testo:cs.map(c=>`${c.materia}: ${c.testo}`).join(" · ").slice(0,160)})}
+  return out}
+
+// ---------- timer di concentrazione ----------
+let TM={fase:"pronto",fine:0,durata:25,int:null,wake:null};
+const timerOn=()=>TM.fase==="studio";
+function vTimer(){const rest=Math.max(0,TM.fine-now()),mm=Math.floor(rest/60e3),ss=Math.floor(rest%60e3/1000);const tot=(TM.fase==="pausa"?5:TM.durata)*60e3;const pct=TM.fase==="pronto"?0:100-rest/tot*100;
+  const R=110,C=2*Math.PI*R;
+  return `<button class="back" data-act="tmstop">${ic("back",18)} ${TM.fase==="pronto"?"Indietro":"Esci dal timer"}</button>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:18px;padding:20px 0;text-align:center">
+   <p class="label">${TM.fase==="studio"?"Concentrazione":TM.fase==="pausa"?"Pausa":"Timer di concentrazione"}</p>
+   <div style="position:relative;width:260px;height:260px">
+    <svg width="260" height="260" viewBox="0 0 260 260" aria-hidden="true"><circle cx="130" cy="130" r="${R}" fill="none" stroke="var(--line)" stroke-width="12"/><circle cx="130" cy="130" r="${R}" fill="none" stroke="${TM.fase==="pausa"?"var(--ok)":"var(--pri)"}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-pct/100)}" transform="rotate(-90 130 130)"/></svg>
+    <p class="xb" id="tmtxt" style="position:absolute;inset:0;display:grid;place-items:center;font-size:3.2em;letter-spacing:-.03em">${TM.fase==="pronto"?`${TM.durata}:00`:`${mm}:${pad(ss)}`}</p></div>
+   ${TM.fase==="pronto"?`<div class="seg" style="width:100%;max-width:320px">${[15,25,40].map(d=>`<button class="${TM.durata===d?"act":""}" data-act="tmdur:${d}">${d} min</button>`).join("")}</div>
+     <button class="btn wide" style="max-width:320px" data-act="tmgo">Inizia</button><p class="small muted" style="max-width:320px">Metti il telefono in silenzioso. Alla fine ti avviso e parte una pausa di 5 minuti.</p>`
+    :TM.fase==="studio"?`<p class="small muted">Una cosa alla volta. Il tempo conta per il tuo obiettivo di oggi.</p><button class="btn ghost" data-act="tmstop">Interrompi</button>`
+    :`<p class="small muted">Alzati, bevi un bicchiere d’acqua, guarda lontano.</p><button class="btn" data-act="tmgo">Altri ${TM.durata} minuti</button>`}
+  </div>`}
+async function tmStart(){TM.fase="studio";TM.fine=now()+TM.durata*60e3;studyStart=now();pausaAvvisata=true;
+  try{if(navigator.wakeLock)TM.wake=await navigator.wakeLock.request("screen")}catch(e){}
+  clearInterval(TM.int);TM.int=setInterval(tmTick,1000);render()}
+function tmTick(){lastAct=now();if(route().name==="timer"){const el=$("#tmtxt");const rest=Math.max(0,TM.fine-now());if(el)el.textContent=`${Math.floor(rest/60e3)}:${pad(Math.floor(rest%60e3/1000))}`;const c=document.querySelector("#main circle:last-child");if(c){const tot=(TM.fase==="pausa"?5:TM.durata)*60e3,C=2*Math.PI*110;c.setAttribute("stroke-dashoffset",C*(rest/tot))}}
+  if(now()>=TM.fine){if(TM.fase==="studio"){TM.fase="pausa";TM.fine=now()+5*60e3;avvisoTimer("Bravo! Ora 5 minuti di pausa.")}else{TM.fase="pronto";clearInterval(TM.int);rilasciaWake();avvisoTimer("Pausa finita: si riparte quando vuoi.")}if(route().name==="timer")render()}}
+function avvisoTimer(t){toast(t,5000);try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}if("Notification" in window&&Notification.permission==="granted"&&document.visibilityState!=="visible"){try{new Notification("Studio Smart",{body:t,icon:"icon-192.png"})}catch(e){}}}
+function rilasciaWake(){try{TM.wake&&TM.wake.release()}catch(e){}TM.wake=null}
+function tmStop(){if(TM.fase!=="pronto"&&!confirm("Interrompere il timer?"))return;TM.fase="pronto";clearInterval(TM.int);rilasciaWake();save();go("home")}
+
+// ---------- annulla ----------
+let undoT;function toastUndo(msg,fn){let el=$(".toast");if(!el){el=document.createElement("div");el.className="toast";el.setAttribute("role","status");document.body.appendChild(el)}
+  el.innerHTML=`${esc(msg)} <button class="undo">Annulla</button>`;el.querySelector(".undo").onclick=()=>{el.remove();fn()};clearTimeout(undoT);clearTimeout(toastT);undoT=setTimeout(()=>el.remove(),10000)}
+
+// ---------- area genitore: verifica collegamento ----------
+async function gVerifica(){const righe=[];const box=sheet(`<h2>Verifica collegamento</h2><div id="vres" class="stack"><p class="muted small">Controllo in corso…</p></div><button class="btn wide" data-s="x">Chiudi</button>`,(k,bg)=>bg.remove());
+  const show=()=>{const el=box.querySelector("#vres");if(el)el.innerHTML=righe.map(r=>`<div class="card row" style="align-items:flex-start"><span class="chip ${r[1]?"ok":"bad"}">${r[1]?"OK":"Problema"}</span><div class="grow"><p class="b small">${r[0]}</p><p class="xs muted">${r[2]}</p></div></div>`).join("")};
+  try{await fb.db.collection("studenti").limit(1).get();righe.push(["Firebase e regole",true,"Il database risponde e le regole ti riconoscono come genitore."])}catch(e){righe.push(["Firebase e regole",false,"Il database non risponde o le regole non sono aggiornate: ricontrolla la scheda Regole di Firestore."])}show();
+  if(!CFG.ponteUrl){righe.push(["Ponte Cloudflare",false,"Manca l’indirizzo del ponte in config.js."]);show();return}
+  try{const r=await fetch(CFG.ponteUrl.replace(/\/$/,"")+"/");const d=await r.json();righe.push(["Ponte Cloudflare",!!d.ok,d.ok?"Il ponte è online.":"Il ponte risponde in modo strano: ricontrolla il codice distribuito."])}catch(e){righe.push(["Ponte Cloudflare",false,"Il ponte non risponde: controlla l’indirizzo e che il worker sia distribuito."]);show();return}show();
+  try{const d=await ponte("/stato",{});righe.push(["Accesso al tutor e Firebase dal ponte",true,`Account riconosciuto. Messaggi usati oggi: ${d.usati} su ${d.tetto}.`])}catch(e){righe.push(["Accesso al tutor e Firebase dal ponte",false,e.message])}show();
+  try{await ponte("/chat",{messaggi:[{ruolo:"user",testo:"Prova di collegamento: rispondi solo OK."}],modo:"compiti",nome:"Prova",sessione:"verifica"});righe.push(["Claude e credito",true,"Il tutor risponde: chiave e credito funzionano (usato 1 messaggio dell’account di prova)."])}
+  catch(e){righe.push(["Claude e credito",false,e.message+(/credito/i.test(e.message)?" Carica il credito su platform.claude.com.":"")])}show()}
+
+// ---------- area genitore: copia di sicurezza ----------
+function scaricaCopia(){if(!G.cur)return;const dati={app:"Studio Smart",versione:APP_VERSION,creata:new Date().toISOString(),studente:G.cur.nome,dati:G.dati,impostazioni:G.imp};
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(dati,null,1)],{type:"application/json"}));a.download=`studio-smart-${G.cur.prova?"prova":"davide"}-${today()}.json`;document.body.appendChild(a);a.click();a.remove();toast("Copia scaricata nella cartella Download")}
+function ripristinaCopia(){const i=document.createElement("input");i.type="file";i.accept=".json,application/json";i.onchange=async()=>{try{const o=JSON.parse(await i.files[0].text());if(!o.dati||o.app!=="Studio Smart")throw 0;
+  if(!confirm(`Ripristinare la copia del ${new Date(o.creata).toLocaleString("it-IT")}? I dati attuali ${G.cur.prova?"dell’account di prova":"di "+G.cur.nome} verranno sostituiti.`))return;
+  const D=Object.assign(blank(),o.dati),t=now();D.resets=D.resets||{};for(const k of RESETTABILI)D.resets[k]=t;for(const k of ["compiti","voti","glossario","schede"])for(const x of D[k])x.mod=t;
+  for(const id in D.del)if([...D.compiti,...D.voti,...D.glossario,...D.schede].some(x=>x.id===id))delete D.del[id];
+  G.dati=D;await G.salvaDati();if(o.impostazioni){G.imp=Object.assign(G.imp,o.impostazioni);await G.salvaImp()}await G.carica();render();toast("Copia ripristinata")}catch(e){toast("File non valido: scegli una copia scaricata da Studio Smart",5000)}};i.click()}
+
+// ---------- area genitore: resoconto del mese ----------
+function resocontoMese(){if(!G.cur)return;const D=G.dati,oggi=today(),mese=oggi.slice(0,7),nomeMese=MESI[+mese.slice(5)-1]+" "+mese.slice(0,4);
+  const giorni=Object.entries(D.tempo).filter(([d])=>d.startsWith(mese));const minTot=Math.round(giorni.reduce((a,[,m])=>a+m,0));const ob=+G.imp.obiettivoMin||20;const ok=giorni.filter(([,m])=>m>=ob).length;
+  const votiM=D.voti.filter(v=>v.data.startsWith(mese)).sort((a,b)=>a.data<b.data?-1:1);
+  const mm={};for(const v of D.voti)(mm[v.materia]=mm[v.materia]||[]).push(+v.voto);const medie=Object.entries(mm).map(([k,a])=>[k,media(a)]).sort((a,b)=>a[0].localeCompare(b[0]));
+  const cm=D.compiti.filter(c=>c.scadenza.startsWith(mese)),fatti=cm.filter(c=>c.fatto),inTempo=fatti.filter(c=>c.fattoIl&&ymd(new Date(c.fattoIl))<=c.scadenza).length,ritardo=cm.filter(c=>!c.fatto&&c.scadenza<oggi);
+  const log=G.log.filter(l=>ymd(new Date(l.ms)).startsWith(mese)&&!String(l.modo).startsWith("genera"));const perMat={};for(const l of log)perMat[l.materia||"Altro"]=(perMat[l.materia||"Altro"]||0)+1;
+  const err=Object.values(D.errori).filter(e=>e.n>0).sort((a,b)=>b.n-a.n).slice(0,8);
+  const tab=(h,rows)=>rows.length?`<table><tr>${h.map(x=>`<th>${x}</th>`).join("")}</tr>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</table>`:`<p class="m">Nessun dato.</p>`;
+  const html=`<!DOCTYPE html><html lang="it"><head><meta charset="utf-8"><title>Resoconto ${esc(nomeMese)} – ${esc(G.cur.nome)}</title><style>
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#172033;max-width:760px;margin:30px auto;padding:0 20px;font-size:13px}h1{font-size:22px;margin:0}h2{font-size:15px;margin:22px 0 8px;border-bottom:2px solid #E3E6EC;padding-bottom:4px}
+  .m{color:#5B6577}.k{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}.k div{border:1px solid #E3E6EC;border-radius:10px;padding:10px}.k b{display:block;font-size:20px}
+  table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:5px 6px;border-bottom:1px solid #EEF0F4}th{color:#5B6577;font-weight:600}@media print{body{margin:0}}</style></head><body>
+  <h1>Resoconto di ${esc(nomeMese)}</h1><p class="m">${esc(G.cur.nome)} · Studio Smart · creato il ${esc(dataLunga(oggi))}</p>
+  <div class="k"><div>Tempo di studio<b>${Math.floor(minTot/60)} h ${minTot%60} min</b></div><div>Giorni con obiettivo (${ob} min)<b>${ok}</b></div><div>Compiti fatti in tempo<b>${inTempo}/${fatti.length}</b></div><div>Domande al tutor<b>${log.length}</b></div></div>
+  <h2>Medie per materia</h2>${tab(["Materia","Media","Voti"],medie.map(([m,v])=>[esc(m),fmtMedia(v),mm[m].length]))}
+  <h2>Voti del mese</h2>${tab(["Data","Materia","Tipo","Voto"],votiM.map(v=>[esc(dataBreve(v.data)),esc(v.materia),esc(v.tipo),fmtVoto(v.voto)]))}
+  <h2>Compiti in ritardo</h2>${tab(["Materia","Compito","Scadenza"],ritardo.map(c=>[esc(c.materia),esc(c.testo),esc(dataBreve(c.scadenza))]))}
+  <h2>Materie su cui ha chiesto aiuto</h2>${tab(["Materia","Domande"],Object.entries(perMat).sort((a,b)=>b[1]-a[1]).map(([m,n])=>[esc(m),n]))}
+  <h2>Punti deboli</h2>${tab(["Materia","Argomento","Errore","Volte"],err.map(e=>[esc(e.materia),esc(e.argomento||""),esc(e.errore),e.n]))}
+  <script>setTimeout(()=>print(),400)<\/script></body></html>`;
+  const w=window.open("","_blank");if(!w){toast("Consenti le finestre pop-up per creare il resoconto",5000);return}w.document.write(html);w.document.close()}
 
 // ===== STUDIO SMART – avvio, navigazione, eventi =====
 function render(){applyTheme();
@@ -1628,8 +1767,9 @@ function render(){applyTheme();
     case "quiz":html=vQuiz();act="studio";break;
     case "risultato":html=vRisultato();act="studio";break;
     case "storico":html="";act="profilo";break;
+    case "timer":html=vTimer();act="home";break;
     default:html=vHome();act="home"}
-  const full=r.name==="tutor"||r.name==="quiz"||r.name==="qz";
+  const full=r.name==="tutor"||r.name==="quiz"||r.name==="qz"||r.name==="timer";
   $("#app").innerHTML=`${prova?`<div class="prova-bar"><span class="grow">Modalità prova: stai usando l’app come la vede Davide (account di prova)</span><button data-act="esciprova">Torna all’area genitore</button></div>`:""}<div class="app">${full&&matchMedia("(max-width:899px)").matches?"":navHtml(act)}<main id="main" class="fade" ${r.name==="tutor"?'style="padding-bottom:0"':""}>${html}</main></div>`;
   if(r.name==="storico")vStorico();
   if(r.name==="tutor")scrollChat();
@@ -1644,6 +1784,16 @@ document.addEventListener("click",async e=>{
   switch(cmd){
     case "login":login();break;
     case "esciprova":esciProva();break;
+    case "novita":mostraNovita();break;
+    case "aggiorna":aggiornaApp();break;
+    case "colore":S.colore=x;S.prefMod=now();save();render();break;
+    case "avtipo":S.avatarTipo=x;S.prefMod=now();save();render();if(x==="foto"&&!S.avatar)scegliFotoProfilo();break;
+    case "avsym":S.avatarSimbolo=+x;S.prefMod=now();save();render();break;
+    case "avfoto":scegliFotoProfilo();break;
+    case "matcol":coloriMaterie();break;
+    case "tmgo":tmStart();break;
+    case "tmstop":tmStop();break;
+    case "tmdur":TM.durata=+x;render();break;
     case "logout":logout();break;
     case "notif":attivaNotifiche();break;
     case "askfoto":scegliFoto(b=>{pendingAsk={testo:($("[data-form=ask] input")||{}).value||"",foto:[b],nuova:true,invia:false};go("tutor")});break;
@@ -1701,7 +1851,14 @@ document.addEventListener("submit",async e=>{const f=e.target.dataset.form;if(!f
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.id==="ans"){e.preventDefault();checkNum()}});
 document.addEventListener("change",e=>{
   if(e.target.id==="pn"){S.nome=e.target.value.trim()||"Davide";S.prefMod=now();save();toast("Nome salvato")}
+  if(e.target.id==="seraOn"){S.seraOn=e.target.checked;S.prefMod=now();save();toast(S.seraOn?"Promemoria serale attivo":"Promemoria serale disattivato")}
+  if(e.target.id==="oraSera"){S.oraSera=e.target.value||"18:00";S.prefMod=now();save();toast("Promemoria serale alle "+S.oraSera)}
   if(e.target.id==="tn"){S.tutorNome=e.target.value.trim()||"Orione";S.prefMod=now();save();toast("Nome del tutor salvato")}});
+function scegliFotoProfilo(){scegliFoto(async b=>{const t=await miniatura(b);if(t){S.avatar=t;S.avatarTipo="foto";S.prefMod=now();save();render()}})}
+function coloriMaterie(){sheet(`<h2>Colori delle materie</h2><p class="small muted">Tocca il colore per cambiarlo.</p><div class="card flush list">${MATERIE.map(m=>`<label class="row" style="cursor:pointer"><span class="grow b small">${m}</span><input type="color" data-mat="${m}" value="${mcol(m)}" style="width:52px;height:36px;border:0;background:none;padding:0" aria-label="Colore di ${m}"></label>`).join("")}</div>
+  <div class="row"><button class="btn ghost grow" data-s="reset">Colori originali</button><button class="btn grow" data-s="ok">Fatto</button></div>`,(k,bg)=>{
+  if(k==="reset"){S.coloriMaterie={};S.prefMod=now();save();bg.remove();render();return}
+  const cm={};bg.querySelectorAll("[data-mat]").forEach(i=>{if(i.value.toLowerCase()!==(MCOL[i.dataset.mat]||"").toLowerCase())cm[i.dataset.mat]=i.value});S.coloriMaterie=cm;S.prefMod=now();save();bg.remove();render()})}
 function rimpicciolisci(b64){return new Promise(ok=>{const im=new Image();im.onload=()=>{const k=Math.min(1,900/Math.max(im.width,im.height));const c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);ok(c.toDataURL("image/jpeg",.6).split(",")[1])};im.onerror=()=>ok(b64);im.src="data:image/jpeg;base64,"+b64})}
 
 if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
