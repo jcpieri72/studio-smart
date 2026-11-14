@@ -90,8 +90,8 @@ main{flex:1;min-width:0;max-width:760px;margin:0 auto;width:100%;padding:calc(en
 .sec a,.link{color:var(--pri);font-weight:700;font-size:.84em;text-decoration:none;background:none;border:0;padding:4px 0}
 .label{font-size:.78em;font-weight:800;color:var(--ink2);letter-spacing:.03em;text-transform:uppercase}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:12px;padding:0 18px;min-height:46px;font-weight:700;font-size:.92em;background:var(--pri);color:#fff}
-:root[data-theme="dark"] .btn{color:#0F1522}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn{color:#0F1522}}
+:root[data-theme="dark"] .btn:not(.ghost):not(.soft):not(.danger){color:#0F1522}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn:not(.ghost):not(.soft):not(.danger){color:#0F1522}}
 .btn.soft{background:var(--pri-soft);color:var(--pri-ink)}
 .btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line)}
 .btn.danger{background:var(--card);color:var(--bad);border:1px solid var(--line)}
@@ -220,6 +220,11 @@ textarea.field{min-height:90px;resize:vertical}
 .fade{animation:fade .25s ease}
 @keyframes fade{from{opacity:.3;transform:translateY(4px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.prova-bar{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--warm-soft);color:var(--warm);border-bottom:1px solid var(--warm-line);padding:calc(env(safe-area-inset-top,0px) + 8px) 16px 8px;font-size:.84em;font-weight:700}
+.prova-bar .grow{min-width:160px}
+.prova-bar button{border:1px solid var(--warm-line);background:var(--card);color:var(--warm);border-radius:10px;padding:7px 12px;font-weight:800}
+.gbtns{display:flex;gap:8px;flex-wrap:wrap}
 
 </style>
 <script src="config.js"></script>
@@ -757,7 +762,8 @@ const CFG=Object.assign({firebase:{},ponteUrl:"",vapidKey:"",genitoreHash:""},wi
 const MATERIE=["Italiano","Storia","Inglese","Tedesco","Matematica","Diritto ed economia","Economia aziendale","Informatica","Geografia","Scienze della Terra e Biologia","Fisica"];
 const MCOL={"Italiano":"#B42350","Storia":"#9A4316","Inglese":"#1D5FA8","Tedesco":"#6B3FA0","Matematica":"#3451D1","Diritto ed economia":"#556B12","Economia aziendale":"#0F766E","Informatica":"#0B6E99","Geografia":"#2F7D32","Scienze della Terra e Biologia":"#7A5C12","Fisica":"#8A5A00","Altro":"#5B6577"};
 const mcol=m=>MCOL[m]||"#5B6577";
-const LS="studiosmart-v2";
+const LS_BASE="studiosmart-v2";let LS=LS_BASE,prova=false;
+const RESETTABILI=["compiti","voti","orario","errori","glossario","schede","tempo","fis","piani","obiettiviVoto","assegnatiFatti","stat"];
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const uid8=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
@@ -785,7 +791,7 @@ function blank(){return{v:2,nome:"Davide",tutorNome:"Orione",tutorSimbolo:0,tema
   fis:{selected:[1,2,3,4,7],topics:{},stats:{done:0,ok:0}},
   orario:{ore:["8:00","9:00","10:00","11:00","12:00","13:00"],giorni:{1:[],2:[],3:[],4:[],5:[],6:[]},mod:0},
   compiti:[],voti:[],glossario:[],schede:[],piani:{},errori:{},tempo:{},obiettiviVoto:{},assegnatiFatti:[],del:{},
-  stat:{tutor:0,corretti:0},updatedAt:0}}
+  stat:{tutor:0,corretti:0},resets:{},updatedAt:0}}
 function load(){try{const s=JSON.parse(localStorage.getItem(LS));if(s&&s.v===2)return Object.assign(blank(),s)}catch(e){}return blank()}
 let S=load();
 let IMP={tetto:60,obiettivoMin:20,premio:"",premioSessioni:5,assegnati:[],oraFine:"",oraInizio:""}; // impostazioni del genitore
@@ -812,6 +818,12 @@ function merge(a,b){
   r.assegnatiFatti=[...new Set([...(a.assegnatiFatti||[]),...(b.assegnatiFatti||[])])];
   r.stat={tutor:Math.max(a.stat.tutor||0,(b.stat||{}).tutor||0),corretti:Math.max(a.stat.corretti||0,(b.stat||{}).corretti||0)};
   r.fis.stats={done:Math.max(a.fis.stats.done||0,(b.fis.stats||{}).done||0),ok:Math.max(a.fis.stats.ok||0,(b.fis.stats||{}).ok||0)};
+  const RA=a.resets||{},RB=b.resets||{},sel=r.fis.selected;r.resets={};
+  for(const k of RESETTABILI){const x=RA[k]||0,y=RB[k]||0;r.resets[k]=Math.max(x,y);if(x===y)continue;
+    const [nuovo,vecchio,t]=y>x?[b,a,y]:[a,b,x];
+    if(["compiti","voti","glossario","schede"].includes(k))r[k]=mergeList(nuovo[k]||[],(vecchio[k]||[]).filter(i=>(i.mod||0)>t),r.del);
+    else r[k]=JSON.parse(JSON.stringify(nuovo[k]!==undefined?nuovo[k]:blank()[k]));
+    if(k==="fis")r.fis.selected=sel}
   r.updatedAt=Math.max(a.updatedAt||0,b.updatedAt||0);
   return r}
 
@@ -832,6 +844,7 @@ async function initFirebase(){
     fb.auth.onAuthStateChanged(async u=>{
       user=u;ruolo=null;
       if(u){const h=await sha256((u.email||"").toLowerCase());ruolo=CFG.genitoreHash&&h===CFG.genitoreHash.toLowerCase()?"genitore":"studente";
+        if(ruolo==="genitore"&&localStorage.getItem("ss-prova")==="1"){prova=true;LS=LS_BASE+"-prova";S=load();ruolo="studente"}
         if(ruolo==="studente"){await pull();listenImp()}else{await G.init()}}
       fbReady=true;render()});
   }catch(e){syncErr=true;fbReady=true;render()}
@@ -839,17 +852,20 @@ async function initFirebase(){
 function login(){if(!fb){toast("Collegamento non disponibile: controlla internet");return}
   const p=new firebase.auth.GoogleAuthProvider();p.setCustomParameters({prompt:"select_account"});
   fb.auth.signInWithPopup(p).catch(err=>{if(/popup|operation-not-supported/i.test(err.code||""))fb.auth.signInWithRedirect(p);else toast("Accesso non riuscito: riprova")})}
-function logout(){if(fb)fb.auth.signOut();location.hash="home"}
+function logout(){localStorage.removeItem("ss-prova");if(prova){prova=false;LS=LS_BASE;S=load()}if(fb)fb.auth.signOut();location.hash="home"}
+async function entraProva(){localStorage.setItem("ss-prova","1");prova=true;LS=LS_BASE+"-prova";S=load();ruolo="studente";location.hash="home";render();await pull();listenImp();render();toast("Modalità prova: usi l’app come la vede Davide",4000)}
+async function esciProva(){localStorage.removeItem("ss-prova");prova=false;if(impUnsub){impUnsub();impUnsub=null}await push();LS=LS_BASE;S=load();ruolo="genitore";G.caricato=false;location.hash="g";render();await G.init();render()}
 const myDoc=()=>fb.db.collection("studenti").doc(user.uid);
 async function pull(){if(!user||ruolo!=="studente")return;
   try{const d=await myDoc().get();if(d.exists&&d.data().json){S=merge(S,JSON.parse(d.data().json));persist()}await push();syncErr=false}catch(e){syncErr=true}}
-function promemoriaList(){const out=[];
-  for(const c of S.compiti){if(c.fatto||!c.promemoria)continue;out.push({id:c.id+"@"+c.promemoria,at:new Date(c.promemoria).toISOString(),titolo:c.tipo==="verifica"?"Verifica in arrivo":"Promemoria compiti",testo:`${c.materia}: ${c.testo}`.slice(0,140)})}
-  for(const k in S.piani){const p=S.piani[k];const c=S.compiti.find(x=>x.id===k);if(!c||c.fatto)continue;
+function promemoriaList(st){st=st||S;const out=[];
+  for(const c of st.compiti){if(c.fatto||!c.promemoria)continue;out.push({id:c.id+"@"+c.promemoria,at:new Date(c.promemoria).toISOString(),titolo:c.tipo==="verifica"?"Verifica in arrivo":"Promemoria compiti",testo:`${c.materia}: ${c.testo}`.slice(0,140)})}
+  for(const k in st.piani){const p=st.piani[k];const c=st.compiti.find(x=>x.id===k);if(!c||c.fatto)continue;
     for(const g of p.giorni||[]){if(g.fatto)continue;const at=parseD(g.data);at.setHours(16,30,0,0);out.push({id:k+"@piano@"+g.data,at:at.toISOString(),titolo:`Piano per la verifica di ${c.materia}`,testo:g.attivita.slice(0,140)})}}
   const lim=now()-864e5;return out.filter(p=>Date.parse(p.at)>lim).slice(0,80)}
 async function push(){if(!user||ruolo!=="studente")return;
-  try{await myDoc().set({json:JSON.stringify(S),email:user.email||"",nome:S.nome,aggiornato:firebase.firestore.FieldValue.serverTimestamp(),promemoria:JSON.stringify(promemoriaList())},{merge:true});syncErr=false}catch(e){syncErr=true}}
+  try{const d=await myDoc().get();if(d.exists&&d.data().json){S=merge(S,JSON.parse(d.data().json));persist()}
+    await myDoc().set({json:JSON.stringify(S),email:user.email||"",nome:S.nome,aggiornato:firebase.firestore.FieldValue.serverTimestamp(),promemoria:JSON.stringify(promemoriaList())},{merge:true});syncErr=false}catch(e){syncErr=true}}
 function scheduleSync(){if(!user||ruolo!=="studente")return;clearTimeout(syncT);syncT=setTimeout(push,1500)}
 let impUnsub=null;
 function listenImp(){if(impUnsub)impUnsub();impUnsub=myDoc().collection("genitore").doc("impostazioni").onSnapshot(d=>{if(d.exists)IMP=Object.assign(IMP,d.data());if(route().name!=="tutor")render()},()=>{})}
@@ -1385,19 +1401,26 @@ function tutorAct(cmd,x,y){const s=T.sess;
   }return false}
 
 // ===== STUDIO SMART – area genitore =====
-const G={stud:[],cur:null,dati:null,imp:{},log:[],stato:{},filtro:"tutte",caricato:false,
- async init(){try{const q=await fb.db.collection("studenti").get();this.stud=q.docs.filter(d=>d.data().json).map(d=>({uid:d.id,email:d.data().email||"",nome:d.data().nome||"Studente",agg:d.data().aggiornato}));
-   const scelto=localStorage.getItem("ss-g-stud");this.cur=(this.stud.find(s=>s.uid===scelto)||this.stud[0]||null);if(this.cur)await this.carica()}catch(e){toast("Non riesco a leggere i dati: controlla le regole di Firebase",5000)}this.caricato=true},
- async carica(){const u=this.cur.uid,ref=fb.db.collection("studenti").doc(u);
+const G={stud:[],cur:null,dati:null,imp:{},log:[],stato:{},caricato:false,
+ async init(){try{const q=await fb.db.collection("studenti").get();
+   this.stud=q.docs.filter(d=>d.data().json).map(d=>({uid:d.id,email:d.data().email||"",prova:d.id===user.uid,nome:d.id===user.uid?"Account di prova":(d.data().nome||"Studente"),agg:d.data().aggiornato}));
+   this.stud.sort((a,b)=>a.prova-b.prova);
+   const scelto=localStorage.getItem("ss-g-stud");this.cur=(this.stud.find(s=>s.uid===scelto)||this.stud.find(s=>!s.prova)||this.stud[0]||null);
+   if(this.cur)await this.carica()}catch(e){toast("Non riesco a leggere i dati: controlla le regole di Firebase",5000)}this.caricato=true},
+ ref(){return fb.db.collection("studenti").doc(this.cur.uid)},
+ async carica(){const ref=this.ref();
    const [d,imp,st,lg]=await Promise.all([ref.get(),ref.collection("genitore").doc("impostazioni").get(),ref.collection("sistema").doc("stato").get().catch(()=>null),ref.collection("log").orderBy("t","desc").limit(300).get().catch(()=>({docs:[]}))]);
    try{this.dati=Object.assign(blank(),JSON.parse(d.data().json))}catch(e){this.dati=blank()}
+   this.dati.del=this.dati.del||{};this.dati.resets=this.dati.resets||{};
    this.imp=Object.assign({tetto:60,obiettivoMin:20,premio:"",premioSessioni:5,assegnati:[],oraFine:"",oraInizio:""},imp.exists?imp.data():{});
    this.stato=st&&st.exists?st.data():{};
    this.log=lg.docs.map(x=>{const o=x.data();o.id=x.id;o.ms=o.t&&o.t.toDate?o.t.toDate().getTime():Date.parse(o.t)||0;return o})},
- async salvaImp(){await fb.db.collection("studenti").doc(this.cur.uid).collection("genitore").doc("impostazioni").set(this.imp,{merge:true})}
+ async salvaImp(){await this.ref().collection("genitore").doc("impostazioni").set(this.imp,{merge:true})},
+ async salvaDati(){const D=this.dati;D.updatedAt=now();await this.ref().set({json:JSON.stringify(D),promemoria:JSON.stringify(promemoriaList(D))},{merge:true})},
+ async svuota(coll){const ref=this.ref().collection(coll);for(let i=0;i<20;i++){const q=await ref.limit(300).get();if(q.empty)break;const b=fb.db.batch();q.docs.forEach(d=>b.delete(d.ref));await b.commit()}}
 };
-const GNAV=[["g","Panoramica","chart"],["g/chat","Conversazioni","chat"],["g/segn","Segnalazioni","flag"],["g/imp","Impostazioni","gear"]];
-const gnav=act=>`<nav class="nav g" aria-label="Menu genitore"><div class="brandside"><div class="logo">${LOGO}</div>Area genitore</div>${GNAV.map(n=>`<button data-go="${n[0]}" class="${act===n[0]?"act":""}">${ic(n[2])}<span>${n[1]}</span></button>`).join("")}</nav>`;
+const GNAV=[["g","Panoramica","chart"],["g/chat","Conversazioni","chat"],["g/segn","Segnalazioni","flag"],["g/dati","Dati","list"],["g/imp","Impostazioni","gear"]];
+const gnav=act=>`<nav class="nav" aria-label="Menu genitore"><div class="brandside"><div class="logo">${LOGO}</div>Area genitore</div>${GNAV.map(n=>`<button data-go="${n[0]}" class="${act===n[0]?"act":""}">${ic(n[2])}<span>${n[1]}</span></button>`).join("")}</nav>`;
 
 // ---------- blocco con impronta o PIN ----------
 const LOCK="ss-lock";
@@ -1413,13 +1436,18 @@ async function usaImpronta(){const cfg=lockCfg();if(!cfg||!cfg.cred)return false
   try{await navigator.credentials.get({publicKey:{challenge:rndB(32),allowCredentials:[{type:"public-key",id:unb64(cfg.cred)}],userVerification:"required",timeout:60000}});return true}catch(e){return false}}
 function vLock(){const cfg=lockCfg();return `<div class="lock"><div class="logo" style="width:56px;height:56px;border-radius:16px">${LOGO}</div><h1>Area genitore</h1><p class="muted">Sblocca per continuare</p>
   ${cfg.cred?`<button class="btn" data-act="gimpronta">${ic("shield",18)} Usa l’impronta</button>`:""}
-  ${cfg.pin?`<form data-form="pin" class="stack" style="display:flex;flex-direction:column;align-items:center"><label class="flabel" for="pinin">PIN</label><input id="pinin" class="field" type="password" inputmode="numeric" maxlength="8" style="width:180px;text-align:center;font-size:1.4em;letter-spacing:.3em" autocomplete="off"><button class="btn ghost" type="submit">Sblocca con PIN</button></form>`:""}
+  ${cfg.pin?`<form data-form="pin" style="display:flex;flex-direction:column;align-items:center;gap:10px"><label class="flabel" for="pinin">PIN</label><input id="pinin" class="field" type="password" inputmode="numeric" maxlength="8" style="width:180px;text-align:center;font-size:1.4em;letter-spacing:.3em" autocomplete="off"><button class="btn ghost" type="submit">Sblocca con PIN</button></form>`:""}
   <button class="link" data-act="logout">Esci dall’account</button></div>`}
 
-// ---------- viste ----------
-function gHead(t){const s=G.cur;return `<div class="top"><div><p class="xs b muted">AREA GENITORE${s?" · "+esc(s.nome):""}</p><h1>${t}</h1></div>${G.stud.length>1?`<button class="btn ghost sm" data-act="gstud">Cambia</button>`:`<button class="btn ghost sm" data-act="greload">Aggiorna</button>`}</div>`}
+// ---------- intestazione ----------
+function gHead(t,back){const s=G.cur;return `${back?`<button class="back" data-act="gback">${ic("back",18)} Indietro</button>`:""}
+ <div class="top"><div><p class="xs b muted">AREA GENITORE${s?" · "+esc(s.nome):""}</p><h1>${t}</h1></div><div class="gbtns">${G.stud.length>1?`<button class="btn ghost sm" data-act="gstud">Cambia</button>`:""}<button class="btn ghost sm" data-act="greload">Aggiorna</button></div></div>`}
+const provaCard=()=>`<div class="card row" style="flex-wrap:wrap"><div class="grow" style="min-width:200px"><p class="b">Prova l’app come Davide</p><p class="small muted">Apri l’app studente con il tuo account di prova: dati e conversazioni restano separati da quelli di Davide.</p></div><button class="btn" data-act="gprova">${ic("user",18)} Prova come Davide</button></div>`;
+function gVuoto(t,back){return `${gHead(t,back)}<div class="card stack"><p class="b">Nessuno studente collegato</p><p class="small muted">Fai accedere Davide con il suo account Google nell’app sul suo telefono: i suoi dati compariranno qui.</p></div>${provaCard()}`}
+
+// ---------- panoramica ----------
 function settimanaLog(){return G.log.filter(l=>l.ms>now()-7*864e5&&!String(l.modo).startsWith("genera"))}
-function gPanoramica(){if(!G.cur)return gVuoto();const D=G.dati,oggi=today();
+function gPanoramica(){if(!G.cur)return gVuoto("Area genitore");const D=G.dati,oggi=today();
   let min=0,giorniOk=0;const ob=+G.imp.obiettivoMin||20;const giorni=[];for(let i=6;i>=0;i--){const d=addDays(oggi,-i),m=Math.round(D.tempo[d]||0);min+=m;if(m>=ob)giorniOk++;giorni.push([d,m])}
   const max=Math.max(ob,...giorni.map(g=>g[1]))||1;
   const sett=settimanaLog(),segn=sett.filter(l=>l.segnalazione);
@@ -1433,7 +1461,8 @@ function gPanoramica(){if(!G.cur)return gVuoto();const D=G.dati,oggi=today();
   const ass=(G.imp.assegnati||[]);
   const agg=G.cur.agg&&G.cur.agg.toDate?G.cur.agg.toDate():null;
   return `${gHead("Panoramica")}
-  ${agg?`<p class="xs muted">Ultimo aggiornamento dall’app di ${esc(G.cur.nome)}: ${agg.toLocaleString("it-IT",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</p>`:""}
+  ${G.cur.prova?`<p class="chip warm" style="align-self:flex-start">Stai guardando l’account di prova</p>`:""}
+  ${agg?`<p class="xs muted">Ultimo aggiornamento dall’app: ${agg.toLocaleString("it-IT",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</p>`:""}
   ${segn.length?`<button class="card warn row" style="text-align:left;width:100%" data-go="g/segn"><span class="icon-btn" style="background:var(--warm-soft);color:var(--warm)">${ic("flag")}</span><span class="grow"><span class="b" style="display:block">${segn.length} segnalazion${segn.length>1?"i":"e"} questa settimana</span><span class="small muted">${segn.filter(s=>s.segnalazione==="delicato").length?"Include un argomento delicato. ":""}Tocca per leggere.</span></span></button>`:""}
   <div class="card stack"><div class="row"><p class="b grow">Tempo di studio · ultimi 7 giorni</p><p class="xb">${Math.floor(min/60)} h ${min%60} min</p></div>
    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;align-items:end;height:90px">${giorni.map(([d,m])=>`<div style="display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end"><span class="xs b">${m||""}</span><div style="width:100%;max-width:26px;border-radius:6px 6px 2px 2px;height:${Math.max(3,m/max*60)}px;background:${m>=ob?"var(--pri)":"var(--line)"}"></div><span class="xs muted">${GG[parseD(d).getDay()]}</span></div>`).join("")}</div>
@@ -1448,20 +1477,83 @@ function gPanoramica(){if(!G.cur)return gVuoto();const D=G.dati,oggi=today();
   ${ritardo.length?`<div class="card stack warn"><p class="b">Compiti in ritardo</p>${ritardo.map(c=>`<p class="small"><b>${esc(c.materia)}</b>: ${esc(c.testo)} <span class="muted">(era per ${quando(c.scadenza)})</span></p>`).join("")}</div>`:""}
   ${ass.length?`<div class="card stack"><p class="b">Attività assegnate</p>${ass.map(a=>`<div class="row"><span class="chip ${D.assegnatiFatti.includes(a.id)?"ok":"warm"}">${D.assegnatiFatti.includes(a.id)?"Fatto":"Da fare"}</span><span class="small grow">${esc(a.testo)}</span></div>`).join("")}</div>`:""}
   ${G.imp.premio?`<div class="card stack"><p class="b">Premio: ${esc(G.imp.premio)}</p><p class="small muted">Giorni con obiettivo raggiunto questa settimana: ${(()=>{const d=new Date(),off=(d.getDay()+6)%7;let n=0;for(let i=0;i<=off;i++)if((D.tempo[addDays(oggi,-i)]||0)>=ob)n++;return n})()} su ${G.imp.premioSessioni||5}</p></div>`:""}
-  <div class="card stack"><p class="b">Credito del tutor</p><p class="small">Questo mese: ${uso.n||0} richieste, circa <b>${(uso.dollari||0).toFixed(2).replace(".",",")} $</b> (stima).</p><p class="xs muted">Il saldo esatto è sulla console di Claude (platform.claude.com › Billing).</p></div>`}
-function gChat(soloSegn){if(!G.cur)return gVuoto();const L=G.log.filter(l=>!String(l.modo).startsWith("genera")&&(!soloSegn||l.segnalazione));
+  <div class="card stack"><p class="b">Credito del tutor</p><p class="small">Questo mese: ${uso.n||0} richieste, circa <b>${(uso.dollari||0).toFixed(2).replace(".",",")} $</b> (stima).</p><p class="xs muted">Il saldo esatto è sulla Claude Console (platform.claude.com).</p></div>
+  ${provaCard()}`}
+
+// ---------- conversazioni e segnalazioni ----------
+function gChat(soloSegn){const t=soloSegn?"Segnalazioni":"Conversazioni";if(!G.cur)return gVuoto(t,true);
+  const L=G.log.filter(l=>!String(l.modo).startsWith("genera")&&(!soloSegn||l.segnalazione));
   const perGiorno={};for(const l of L){const d=ymd(new Date(l.ms));(perGiorno[d]=perGiorno[d]||[]).push(l)}
-  const nomeMod=m=>(MODI.find(x=>x[0]===m)||["","Tutor"])[1];
-  return `${gHead(soloSegn?"Segnalazioni":"Conversazioni")}
-  ${soloSegn?`<p class="small muted">Richieste di farsi fare i compiti e argomenti delicati. Il tutor non dà mai le soluzioni e su temi delicati invita a parlarne con voi.</p>`:`<p class="small muted">Tutto quello che ${esc(G.cur.nome)} ha scritto al tutor e le risposte, dalle più recenti. Questo registro lo scrive il ponte e dall’app di ${esc(G.cur.nome)} non si può cancellare.</p>`}
+  const nomeMod=m=>(MODI.find(x=>x[0]===m)||["","Tutor"])[1];const chi=G.cur.prova?"Prova":esc(G.cur.nome);
+  return `${gHead(t,true)}
+  ${soloSegn?`<p class="small muted">Richieste di farsi fare i compiti e argomenti delicati. Il tutor non dà mai le soluzioni e su temi delicati invita a parlarne con voi.</p>`:`<p class="small muted">Tutto quello che è stato scritto al tutor e le risposte, dalle più recenti. Questo registro lo scrive il ponte e dall’app studente non si può cancellare.</p>`}
   ${Object.keys(perGiorno).length?Object.keys(perGiorno).sort().reverse().map(d=>`<p class="label">${esc(dataLunga(d))}</p><div class="stack">${perGiorno[d].map(l=>`<div class="card stack ${l.segnalazione?"warn":""}">
     <div class="row wrap" style="gap:6px"><span class="xs b muted">${new Date(l.ms).toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"})}</span><span class="chip">${esc(nomeMod(l.modo))}</span><span class="chip" style="color:${mcol(l.materia)}">${esc(l.materia||"")}</span>${l.segnalazione?`<span class="chip warm">${l.segnalazione==="delicato"?"Argomento delicato":"Scorciatoia"}</span>`:""}${l.esito==="corretto"?`<span class="chip ok">Risolto da solo</span>`:""}</div>
-    <p class="small"><b>${esc(G.cur.nome)}:</b> ${l.haFoto?`<span class="chip">foto</span> `:""}${esc(l.domanda||"")}</p>
+    <p class="small"><b>${chi}:</b> ${l.haFoto?`<span class="chip">foto</span> `:""}${esc(l.domanda||"")}</p>
     <p class="small muted" style="white-space:pre-wrap"><b>Tutor:</b> ${md((l.risposta||"").replace(/<ascolto[^>]*>/,"[testo di ascolto] ").replace(/<\/ascolto>/,""))}</p>
     ${l.errore?`<p class="xs" style="color:var(--warm)"><b>Errore:</b> ${esc(l.errore)}</p>`:""}</div>`).join("")}</div>`).join(""):`<div class="card empty">${soloSegn?"Nessuna segnalazione.":"Nessuna conversazione ancora."}</div>`}`}
-function gImp(){if(!G.cur)return gVuoto();const I=G.imp,cfg=lockCfg()||{};
-  return `${gHead("Impostazioni")}
-  <form class="card stack" data-form="gimp"><p class="b">Tutor</p>
+
+// ---------- dati ----------
+const ord=(a,k)=>a.slice().sort((x,y)=>(x[k]<y[k]?1:-1));
+function gDati(){if(!G.cur)return gVuoto("Dati",true);const D=G.dati;
+  const sez=(id,tit,n,desc,body)=>`<div class="card stack"><div class="row"><div class="grow"><p class="b">${tit} <span class="muted small">(${n})</span></p>${desc?`<p class="xs muted">${desc}</p>`:""}</div>${n?`<button class="btn danger sm" data-act="gres:${id}">Azzera</button>`:""}</div>${body||""}</div>`;
+  const rigaBtn=(ed,de)=>`<span class="gbtns">${ed?`<button class="icon-btn" style="width:38px;height:38px" data-act="${ed}" aria-label="Modifica">${ic("edit",17)}</button>`:""}<button class="icon-btn" style="width:38px;height:38px;color:var(--bad)" data-act="${de}" aria-label="Elimina">${ic("trash",17)}</button></span>`;
+  const comp=ord(D.compiti,"scadenza").slice(0,60),voti=ord(D.voti,"data").slice(0,60);
+  const errs=Object.entries(D.errori).filter(([k,e])=>e.n>0).sort((a,b)=>b[1].n-a[1].n);window._gerr=errs.map(e=>e[0]);
+  const ore=Object.values(D.orario.giorni||{}).reduce((a,g)=>a+(g||[]).filter(Boolean).length,0);
+  const minTot=Math.round(Object.values(D.tempo).reduce((a,b)=>a+b,0));
+  const fisN=Object.keys(D.fis.topics||{}).length;const usati=G.stato.giorno===today()?G.stato.n||0:0;
+  return `${gHead("Dati",true)}
+  <p class="small muted">${G.cur.prova?"Dati dell’account di prova.":`Dati di ${esc(G.cur.nome)}.`} Le modifiche arrivano anche sull’app studente al prossimo aggiornamento, e quello che cancelli non ricompare.</p>
+  ${sez("compiti","Compiti e verifiche",D.compiti.length,"",comp.length?`<div class="list" style="margin:0 -16px">${comp.map(c=>`<div class="row"><div class="grow"><p class="xs b" style="color:${mcol(c.materia)}">${esc(c.materia)} · ${esc(c.tipo)} · ${esc(dataBreve(c.scadenza))}${c.fatto?" · fatto":""}</p><p class="small b">${esc(c.testo)}</p></div>${rigaBtn("gcomp:"+c.id,"gdelc:"+c.id)}</div>`).join("")}</div>`:"")}
+  ${sez("voti","Voti",D.voti.length,"",voti.length?`<div class="list" style="margin:0 -16px">${voti.map(v=>`<div class="row"><div class="grow"><p class="small b">${esc(v.materia)} · ${fmtVoto(v.voto)}</p><p class="xs muted">${esc(dataBreve(v.data))} · ${esc(v.tipo)}${v.nota?" · "+esc(v.nota):""}</p></div>${rigaBtn("gvoto:"+v.id,"gdelv:"+v.id)}</div>`).join("")}</div>`:"")}
+  ${sez("errori","Quaderno degli errori",errs.length,"",errs.length?`<div class="list" style="margin:0 -16px">${errs.slice(0,60).map(([k,e],i)=>`<div class="row"><div class="grow"><p class="small b">${esc(e.materia)} · ${esc(e.argomento||"")}</p><p class="xs muted">${esc(e.errore)} · ${e.n} volt${e.n>1?"e":"a"}</p></div>${rigaBtn("","gdele:"+i)}</div>`).join("")}</div>`:"")}
+  ${sez("orario","Orario delle lezioni",ore,"Ore di lezione inserite")}
+  ${sez("glossario","Glossario e schede di ripasso",D.glossario.length+D.schede.length,`${D.glossario.length} parole · ${D.schede.length} schede`)}
+  ${sez("tempo","Tempo di studio",minTot,"Minuti totali registrati")}
+  ${sez("fis","Progressi di fisica",fisN,"Lezioni lette, livelli e argomenti completati")}
+  ${sez("piani","Piani di studio",Object.keys(D.piani).length,"")}
+  ${sez("log","Conversazioni con il tutor",G.log.length,"Cancella il registro completo e le copie nell’app")}
+  ${sez("contatori","Messaggi usati oggi",usati,"Riporta a zero il conteggio del tetto giornaliero")}
+  <div class="card stack warn"><p class="b">Azzera tutto</p><p class="small muted">Cancella compiti, voti, orario, errori, schede, tempo, progressi e conversazioni${G.cur.prova?" dell’account di prova":` di ${esc(G.cur.nome)}`}. Restano il nome e le tue impostazioni.</p><button class="btn danger" data-act="gres:tutto">${ic("trash",18)} Azzera tutto</button></div>`}
+const NOMI_RES={compiti:"tutti i compiti",voti:"tutti i voti",errori:"il quaderno degli errori",orario:"l’orario",glossario:"glossario e schede",tempo:"il tempo di studio",fis:"i progressi di fisica",piani:"i piani di studio",log:"tutte le conversazioni",contatori:"il conteggio dei messaggi di oggi",tutto:"TUTTI i dati"};
+async function gReset(k){const chi=G.cur.prova?"dell’account di prova":"di "+G.cur.nome;
+  if(!confirm(`Cancellare ${NOMI_RES[k]} ${chi}? Non si può annullare.`))return;
+  if(k==="tutto"&&!confirm("Sei proprio sicuro? Verranno cancellati tutti i dati."))return;
+  toast("Cancello…",8000);const D=G.dati,t=now(),B=blank();
+  const doKey=key=>{if(["compiti","voti","glossario","schede"].includes(key))for(const x of D[key])D.del[x.id]=t;
+    if(key==="fis")D.fis=Object.assign(JSON.parse(JSON.stringify(B.fis)),{selected:D.fis.selected});else D[key]=JSON.parse(JSON.stringify(B[key]));
+    if(key==="orario"){D.orario.mod=t;D.orario.ore=G.dati.orario.ore||B.orario.ore}D.resets[key]=t};
+  try{
+    if(k==="log"){await G.svuota("log");await G.svuota("chat")}
+    else if(k==="contatori")await G.ref().collection("sistema").doc("stato").set({giorno:"",n:0},{merge:true});
+    else if(k==="tutto"){for(const key of RESETTABILI)doKey(key);await G.salvaDati();await G.svuota("log");await G.svuota("chat");await G.svuota("foto");await G.ref().collection("sistema").doc("stato").set({giorno:"",n:0},{merge:true})}
+    else{doKey(k);if(k==="glossario")doKey("schede");await G.salvaDati()}
+    await G.carica();toast("Fatto")}catch(e){toast("Non riuscito: aggiorna le regole di Firebase",5000)}
+  render()}
+async function gDelItem(lista,id){if(!confirm("Eliminare questo elemento?"))return;const D=G.dati;D[lista]=D[lista].filter(x=>x.id!==id);D.del[id]=now();if(lista==="compiti")delete D.piani[id];
+  try{await G.salvaDati();toast("Eliminato")}catch(e){toast("Non riuscito: aggiorna le regole di Firebase",5000)}render()}
+async function gDelErr(i){const k=window._gerr[i];if(!k||!confirm("Eliminare questo errore dal quaderno?"))return;G.dati.errori[k].n=0;G.dati.errori[k].ultimo=now();
+  try{await G.salvaDati();toast("Eliminato")}catch(e){toast("Non riuscito",4000)}render()}
+function gEditCompito(id){const c=Object.assign({},G.dati.compiti.find(x=>x.id===id));if(!c.id)return;
+  sheet(`<h2>Modifica compito</h2><div><label class="flabel" for="gcm">Materia</label><select class="field" id="gcm">${selMaterie(c.materia)}</select></div>
+   <div><label class="flabel" for="gct">Testo</label><textarea class="field" id="gct">${esc(c.testo)}</textarea></div>
+   <div class="grid2"><div><label class="flabel" for="gcs">Scadenza</label><input class="field" type="date" id="gcs" value="${c.scadenza}"></div><div><label class="flabel" for="gcf">Stato</label><select class="field" id="gcf"><option value="0" ${c.fatto?"":"selected"}>Da fare</option><option value="1" ${c.fatto?"selected":""}>Fatto</option></select></div></div>
+   <div class="row"><button class="btn ghost grow" data-s="x">Annulla</button><button class="btn grow" data-s="ok">Salva</button></div>`,async(k,bg)=>{if(k==="x"){bg.remove();return}
+   c.materia=bg.querySelector("#gcm").value;c.testo=bg.querySelector("#gct").value.trim()||c.testo;c.scadenza=bg.querySelector("#gcs").value||c.scadenza;const f=bg.querySelector("#gcf").value==="1";if(f!==!!c.fatto){c.fatto=f;c.fattoIl=f?now():null}c.mod=now();
+   G.dati.compiti=G.dati.compiti.map(x=>x.id===id?c:x);bg.remove();try{await G.salvaDati();toast("Salvato")}catch(e){toast("Non riuscito: aggiorna le regole di Firebase",5000)}render()})}
+function gEditVoto(id){const v=Object.assign({},G.dati.voti.find(x=>x.id===id));if(!v.id)return;const vv=[];for(let x=2;x<=10;x+=.25)vv.push(x);
+  sheet(`<h2>Modifica voto</h2><div><label class="flabel" for="gvm">Materia</label><select class="field" id="gvm">${selMaterie(v.materia)}</select></div>
+   <div class="grid2"><div><label class="flabel" for="gvv">Voto</label><select class="field" id="gvv">${vv.map(x=>`<option value="${x}" ${+v.voto===x?"selected":""}>${fmtVoto(x)}</option>`).join("")}</select></div><div><label class="flabel" for="gvd">Data</label><input class="field" type="date" id="gvd" value="${v.data}"></div></div>
+   <div><label class="flabel" for="gvt">Tipo</label><select class="field" id="gvt">${["scritto","orale","pratico"].map(t=>`<option ${v.tipo===t?"selected":""}>${t}</option>`).join("")}</select></div>
+   <div class="row"><button class="btn ghost grow" data-s="x">Annulla</button><button class="btn grow" data-s="ok">Salva</button></div>`,async(k,bg)=>{if(k==="x"){bg.remove();return}
+   v.materia=bg.querySelector("#gvm").value;v.voto=+bg.querySelector("#gvv").value;v.data=bg.querySelector("#gvd").value||v.data;v.tipo=bg.querySelector("#gvt").value;v.mod=now();
+   G.dati.voti=G.dati.voti.map(x=>x.id===id?v:x);bg.remove();try{await G.salvaDati();toast("Salvato")}catch(e){toast("Non riuscito: aggiorna le regole di Firebase",5000)}render()})}
+
+// ---------- impostazioni ----------
+function gImp(){const I=G.imp,cfg=lockCfg()||{};
+  return `${gHead("Impostazioni",true)}
+  ${G.cur?`<form class="card stack" data-form="gimp"><p class="b">Tutor${G.cur.prova?" (account di prova)":` di ${esc(G.cur.nome)}`}</p>
    <div><label class="flabel" for="gt">Messaggi al giorno (tetto di spesa)</label><input class="field" id="gt" type="number" min="5" max="300" value="${I.tetto||60}"></div>
    <div class="grid2"><div><label class="flabel" for="gi">Disponibile dalle</label><input class="field" id="gi" type="time" value="${esc(I.oraInizio||"")}"></div><div><label class="flabel" for="gf">Fino alle</label><input class="field" id="gf" type="time" value="${esc(I.oraFine||"")}"></div></div>
    <p class="xs muted">Lascia vuoto per non mettere limiti di orario.</p>
@@ -1469,27 +1561,38 @@ function gImp(){if(!G.cur)return gVuoto();const I=G.imp,cfg=lockCfg()||{};
    <div><label class="flabel" for="gp">Premio della settimana (facoltativo)</label><input class="field" id="gp" value="${esc(I.premio||"")}" placeholder="Es. pizza il venerdì"></div>
    <div><label class="flabel" for="gps">Giorni con obiettivo raggiunto per il premio</label><input class="field" id="gps" type="number" min="1" max="7" value="${I.premioSessioni||5}"></div>
    <button class="btn" type="submit">Salva</button></form>
-  <div class="card stack"><p class="b">Assegna un’attività</p><p class="small muted">${esc(G.cur.nome)} la vede in Home e tu vedi quando la completa.</p>
-   ${(I.assegnati||[]).map(a=>`<div class="row"><span class="chip ${G.dati.assegnatiFatti.includes(a.id)?"ok":"warm"}">${G.dati.assegnatiFatti.includes(a.id)?"Fatto":"Da fare"}</span><span class="small grow">${esc(a.testo)}${a.entro?` · entro ${quando(a.entro)}`:""}</span><button class="icon-btn" style="width:38px;height:38px" data-act="gdel:${a.id}" aria-label="Elimina">${ic("trash",18)}</button></div>`).join("")}
-   <form data-form="gass" class="stack"><input class="field" id="ga" placeholder="Es. ripassa il capitolo 3 di storia" required><div class="grid2"><select class="field" id="gam">${selMaterie("","<option value=''>Materia</option>")}</select><input class="field" id="gae" type="date" aria-label="Entro il"></div><button class="btn ghost" type="submit">${ic("plus",16)} Assegna</button></form></div>
+  <div class="card stack"><p class="b">Assegna un’attività</p><p class="small muted">La vede nella Home dell’app e tu vedi quando la completa.</p>
+   ${(I.assegnati||[]).map(a=>`<div class="row"><span class="chip ${G.dati.assegnatiFatti.includes(a.id)?"ok":"warm"}">${G.dati.assegnatiFatti.includes(a.id)?"Fatto":"Da fare"}</span><span class="small grow">${esc(a.testo)}${a.entro?` · entro ${quando(a.entro)}`:""}</span><button class="icon-btn" style="width:38px;height:38px;color:var(--bad)" data-act="gdel:${a.id}" aria-label="Elimina">${ic("trash",18)}</button></div>`).join("")}
+   <form data-form="gass" class="stack"><input class="field" id="ga" placeholder="Es. ripassa il capitolo 3 di storia" required><div class="grid2"><select class="field" id="gam">${selMaterie("","<option value=''>Materia</option>")}</select><input class="field" id="gae" type="date" aria-label="Entro il"></div><button class="btn ghost" type="submit">${ic("plus",16)} Assegna</button></form></div>`:""}
+  ${provaCard()}
   <div class="card stack"><p class="b">Notifiche su questo telefono</p><p class="small muted">Ricevi un avviso quando c’è una segnalazione.</p><button class="btn ghost wide" data-act="notif">Attiva le notifiche</button></div>
-  <div class="card stack"><p class="b">Blocco dell’area genitore</p><p class="small muted">${cfg.cred||cfg.pin?"Attivo":"Non attivo"}: chiede impronta o PIN ogni volta che apri l’area dopo 10 minuti.</p>
+  <div class="card stack"><p class="b">Blocco dell’area genitore</p><p class="small muted">${cfg.cred||cfg.pin?"Attivo":"Non attivo"}: chiede impronta o PIN quando apri l’area dopo 10 minuti.</p>
    <div class="grid2"><button class="btn ghost" data-act="gsetimpronta">${cfg.cred?"Rifai impronta":"Usa l’impronta"}</button><button class="btn ghost" data-act="gsetpin">${cfg.pin?"Cambia PIN":"Imposta un PIN"}</button></div>
    ${cfg.cred||cfg.pin?`<button class="link" data-act="gnolock">Togli il blocco</button>`:""}</div>
-  <div class="card stack"><p class="small">Accesso come <b>${esc(user.email||"")}</b></p><button class="btn ghost wide" data-act="logout">Esci</button></div>
+  <div class="card stack"><p class="small">Accesso come <b>${esc(user.email||"")}</b></p><button class="btn ghost wide" data-act="logout">Esci dall’account</button></div>
   <p class="xs muted" style="text-align:center">Studio Smart ${APP_VERSION} · area genitore</p>`}
-function gVuoto(){return `${gHead("Area genitore")}<div class="card stack"><p class="b">Nessuno studente collegato</p><p class="small muted">Fai accedere ${"Davide"} con il suo account Google nell’app sul suo telefono: i suoi dati compariranno qui.</p><button class="btn ghost" data-act="greload">Aggiorna</button></div>`}
+
+// ---------- rendering ed eventi ----------
 function renderGenitore(){const r=route();
   if(!G.caricato){$("#app").innerHTML=`<div class="lock"><p class="muted">Carico i dati…</p></div>`;return}
   const cfg=lockCfg();if(cfg&&(cfg.cred||cfg.pin)&&!sbloccato()){$("#app").innerHTML=vLock();if(cfg.cred&&!window._autoFp){window._autoFp=1;setTimeout(()=>gAct("gimpronta"),300)}return}
-  const name=r.name==="g"?(r.a?"g/"+r.a:"g"):"g";if(!location.hash.startsWith("#g")){location.hash="g";return}
-  const html=name==="g/chat"?gChat(false):name==="g/segn"?gChat(true):name==="g/imp"?gImp():gPanoramica();
+  if(!location.hash.startsWith("#g")){location.hash="g";return}
+  const name=r.a?"g/"+r.a:"g";
+  const html=name==="g/chat"?gChat(false):name==="g/segn"?gChat(true):name==="g/dati"?gDati():name==="g/imp"?gImp():gPanoramica();
   $("#app").innerHTML=`<div class="app">${gnav(name)}<main id="main" class="fade">${html}</main></div>`}
-async function gAct(cmd,x){switch(cmd){
+async function gAct(cmd,x){if(ruolo!=="genitore")return false;switch(cmd){
   case "gimpronta":if(await usaImpronta()){sessionStorage.setItem("ss-unl",now());render()}else toast("Impronta non riconosciuta");return true;
+  case "gback":if(history.length>1&&location.hash!=="#g")history.back();else go("g");return true;
   case "greload":toast("Aggiorno…");await G.init();render();return true;
-  case "gstud":sheet(`<h2>Quale studente?</h2>${G.stud.map(s=>`<button class="btn ${s.uid===G.cur.uid?"":"ghost"} wide" data-s="${s.uid}">${esc(s.nome)} · ${esc(s.email)}</button>`).join("")}`,async(k,bg)=>{G.cur=G.stud.find(s=>s.uid===k);localStorage.setItem("ss-g-stud",k);bg.remove();await G.carica();render()});return true;
+  case "gprova":entraProva();return true;
+  case "gstud":sheet(`<h2>Di chi vuoi vedere i dati?</h2>${G.stud.map(s=>`<button class="btn ${s.uid===G.cur.uid?"":"ghost"} wide" data-s="${s.uid}">${esc(s.nome)}${s.prova?"":" · "+esc(s.email)}</button>`).join("")}`,async(k,bg)=>{G.cur=G.stud.find(s=>s.uid===k);localStorage.setItem("ss-g-stud",k);bg.remove();await G.carica();render()});return true;
   case "gdel":G.imp.assegnati=(G.imp.assegnati||[]).filter(a=>a.id!==x);await G.salvaImp();render();return true;
+  case "gres":gReset(x);return true;
+  case "gdelc":gDelItem("compiti",x);return true;
+  case "gdelv":gDelItem("voti",x);return true;
+  case "gdele":gDelErr(+x);return true;
+  case "gcomp":gEditCompito(x);return true;
+  case "gvoto":gEditVoto(x);return true;
   case "gsetimpronta":await creaImpronta();sessionStorage.setItem("ss-unl",now());render();return true;
   case "gsetpin":{const p=prompt("Scegli un PIN di 4-8 cifre");if(!p)return true;if(!/^\d{4,8}$/.test(p)){toast("Il PIN deve avere da 4 a 8 cifre");return true}
     const cfg=lockCfg()||{};cfg.pin=await sha256("ss:"+p);localStorage.setItem(LOCK,JSON.stringify(cfg));sessionStorage.setItem("ss-unl",now());toast("PIN impostato");render();return true}
@@ -1527,7 +1630,7 @@ function render(){applyTheme();
     case "storico":html="";act="profilo";break;
     default:html=vHome();act="home"}
   const full=r.name==="tutor"||r.name==="quiz"||r.name==="qz";
-  $("#app").innerHTML=`<div class="app">${full&&matchMedia("(max-width:899px)").matches?"":navHtml(act)}<main id="main" class="fade" ${r.name==="tutor"?'style="padding-bottom:0"':""}>${html}</main></div>`;
+  $("#app").innerHTML=`${prova?`<div class="prova-bar"><span class="grow">Modalità prova: stai usando l’app come la vede Davide (account di prova)</span><button data-act="esciprova">Torna all’area genitore</button></div>`:""}<div class="app">${full&&matchMedia("(max-width:899px)").matches?"":navHtml(act)}<main id="main" class="fade" ${r.name==="tutor"?'style="padding-bottom:0"':""}>${html}</main></div>`;
   if(r.name==="storico")vStorico();
   if(r.name==="tutor")scrollChat();
   const a=$("#ans");if(a&&quiz&&!quiz.answered)a.focus({preventScroll:true})}
@@ -1540,6 +1643,7 @@ document.addEventListener("click",async e=>{
   if(await gAct(cmd,x))return;
   switch(cmd){
     case "login":login();break;
+    case "esciprova":esciProva();break;
     case "logout":logout();break;
     case "notif":attivaNotifiche();break;
     case "askfoto":scegliFoto(b=>{pendingAsk={testo:($("[data-form=ask] input")||{}).value||"",foto:[b],nuova:true,invia:false};go("tutor")});break;
