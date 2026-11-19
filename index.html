@@ -61,11 +61,9 @@ main{flex:1;min-width:0;max-width:760px;margin:0 auto;width:100%;padding:calc(en
 .nav button.act{color:var(--pri);font-weight:800}
 .nav.g{grid-template-columns:repeat(4,minmax(0,1fr))}
 @media (min-width:900px){
-  .nav{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:4px;width:210px;border-top:0;border-right:1px solid var(--line);padding:22px 12px}
-  .nav button{flex-direction:row;gap:12px;font-size:.92em;padding:11px 14px;border-radius:12px;justify-content:flex-start}
-  .nav button.act{background:var(--pri-soft)}
-  .nav .brandside{display:flex}
-  main{padding-top:28px;padding-bottom:40px}
+  .nav{left:50%;right:auto;transform:translateX(-50%);width:min(760px,100%);border:1px solid var(--line);border-bottom:0;border-radius:18px 18px 0 0}
+  .nav button{font-size:.78em}
+  main{padding-top:28px}
 }
 .brandside{display:none;align-items:center;gap:10px;padding:4px 10px 18px;font-weight:800}
 
@@ -163,7 +161,7 @@ textarea.field{min-height:90px;resize:vertical}
 .typing i{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ink2);margin-right:4px;animation:blink 1s infinite}
 .typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
 @keyframes blink{50%{opacity:.25}}
-.chatbar{position:sticky;bottom:0;background:var(--bg);padding:8px 0 calc(10px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:8px}
+.chatbar{position:sticky;bottom:calc(66px + env(safe-area-inset-bottom,0px));background:var(--bg);padding:8px 0 calc(10px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:8px}
 .chatbar .row{align-items:flex-end}
 .chatin{flex:1;min-width:0;border:0;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;min-height:46px;max-height:140px;resize:none;line-height:1.4}
 .chatin:focus{outline:2px solid var(--pri);border-color:transparent}
@@ -232,6 +230,9 @@ textarea.field{min-height:90px;resize:vertical}
 .upd-bar button{border:0;border-radius:10px;background:var(--pri);color:#fff;font-weight:800;padding:8px 14px}
 
 .toast .undo{margin-left:10px;border:0;background:none;color:var(--pri-soft);font-weight:800;text-decoration:underline;padding:0}
+
+.navbadge{position:absolute;top:0;left:calc(50% + 6px);min-width:18px;height:18px;padding:0 5px;border-radius:99px;background:var(--bad);color:#fff;font-size:11px;font-weight:800;line-height:18px;text-align:center}
+.chatwrap{min-height:calc(100vh - 110px)}
 
 </style>
 <script src="config.js"></script>
@@ -764,7 +765,7 @@ function makeSet(topicIds,levels,n){
 
 
 // ===== STUDIO SMART – nucleo: dati, sincronizzazione, utilità =====
-const APP_VERSION="2.1";
+const APP_VERSION="2.2";
 const CFG=Object.assign({firebase:{},ponteUrl:"",vapidKey:"",genitoreHash:""},window.STUDIO_CONFIG||{});
 const MATERIE=["Italiano","Storia","Inglese","Tedesco","Matematica","Diritto ed economia","Economia aziendale","Informatica","Geografia","Scienze della Terra e Biologia","Fisica"];
 const MCOL={"Italiano":"#B42350","Storia":"#9A4316","Inglese":"#1D5FA8","Tedesco":"#6B3FA0","Matematica":"#3451D1","Diritto ed economia":"#556B12","Economia aziendale":"#0F766E","Informatica":"#0B6E99","Geografia":"#2F7D32","Scienze della Terra e Biologia":"#7A5C12","Fisica":"#8A5A00","Altro":"#5B6577"};
@@ -962,6 +963,7 @@ setInterval(()=>{if(ruolo==="genitore"||localStorage.getItem("ss-push")==="1")re
 
 // ---------- icone ----------
 const IC={
+ archive:'<rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v10h14V9M10 13h4"/>',
  home:'<path d="M3 11l9-7 9 7v9h-6v-6H9v6H3z"/>',chat:'<path d="M4 5h16v11H9l-5 4z"/>',cal:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',
  book:'<path d="M5 4h11l3 3v13H5z"/><path d="M9 10h6M9 14h6"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4.5-6 8-6s7 2 8 6"/>',
  cam:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/>',
@@ -991,7 +993,7 @@ function applyTheme(){const r=document.documentElement;if(S.tema==="auto")delete
 // ===== STUDIO SMART – schermate dello studente =====
 let quiz=null,lastResult=null,gq=null,pendingAsk=null,agDay=null,agWeek=null,flashI=0,flashShow=false,lessonIdx={},triState={};
 const NAV=[["home","Home","home"],["tutor","Tutor","chat"],["agenda","Agenda","cal"],["studio","Studio","book"],["profilo","Profilo","user"]];
-const navHtml=act=>`<nav class="nav" aria-label="Menu"><div class="brandside"><div class="logo">${LOGO}</div>Studio Smart ${verChip()}</div>${NAV.map(n=>`<button data-go="${n[0]}" class="${act===n[0]?"act":""}">${ic(n[2])}<span>${n[1]}</span></button>`).join("")}</nav>`;
+const navHtml=act=>`<nav class="nav" aria-label="Menu">${NAV.map(n=>`<button data-go="${n[0]}" class="${act===n[0]?"act":""}">${ic(n[2])}<span>${n[1]}</span></button>`).join("")}</nav>`;
 function saluto(){const h=new Date().getHours();return h<6?"Buonanotte":h<13?"Buongiorno":h<18?"Buon pomeriggio":"Buonasera"}
 
 // ---------- utilità didattiche ----------
@@ -1046,7 +1048,7 @@ function rigaCompito(c,home){const oggi=today(),rit=c.scadenza<oggi&&!c.fatto;co
   return `<div class="row" style="align-items:flex-start">
    <button class="check ${c.fatto?"on":""}" data-act="cdone:${c.id}" aria-label="${c.fatto?"Fatto":"Segna come fatto"}" style="margin-top:2px">${c.fatto?ic("check"):""}</button>
    <button class="grow" data-act="cedit:${c.id}" style="text-align:left;background:none;border:0;padding:0;display:flex;flex-direction:column;gap:5px;min-width:0">
-     <span class="xs b" style="color:${mcol(c.materia)}">${esc(c.materia)}${c.tipo!=="compito"?` · ${c.tipo}`:""}${home?` · ${rit?"era per "+quando(c.scadenza):"per "+quando(c.scadenza)}`:""}</span>
+     <span class="xs b" style="color:${mcol(c.materia)}">${prova?`<span class="chip warm" style="margin-right:6px;padding:1px 8px">Prova</span>`:""}${esc(c.materia)}${c.tipo!=="compito"?` · ${c.tipo}`:""}${home?` · ${rit?"era per "+quando(c.scadenza):"per "+quando(c.scadenza)}`:""}</span>
      <span class="b" style="${c.fatto?"text-decoration:line-through;color:var(--ink2)":""}">${esc(c.testo)}</span>
      ${home?"":`<span class="row wrap" style="gap:6px">${rit?`<span class="chip bad">In ritardo · era per ${quando(c.scadenza)}</span>`:""}${c.promemoria&&!c.fatto?`<span class="chip warm">Promemoria ${quando(ymd(new Date(c.promemoria)))} ${oraDi(c.promemoria)}</span>`:""}${ora!=null?`<span class="chip">Lezione ${ora+1}ª ora</span>`:""}${c.foto?`<span class="chip">Foto</span>`:""}</span>`}
    </button>
@@ -1169,7 +1171,7 @@ function vVoti(){const mm=medieMaterie(),mg=mediaGenerale();
   ${obHtml}
   ${righe.length?`<div class="card flush list">${righe.map(([m,v])=>`<button class="gradeRow" data-act="vmat:${esc(m)}" style="width:100%;background:none;border:0;border-bottom:1px solid var(--line2);text-align:left"><span class="grow b small">${esc(m)}</span><span class="bar"><i style="width:${v*10}%;background:${mcol(m)}"></i></span><span class="v">${fmtMedia(v)}</span></button>`).join("")}</div>`:`<div class="card empty">Inserisci il primo voto per vedere le medie.</div>`}
   <div class="sec"><h2>Ultimi voti</h2><button class="btn sm" data-act="newv">${ic("plus",16)} Aggiungi voto</button></div>
-  ${ultimi.length?`<div class="card flush list">${ultimi.map(v=>`<div class="row"><button class="grow" data-act="vedit:${v.id}" style="text-align:left;background:none;border:0;padding:0"><p class="b small">${esc(v.materia)}</p><p class="xs muted">${esc(dataBreve(v.data))} · ${esc(v.tipo)}${v.nota?" · "+esc(v.nota):""}</p></button>${v.tipo==="scritto"?`<button class="link" data-act="vanalisi:${v.id}">Analizza</button>`:""}<span class="xb" style="font-size:1.15em;width:44px;text-align:right">${fmtVoto(v.voto)}</span></div>`).join("")}</div>`:""}`}
+  ${ultimi.length?`<div class="card flush list">${ultimi.map(v=>`<div class="row"><button class="grow" data-act="vedit:${v.id}" style="text-align:left;background:none;border:0;padding:0"><p class="b small">${prova?`<span class="chip warm" style="margin-right:6px;padding:1px 8px">Prova</span>`:""}${esc(v.materia)}</p><p class="xs muted">${esc(dataBreve(v.data))} · ${esc(v.tipo)}${v.nota?" · "+esc(v.nota):""}</p></button>${v.tipo==="scritto"?`<button class="link" data-act="vanalisi:${v.id}">Analizza</button>`:""}<span class="xb" style="font-size:1.15em;width:44px;text-align:right">${fmtVoto(v.voto)}</span></div>`).join("")}</div>`:""}`}
 function editorVoto(v,mat){const nuovo=!v;v=v?Object.assign({},v):{id:uid8(),materia:mat||MATERIE[0],voto:6,data:today(),tipo:"scritto",nota:""};
   const voti=[];for(let x=2;x<=10;x+=.25)voti.push(x);
   const html=()=>`<h2>${nuovo?"Nuovo voto":"Modifica voto"}</h2>
@@ -1347,7 +1349,7 @@ function vTutor(){
      <div class="grow"><p class="xb">${esc(S.tutorNome||"Orione")}</p><p class="xs muted">Tutor · IA</p></div>
      <button class="chip" style="border:1px solid var(--line);background:var(--card);color:var(--pri-ink);min-height:34px" data-act="tmat">${esc(s.materia||"Tutte le materie")}</button></div>
     <div class="quick">${MODI.map(m=>`<button class="chip ${s.modo===m[0]?"on":""}" data-act="tmodo:${m[0]}">${m[1]}</button>`).join("")}</div>
-    <p class="ai-note">Stai parlando con un’intelligenza artificiale: può sbagliare, nel dubbio controlla sul libro.${T.rimasti!=null&&T.rimasti<=10?` Messaggi rimasti oggi: ${T.rimasti}.`:""}</p>
+    ${prova?`<span class="chip warm" style="align-self:flex-start">Prova: questa conversazione non finisce nel registro di Davide</span>`:""}<p class="ai-note">Stai parlando con un’intelligenza artificiale: può sbagliare, nel dubbio controlla sul libro.${T.rimasti!=null&&T.rimasti<=10?` Messaggi rimasti oggi: ${T.rimasti}.`:""}</p>
    </div>
    <div class="msgs" id="msgs">${vuoto}${msgs}${T.sending?`<div class="typing"><i></i><i></i><i></i></div>`:""}</div>
    <div class="chatbar">${quick}
@@ -1419,7 +1421,7 @@ const G={stud:[],cur:null,dati:null,imp:{},log:[],stato:{},caricato:false,
    this.stud=q.docs.filter(d=>d.data().json).map(d=>({uid:d.id,email:d.data().email||"",prova:d.id===user.uid,nome:d.id===user.uid?"Prova (papà)":(d.data().nome||"Studente"),agg:d.data().aggiornato}));
    this.stud.sort((a,b)=>a.prova-b.prova);
    const scelto=localStorage.getItem("ss-g-stud");this.cur=(this.stud.find(s=>s.uid===scelto)||this.stud.find(s=>!s.prova)||this.stud[0]||null);
-   if(this.cur)await this.carica()}catch(e){toast("Non riesco a leggere i dati: controlla le regole di Firebase",5000)}this.caricato=true},
+   await gStatoCarica();if(this.cur)await this.carica()}catch(e){toast("Non riesco a leggere i dati: controlla le regole di Firebase",5000)}this.caricato=true},
  ref(){return fb.db.collection("studenti").doc(this.cur.uid)},
  async carica(){const ref=this.ref();
    const [d,imp,st,lg]=await Promise.all([ref.get(),ref.collection("genitore").doc("impostazioni").get(),ref.collection("sistema").doc("stato").get().catch(()=>null),ref.collection("log").orderBy("t","desc").limit(300).get().catch(()=>({docs:[]}))]);
@@ -1433,7 +1435,7 @@ const G={stud:[],cur:null,dati:null,imp:{},log:[],stato:{},caricato:false,
  async svuota(coll){const ref=this.ref().collection(coll);for(let i=0;i<20;i++){const q=await ref.limit(300).get();if(q.empty)break;const b=fb.db.batch();q.docs.forEach(d=>b.delete(d.ref));await b.commit()}}
 };
 const GNAV=[["g","Panoramica","chart"],["g/chat","Conversazioni","chat"],["g/segn","Segnalazioni","flag"],["g/dati","Dati","list"],["g/imp","Impostazioni","gear"]];
-const gnav=act=>`<nav class="nav" aria-label="Menu genitore"><div class="brandside"><div class="logo">${LOGO}</div>Area genitore ${verChip()}</div>${GNAV.map(n=>`<button data-go="${n[0]}" class="${act===n[0]?"act":""}">${ic(n[2])}<span>${n[1]}</span></button>`).join("")}</nav>`;
+const gnav=act=>{const nn=segnNuove();return `<nav class="nav" aria-label="Menu genitore">${GNAV.map(n=>`<button data-go="${n[0]}" class="${act===n[0]?"act":""}" style="position:relative">${ic(n[2])}<span>${n[1]}</span>${n[0]==="g/segn"&&nn?`<b class="navbadge" aria-label="${nn} nuove">${nn}</b>`:""}</button>`).join("")}</nav>`};
 
 // ---------- blocco con impronta o PIN ----------
 const LOCK="ss-lock";
@@ -1495,17 +1497,52 @@ function gPanoramica(){if(!G.cur)return gVuoto("Area genitore");const D=G.dati,o
   ${provaCard()}`}
 
 // ---------- conversazioni e segnalazioni ----------
+// ---------- conversazioni e segnalazioni ----------
+const GS={arch:new Set(),lette:new Set(),caric:false,filtro:"",vista:"attive",pend:new Map()};
+async function gStatoCarica(){if(GS.caric)return;try{const d=await fb.db.collection("genitori").doc(user.uid).get();const o=d.exists?d.data():{};GS.arch=new Set(o.archivio||[]);GS.lette=new Set(o.lette||[])}catch(e){}GS.caric=true}
+async function gStatoSalva(){try{await fb.db.collection("genitori").doc(user.uid).set({archivio:[...GS.arch].slice(-3000),lette:[...GS.lette].slice(-3000)},{merge:true})}catch(e){toast("Non salvato: controlla le regole di Firebase",4000)}}
+const lk=l=>G.cur.uid+"/"+l.id;
+const logVisibili=()=>G.log.filter(l=>!String(l.modo).startsWith("genera")&&!GS.pend.has(l.id));
+function segnNuove(){if(!G.cur)return 0;return logVisibili().filter(l=>l.segnalazione&&!GS.lette.has(lk(l))&&!GS.arch.has(lk(l))).length}
+const oggiProva=ms=>ymd(new Date(ms))===today();
 function gChat(soloSegn){const t=soloSegn?"Segnalazioni":"Conversazioni";if(!G.cur)return gVuoto(t,true);
-  const L=G.log.filter(l=>!String(l.modo).startsWith("genera")&&(!soloSegn||l.segnalazione));
+  const arch=GS.vista==="archiviate";
+  let L=logVisibili().filter(l=>(!soloSegn||l.segnalazione)&&(arch?GS.arch.has(lk(l)):!GS.arch.has(lk(l))));
+  const materie=[...new Set(logVisibili().map(l=>l.materia||"Altro"))].sort();
+  if(GS.filtro)L=L.filter(l=>(l.materia||"Altro")===GS.filtro);
   const perGiorno={};for(const l of L){const d=ymd(new Date(l.ms));(perGiorno[d]=perGiorno[d]||[]).push(l)}
   const nomeMod=m=>(MODI.find(x=>x[0]===m)||["","Tutor"])[1];const chi=G.cur.prova?"Prova (papà)":esc(G.cur.nome);
+  const nuove=soloSegn?L.filter(l=>!GS.lette.has(lk(l))).length:0;const provaOggi=G.cur.prova?logVisibili().filter(l=>oggiProva(l.ms)).length:0;
+  const btn=(act,icon,lab,col)=>`<button class="icon-btn" style="width:38px;height:38px;${col?`color:${col}`:""}" data-act="${act}" aria-label="${lab}" title="${lab}">${ic(icon,17)}</button>`;
   return `${gHead(t,true)}
-  ${soloSegn?`<p class="small muted">Richieste di farsi fare i compiti e argomenti delicati. Il tutor non dà mai le soluzioni e su temi delicati invita a parlarne con voi.</p>`:`<p class="small muted">Tutto quello che è stato scritto al tutor e le risposte, dalle più recenti. Questo registro lo scrive il ponte e dall’app studente non si può cancellare.</p>`}
-  ${Object.keys(perGiorno).length?Object.keys(perGiorno).sort().reverse().map(d=>`<p class="label">${esc(dataLunga(d))}</p><div class="stack">${perGiorno[d].map(l=>`<div class="card stack ${l.segnalazione?"warn":""}">
-    <div class="row wrap" style="gap:6px"><span class="xs b muted">${new Date(l.ms).toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"})}</span><span class="chip">${esc(nomeMod(l.modo))}</span><span class="chip" style="color:${mcol(l.materia)}">${esc(l.materia||"")}</span>${l.segnalazione?`<span class="chip warm">${l.segnalazione==="delicato"?"Argomento delicato":"Scorciatoia"}</span>`:""}${l.esito==="corretto"?`<span class="chip ok">Risolto da solo</span>`:""}</div>
+  ${G.cur.prova?`<div class="card row warn" style="flex-wrap:wrap"><span class="chip warm">Prova</span><p class="small grow" style="min-width:160px">Stai guardando l’account di prova.</p>${provaOggi||G.dati?`<button class="btn danger sm" data-act="gprovaoggi">${ic("trash",16)} Cancella le prove di oggi</button>`:""}</div>`:""}
+  ${soloSegn?`<p class="small muted">Richieste di farsi fare i compiti e argomenti delicati. Il tutor non dà mai le soluzioni e su temi delicati invita a parlarne con voi.</p>`:`<p class="small muted">Tutto quello che è stato scritto al tutor e le risposte, dalle più recenti. Dall’app studente questo registro non si può cancellare.</p>`}
+  <div class="row wrap"><div class="seg" style="flex:1;min-width:200px"><button class="${arch?"":"act"}" data-act="gvista:attive">${soloSegn?"Da vedere":"Attive"}</button><button class="${arch?"act":""}" data-act="gvista:archiviate">Archiviate</button></div>
+   <select class="field" id="gfiltro" style="width:auto;min-width:160px;min-height:40px" aria-label="Filtra per materia"><option value="">Tutte le materie</option>${materie.map(m=>`<option ${GS.filtro===m?"selected":""}>${esc(m)}</option>`).join("")}</select></div>
+  ${nuove?`<div class="row"><span class="chip pri">${nuove} nuov${nuove>1?"e":"a"}</span><span class="grow"></span><button class="link" data-act="glettetutte">Segna tutte come lette</button></div>`:""}
+  ${Object.keys(perGiorno).length?Object.keys(perGiorno).sort().reverse().map(d=>`<p class="label">${esc(dataLunga(d))}</p><div class="stack">${perGiorno[d].map(l=>{const nuova=l.segnalazione&&!GS.lette.has(lk(l));return `<div class="card stack ${l.segnalazione?"warn":""}">
+    <div class="row" style="align-items:flex-start"><div class="row wrap grow" style="gap:6px"><span class="xs b muted">${new Date(l.ms).toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"})}</span>${G.cur.prova?`<span class="chip warm">Prova</span>`:""}${nuova?`<span class="chip pri">Nuova</span>`:""}<span class="chip">${esc(nomeMod(l.modo))}</span><span class="chip" style="color:${mcol(l.materia)}">${esc(l.materia||"")}</span>${l.segnalazione?`<span class="chip warm">${l.segnalazione==="delicato"?"Argomento delicato":"Scorciatoia"}</span>`:""}${l.esito==="corretto"?`<span class="chip ok">Risolto da solo</span>`:""}</div>
+     <span class="gbtns">${nuova?btn("glett:"+l.id,"check","Segna come letta"):""}${btn((arch?"gdisarch:":"garch:")+l.id,arch?"back":"archive",arch?"Riporta tra le attive":"Archivia")}${btn("gdellog:"+l.id,"trash","Elimina","var(--bad)")}</span></div>
     <p class="small"><b>${chi}:</b> ${l.haFoto?`<span class="chip">foto</span> `:""}${esc(l.domanda||"")}</p>
     <p class="small muted" style="white-space:pre-wrap"><b>Tutor:</b> ${md((l.risposta||"").replace(/<ascolto[^>]*>/,"[testo di ascolto] ").replace(/<\/ascolto>/,""))}</p>
-    ${l.errore?`<p class="xs" style="color:var(--warm)"><b>Errore:</b> ${esc(l.errore)}</p>`:""}</div>`).join("")}</div>`).join(""):`<div class="card empty">${soloSegn?"Nessuna segnalazione.":"Nessuna conversazione ancora."}</div>`}`}
+    ${l.errore?`<p class="xs" style="color:var(--warm)"><b>Errore:</b> ${esc(l.errore)}</p>`:""}</div>`}).join("")}</div>`).join(""):`<div class="card empty">${arch?"Nessuna conversazione archiviata.":soloSegn?"Nessuna segnalazione da vedere.":GS.filtro?"Nessuna conversazione per questa materia.":"Nessuna conversazione ancora."}</div>`}`}
+// eliminazione con Annulla: la cancellazione vera parte dopo 10 secondi
+function gDelLog(ids,msg){const ref=G.ref(),uid=G.cur.uid,items=G.log.filter(l=>ids.includes(l.id));if(!items.length)return;
+  const t=setTimeout(async()=>{try{const b=fb.db.batch();for(const l of items)b.delete(ref.collection("log").doc(l.id));await b.commit();
+      G.log=G.log.filter(l=>!ids.includes(l.id));
+      const sess=[...new Set(items.map(l=>l.sessione).filter(Boolean))].filter(s=>!G.log.some(l=>l.sessione===s));
+      for(const s of sess)await ref.collection("chat").doc(s).delete().catch(()=>{});
+      for(const l of items){GS.arch.delete(uid+"/"+l.id);GS.lette.delete(uid+"/"+l.id)}await gStatoSalva()}catch(e){toast("Non cancellato: aggiorna le regole di Firebase",5000)}
+    for(const id of ids)GS.pend.delete(id);render()},10000);
+  for(const id of ids)GS.pend.set(id,t);render();
+  toastUndo(msg||"Eliminata.",()=>{clearTimeout(t);for(const id of ids)GS.pend.delete(id);render();toast("Ripristinata")})}
+async function gProvaOggi(){if(!G.cur||!G.cur.prova)return;if(!confirm("Cancellare tutto quello che hai fatto oggi con l’account di prova (conversazioni, compiti, voti, errori, schede, tempo di studio)?"))return;
+  const D=G.dati,t=now(),inizio=parseD(today()).getTime(),creato=id=>{const ms=parseInt(String(id).replace(/^s/,"").slice(0,8),36);return ms>=inizio&&ms<=t+6e4};
+  for(const k of ["compiti","voti","glossario","schede"]){for(const x of D[k])if(creato(x.id)){D.del[x.id]=t;if(k==="compiti")delete D.piani[x.id]}D[k]=D[k].filter(x=>!creato(x.id))}
+  for(const k in D.errori)if((D.errori[k].ultimo||0)>=inizio){D.errori[k].n=0;D.errori[k].ultimo=t}
+  delete D.tempo[today()];D.resets.tempo=t;
+  try{await G.salvaDati()}catch(e){toast("Non riuscito: aggiorna le regole di Firebase",5000);return}
+  const ids=G.log.filter(l=>l.ms>=inizio).map(l=>l.id);if(ids.length)gDelLog(ids,"Prove di oggi cancellate.");else{toast("Prove di oggi cancellate");render()}}
 
 // ---------- dati ----------
 const ord=(a,k)=>a.slice().sort((x,y)=>(x[k]<y[k]?1:-1));
@@ -1518,10 +1555,11 @@ function gDati(){if(!G.cur)return gVuoto("Dati",true);const D=G.dati;
   const minTot=Math.round(Object.values(D.tempo).reduce((a,b)=>a+b,0));
   const fisN=Object.keys(D.fis.topics||{}).length;const usati=G.stato.giorno===today()?G.stato.n||0:0;
   return `${gHead("Dati",true)}
+  ${G.cur.prova?`<button class="btn danger wide" data-act="gprovaoggi">${ic("trash",18)} Cancella le prove di oggi</button>`:""}
   <p class="small muted">${G.cur.prova?"Dati dell’account di prova.":`Dati di ${esc(G.cur.nome)}.`} Le modifiche arrivano anche sull’app studente al prossimo aggiornamento, e quello che cancelli non ricompare.</p>
   <div class="card stack"><p class="b">Copia di sicurezza</p><p class="small muted">Salva tutti i dati in un file sul computer, da ripristinare se cancelli qualcosa per errore.</p><div class="grid2"><button class="btn ghost" data-act="gbackup">Scarica una copia</button><button class="btn ghost" data-act="grestore">Ripristina</button></div></div>
-  ${sez("compiti","Compiti e verifiche",D.compiti.length,"",comp.length?`<div class="list" style="margin:0 -16px">${comp.map(c=>`<div class="row"><div class="grow"><p class="xs b" style="color:${mcol(c.materia)}">${esc(c.materia)} · ${esc(c.tipo)} · ${esc(dataBreve(c.scadenza))}${c.fatto?" · fatto":""}</p><p class="small b">${esc(c.testo)}</p></div>${rigaBtn("gcomp:"+c.id,"gdelc:"+c.id)}</div>`).join("")}</div>`:"")}
-  ${sez("voti","Voti",D.voti.length,"",voti.length?`<div class="list" style="margin:0 -16px">${voti.map(v=>`<div class="row"><div class="grow"><p class="small b">${esc(v.materia)} · ${fmtVoto(v.voto)}</p><p class="xs muted">${esc(dataBreve(v.data))} · ${esc(v.tipo)}${v.nota?" · "+esc(v.nota):""}</p></div>${rigaBtn("gvoto:"+v.id,"gdelv:"+v.id)}</div>`).join("")}</div>`:"")}
+  ${sez("compiti","Compiti e verifiche",D.compiti.length,"",comp.length?`<div class="list" style="margin:0 -16px">${comp.map(c=>`<div class="row"><div class="grow"><p class="xs b" style="color:${mcol(c.materia)}">${G.cur.prova?`<span class="chip warm" style="margin-right:6px">Prova</span>`:""}${esc(c.materia)} · ${esc(c.tipo)} · ${esc(dataBreve(c.scadenza))}${c.fatto?" · fatto":""}</p><p class="small b">${esc(c.testo)}</p></div>${rigaBtn("gcomp:"+c.id,"gdelc:"+c.id)}</div>`).join("")}</div>`:"")}
+  ${sez("voti","Voti",D.voti.length,"",voti.length?`<div class="list" style="margin:0 -16px">${voti.map(v=>`<div class="row"><div class="grow"><p class="small b">${G.cur.prova?`<span class="chip warm" style="margin-right:6px">Prova</span>`:""}${esc(v.materia)} · ${fmtVoto(v.voto)}</p><p class="xs muted">${esc(dataBreve(v.data))} · ${esc(v.tipo)}${v.nota?" · "+esc(v.nota):""}</p></div>${rigaBtn("gvoto:"+v.id,"gdelv:"+v.id)}</div>`).join("")}</div>`:"")}
   ${sez("errori","Quaderno degli errori",errs.length,"",errs.length?`<div class="list" style="margin:0 -16px">${errs.slice(0,60).map(([k,e],i)=>`<div class="row"><div class="grow"><p class="small b">${esc(e.materia)} · ${esc(e.argomento||"")}</p><p class="xs muted">${esc(e.errore)} · ${e.n} volt${e.n>1?"e":"a"}</p></div>${rigaBtn("","gdele:"+i)}</div>`).join("")}</div>`:"")}
   ${sez("orario","Orario delle lezioni",ore,"Ore di lezione inserite")}
   ${sez("glossario","Glossario e schede di ripasso",D.glossario.length+D.schede.length,`${D.glossario.length} parole · ${D.schede.length} schede`)}
@@ -1602,9 +1640,16 @@ async function gAct(cmd,x){if(ruolo!=="genitore")return false;switch(cmd){
   case "gback":if(history.length>1&&location.hash!=="#g")history.back();else go("g");return true;
   case "greload":toast("Aggiorno…");await G.init();render();return true;
   case "gprova":entraProva();return true;
-  case "gstud":sheet(`<h2>Di chi vuoi vedere i dati?</h2>${G.stud.map(s=>`<button class="btn ${s.uid===G.cur.uid?"":"ghost"} wide" data-s="${s.uid}">${esc(s.nome)}${s.prova?"":" · "+esc(s.email)}</button>`).join("")}`,async(k,bg)=>{G.cur=G.stud.find(s=>s.uid===k);localStorage.setItem("ss-g-stud",k);bg.remove();await G.carica();render()});return true;
+  case "gstud":sheet(`<h2>Di chi vuoi vedere i dati?</h2>${G.stud.map(s=>`<button class="btn ${s.uid===G.cur.uid?"":"ghost"} wide" data-s="${s.uid}">${esc(s.nome)}${s.prova?"":" · "+esc(s.email)}</button>`).join("")}`,async(k,bg)=>{GS.filtro="";G.cur=G.stud.find(s=>s.uid===k);localStorage.setItem("ss-g-stud",k);bg.remove();await G.carica();render()});return true;
   case "gdel":G.imp.assegnati=(G.imp.assegnati||[]).filter(a=>a.id!==x);await G.salvaImp();render();return true;
   case "gres":gReset(x);return true;
+  case "gvista":GS.vista=x;render();return true;
+  case "garch":GS.arch.add(G.cur.uid+"/"+x);GS.lette.add(G.cur.uid+"/"+x);await gStatoSalva();render();toastUndo("Archiviata.",async()=>{GS.arch.delete(G.cur.uid+"/"+x);await gStatoSalva();render()});return true;
+  case "gdisarch":GS.arch.delete(G.cur.uid+"/"+x);await gStatoSalva();render();toast("Riportata tra le attive");return true;
+  case "glett":GS.lette.add(G.cur.uid+"/"+x);await gStatoSalva();render();return true;
+  case "glettetutte":for(const l of logVisibili())if(l.segnalazione)GS.lette.add(lk(l));await gStatoSalva();render();return true;
+  case "gdellog":gDelLog([x]);return true;
+  case "gprovaoggi":gProvaOggi();return true;
   case "gverifica":gVerifica();return true;
   case "gbackup":scaricaCopia();return true;
   case "grestore":ripristinaCopia();return true;
@@ -1630,6 +1675,7 @@ async function gForm(f){
 
 // ===== STUDIO SMART – novità v2.1 =====
 const NOVITA=[
+ ["2.2","19 novembre 2026",["Barra Home, Tutor, Agenda, Studio e Profilo sempre in basso","Area genitore: cestino e Annulla su ogni conversazione e segnalazione","Archivia per nascondere una conversazione senza cancellarla","Segnalazioni nuove con il numero nel menu e “Segna come letta”","Filtro per materia nelle conversazioni","Account di prova: badge “Prova” e “Cancella le prove di oggi”"]],
  ["2.1","14 novembre 2026",["Numero di versione e questo elenco delle novità","Avviso quando c’è una nuova versione da caricare","Colore dell’app e colori delle materie personalizzabili","Foto o simbolo del profilo","Promemoria serale con i compiti di domani","Timer di concentrazione da 25 minuti","Area genitore: prova come Davide, gestione dei dati, verifica del collegamento, copia di sicurezza, annulla, resoconto del mese"]],
  ["2.0","14 novembre 2026",["Studio Smart: tutor per tutte le materie, agenda con orario, compiti e voti, area genitore"]],
  ["1.0","12 novembre 2026",["FisicaFacile: lezioni, trucchi ed esercizi di fisica"]]];
@@ -1770,7 +1816,7 @@ function render(){applyTheme();
     case "timer":html=vTimer();act="home";break;
     default:html=vHome();act="home"}
   const full=r.name==="tutor"||r.name==="quiz"||r.name==="qz"||r.name==="timer";
-  $("#app").innerHTML=`${prova?`<div class="prova-bar"><span class="grow">Modalità prova: stai usando l’app come la vede Davide (account di prova)</span><button data-act="esciprova">Torna all’area genitore</button></div>`:""}<div class="app">${full&&matchMedia("(max-width:899px)").matches?"":navHtml(act)}<main id="main" class="fade" ${r.name==="tutor"?'style="padding-bottom:0"':""}>${html}</main></div>`;
+  $("#app").innerHTML=`${prova?`<div class="prova-bar"><span class="grow">Modalità prova: stai usando l’app come la vede Davide (account di prova)</span><button data-act="esciprova">Torna all’area genitore</button></div>`:""}<div class="app">${navHtml(act)}<main id="main" class="fade" ${r.name==="tutor"?'style="padding-bottom:0"':""}>${html}</main></div>`;
   if(r.name==="storico")vStorico();
   if(r.name==="tutor")scrollChat();
   const a=$("#ans");if(a&&quiz&&!quiz.answered)a.focus({preventScroll:true})}
@@ -1850,6 +1896,7 @@ document.addEventListener("submit",async e=>{const f=e.target.dataset.form;if(!f
   if(f==="ask"){const v=e.target.q.value.trim();if(!v)return;pendingAsk={testo:v,nuova:true};go("tutor")}});
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.id==="ans"){e.preventDefault();checkNum()}});
 document.addEventListener("change",e=>{
+  if(e.target.id==="gfiltro"){GS.filtro=e.target.value;render();return}
   if(e.target.id==="pn"){S.nome=e.target.value.trim()||"Davide";S.prefMod=now();save();toast("Nome salvato")}
   if(e.target.id==="seraOn"){S.seraOn=e.target.checked;S.prefMod=now();save();toast(S.seraOn?"Promemoria serale attivo":"Promemoria serale disattivato")}
   if(e.target.id==="oraSera"){S.oraSera=e.target.value||"18:00";S.prefMod=now();save();toast("Promemoria serale alle "+S.oraSera)}
