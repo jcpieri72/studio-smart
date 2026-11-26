@@ -233,6 +233,31 @@ textarea.field{min-height:90px;resize:vertical}
 
 .navbadge{position:absolute;top:0;left:calc(50% + 6px);min-width:18px;height:18px;padding:0 5px;border-radius:99px;background:var(--bad);color:#fff;font-size:11px;font-weight:800;line-height:18px;text-align:center}
 .chatwrap{min-height:calc(100vh - 110px)}
+/* v2.3 – come funziona */
+.howto{border:1px solid var(--line);border-radius:14px;background:var(--card);font-size:.92em}
+.howto>summary{list-style:none;cursor:pointer;padding:10px 14px;font-weight:700;color:var(--pri-ink);display:flex;align-items:center;gap:8px;min-height:44px}
+.howto>summary::-webkit-details-marker{display:none}
+.howto>summary::before{content:"";width:0;height:0;border-left:7px solid currentColor;border-top:5px solid transparent;border-bottom:5px solid transparent;transition:transform .15s}
+.howto[open]>summary::before{transform:rotate(90deg)}
+.howto>div{padding:0 14px 12px;color:var(--ink2);line-height:1.5}
+.howto-es{margin-top:8px;padding:8px 10px;border-radius:10px;background:var(--pri-soft);color:var(--ink)}
+/* v2.3 – mappe */
+.mapzoom{position:relative;overflow:auto;border:1px solid var(--line);border-radius:18px;background:var(--card);-webkit-overflow-scrolling:touch}
+.mapcanvas{position:relative;display:grid;grid-template-columns:1fr 210px 1fr;gap:56px;padding:22px;transform-origin:0 0;align-items:center}
+.mlines{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+.mcol{display:flex;flex-direction:column;gap:14px;position:relative;z-index:1}
+.mcenter{display:flex;justify-content:center;position:relative;z-index:1}
+.mnode{background:var(--ink);color:var(--bg);border-radius:18px;padding:16px 18px;font-weight:800;font-size:1.15em;text-align:center;line-height:1.25;min-width:150px;cursor:pointer}
+.mbranch{text-align:left;background:var(--card);border:1.5px solid var(--line);border-left:6px solid var(--c);border-radius:14px;padding:10px 12px;color:var(--ink);font:inherit;cursor:pointer}
+.mbranch b{display:block;color:var(--c);font-size:1.02em;margin-bottom:2px}
+.mbranch ul{margin:0;padding-left:17px;font-size:.9em;color:var(--ink2)}
+.mbranch:hover{box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.mapcanvas.narrow{display:flex;flex-direction:column;gap:10px;padding:14px 12px 14px 30px}
+.mapcanvas.narrow .mcol{display:contents}
+.mapcanvas.narrow .mcenter{order:0;justify-content:flex-start}
+.mapcanvas.narrow .mbranch{order:var(--o)}
+.mapcanvas.narrow .mnode{font-size:1.05em;padding:12px 16px}
+.mapcanvas.narrow .mbranch{width:100%}
 
 </style>
 <script src="config.js"></script>
@@ -765,13 +790,13 @@ function makeSet(topicIds,levels,n){
 
 
 // ===== STUDIO SMART – nucleo: dati, sincronizzazione, utilità =====
-const APP_VERSION="2.2";
+const APP_VERSION="2.3";
 const CFG=Object.assign({firebase:{},ponteUrl:"",vapidKey:"",genitoreHash:""},window.STUDIO_CONFIG||{});
 const MATERIE=["Italiano","Storia","Inglese","Tedesco","Matematica","Diritto ed economia","Economia aziendale","Informatica","Geografia","Scienze della Terra e Biologia","Fisica"];
 const MCOL={"Italiano":"#B42350","Storia":"#9A4316","Inglese":"#1D5FA8","Tedesco":"#6B3FA0","Matematica":"#3451D1","Diritto ed economia":"#556B12","Economia aziendale":"#0F766E","Informatica":"#0B6E99","Geografia":"#2F7D32","Scienze della Terra e Biologia":"#7A5C12","Fisica":"#8A5A00","Altro":"#5B6577"};
 const mcol=m=>(typeof S!=="undefined"&&S&&S.coloriMaterie&&S.coloriMaterie[m])||MCOL[m]||"#5B6577";
 const LS_BASE="studiosmart-v2";let LS=LS_BASE,prova=false;
-const RESETTABILI=["compiti","voti","orario","errori","glossario","schede","tempo","fis","piani","obiettiviVoto","assegnatiFatti","stat"];
+const RESETTABILI=["compiti","voti","orario","errori","glossario","schede","mappe","tempo","fis","piani","obiettiviVoto","assegnatiFatti","stat"];
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const uid8=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
@@ -798,7 +823,7 @@ const fmtMedia=v=>v==null?"–":v.toFixed(2).replace(".",",");
 function blank(){return{v:2,nome:"Davide",tutorNome:"Orione",tutorSimbolo:0,tema:"auto",testo:"normal",prefMod:0,
   fis:{selected:[1,2,3,4,7],topics:{},stats:{done:0,ok:0}},
   orario:{ore:["8:00","9:00","10:00","11:00","12:00","13:00"],giorni:{1:[],2:[],3:[],4:[],5:[],6:[]},mod:0},
-  compiti:[],voti:[],glossario:[],schede:[],piani:{},errori:{},tempo:{},obiettiviVoto:{},assegnatiFatti:[],del:{},
+  compiti:[],voti:[],glossario:[],schede:[],mappe:[],condivisiVisti:[],noteViste:[],piani:{},errori:{},tempo:{},obiettiviVoto:{},assegnatiFatti:[],del:{},
   stat:{tutor:0,corretti:0},resets:{},colore:"blu",coloriMaterie:{},avatar:null,avatarTipo:"lettera",avatarSimbolo:0,oraSera:"18:00",seraOn:true,updatedAt:0}}
 function load(){try{const s=JSON.parse(localStorage.getItem(LS));if(s&&s.v===2)return Object.assign(blank(),s)}catch(e){}return blank()}
 let S=load();
@@ -814,7 +839,7 @@ function merge(a,b){
   if(!b||b.v!==2)return a;
   const r=JSON.parse(JSON.stringify(a));
   r.del=Object.assign({},b.del||{},a.del||{});
-  for(const k of ["compiti","voti","glossario","schede"])r[k]=mergeList(a[k],b[k],r.del);
+  for(const k of ["compiti","voti","glossario","schede","mappe"])r[k]=mergeList(a[k],b[k],r.del);
   if((b.prefMod||0)>(a.prefMod||0)){for(const k of ["nome","tutorNome","tutorSimbolo","obiettiviVoto","colore","coloriMaterie","avatar","avatarTipo","avatarSimbolo","oraSera","seraOn"])if(b[k]!==undefined)r[k]=b[k];r.fis.selected=b.fis.selected;r.prefMod=b.prefMod}
   if((b.orario&&b.orario.mod||0)>(a.orario.mod||0))r.orario=b.orario;
   for(const id in (b.fis&&b.fis.topics)||{}){const x=r.fis.topics[id]||{read:[],best:{1:0,2:0,3:0},done:false,bestTest:0},y=b.fis.topics[id];
@@ -825,12 +850,13 @@ function merge(a,b){
   for(const k in b.piani||{}){const x=r.piani[k],y=b.piani[k];if(!x||(y.mod||0)>(x.mod||0))r.piani[k]=y}
   for(const k in r.piani)if(r.del[k])delete r.piani[k];
   r.assegnatiFatti=[...new Set([...(a.assegnatiFatti||[]),...(b.assegnatiFatti||[])])];
+  for(const k of ["condivisiVisti","noteViste"])r[k]=[...new Set([...(a[k]||[]),...(b[k]||[])])].slice(-300);
   r.stat={tutor:Math.max(a.stat.tutor||0,(b.stat||{}).tutor||0),corretti:Math.max(a.stat.corretti||0,(b.stat||{}).corretti||0)};
   r.fis.stats={done:Math.max(a.fis.stats.done||0,(b.fis.stats||{}).done||0),ok:Math.max(a.fis.stats.ok||0,(b.fis.stats||{}).ok||0)};
   const RA=a.resets||{},RB=b.resets||{},sel=r.fis.selected;r.resets={};
   for(const k of RESETTABILI){const x=RA[k]||0,y=RB[k]||0;r.resets[k]=Math.max(x,y);if(x===y)continue;
     const [nuovo,vecchio,t]=y>x?[b,a,y]:[a,b,x];
-    if(["compiti","voti","glossario","schede"].includes(k))r[k]=mergeList(nuovo[k]||[],(vecchio[k]||[]).filter(i=>(i.mod||0)>t),r.del);
+    if(["compiti","voti","glossario","schede","mappe"].includes(k))r[k]=mergeList(nuovo[k]||[],(vecchio[k]||[]).filter(i=>(i.mod||0)>t),r.del);
     else r[k]=JSON.parse(JSON.stringify(nuovo[k]!==undefined?nuovo[k]:blank()[k]));
     if(k==="fis")r.fis.selected=sel}
   r.updatedAt=Math.max(a.updatedAt||0,b.updatedAt||0);
@@ -852,18 +878,18 @@ async function initFirebase(){
     fb.auth.getRedirectResult().catch(()=>{});
     fb.auth.onAuthStateChanged(async u=>{
       user=u;ruolo=null;
-      if(u){const h=await sha256((u.email||"").toLowerCase());ruolo=CFG.genitoreHash&&h===CFG.genitoreHash.toLowerCase()?"genitore":"studente";
-        if(ruolo==="genitore"&&localStorage.getItem("ss-prova")==="1"){prova=true;LS=LS_BASE+"-prova";S=load();ruolo="studente"}
-        if(ruolo==="studente"){await pull();listenImp()}else{await G.init()}}
+      if(u){const h=await sha256((u.email||"").toLowerCase());const gg=genitoriCfg().find(g=>g.hash===h);ruolo=gg?"genitore":"studente";GEN_NOME=gg?gg.nome:"";
+        if(ruolo==="genitore"&&localStorage.getItem("ss-prova")==="1"){prova=true;LS=LS_BASE+"-prova-"+(u||user).uid.slice(0,8);S=load();ruolo="studente"}
+        if(ruolo==="studente"){await pull();listenImp();ascoltaCondivisi()}else{await G.init()}}
       fbReady=true;render()});
   }catch(e){syncErr=true;fbReady=true;render()}
 }
 function login(){if(!fb){toast("Collegamento non disponibile: controlla internet");return}
   const p=new firebase.auth.GoogleAuthProvider();p.setCustomParameters({prompt:"select_account"});
   fb.auth.signInWithPopup(p).catch(err=>{if(/popup|operation-not-supported/i.test(err.code||""))fb.auth.signInWithRedirect(p);else toast("Accesso non riuscito: riprova")})}
-function logout(){localStorage.removeItem("ss-prova");if(prova){prova=false;LS=LS_BASE;S=load()}if(fb)fb.auth.signOut();location.hash="home"}
-async function entraProva(){localStorage.setItem("ss-prova","1");prova=true;LS=LS_BASE+"-prova";S=load();ruolo="studente";location.hash="home";render();await pull();listenImp();render();toast("Modalità prova: usi l’app come la vede Davide",4000)}
-async function esciProva(){localStorage.removeItem("ss-prova");prova=false;if(impUnsub){impUnsub();impUnsub=null}await push();LS=LS_BASE;S=load();ruolo="genitore";G.caricato=false;location.hash="g";render();await G.init();render()}
+function logout(){localStorage.removeItem("ss-prova");if(condUnsub){condUnsub();condUnsub=null}CONDIVISI=[];if(prova){prova=false;LS=LS_BASE;S=load()}if(fb)fb.auth.signOut();location.hash="home"}
+async function entraProva(){localStorage.setItem("ss-prova","1");prova=true;LS=LS_BASE+"-prova-"+user.uid.slice(0,8);S=load();ruolo="studente";location.hash="home";render();await pull();listenImp();render();toast("Modalità prova: usi l’app come la vede Davide",4000)}
+async function esciProva(){localStorage.removeItem("ss-prova");prova=false;if(condUnsub){condUnsub();condUnsub=null}CONDIVISI=[];if(impUnsub){impUnsub();impUnsub=null}await push();LS=LS_BASE;S=load();ruolo="genitore";G.caricato=false;location.hash="g";render();await G.init();render()}
 const myDoc=()=>fb.db.collection("studenti").doc(user.uid);
 async function pull(){if(!user||ruolo!=="studente")return;
   try{const d=await myDoc().get();if(d.exists&&d.data().json){S=merge(S,JSON.parse(d.data().json));persist()}await push();syncErr=false}catch(e){syncErr=true}}
@@ -875,7 +901,7 @@ function promemoriaList(st){st=st||S;const out=[];
   const lim=now()-864e5;return out.filter(p=>Date.parse(p.at)>lim).slice(0,80)}
 async function push(){if(!user||ruolo!=="studente")return;
   try{const d=await myDoc().get();if(d.exists&&d.data().json){S=merge(S,JSON.parse(d.data().json));persist()}
-    await myDoc().set({json:JSON.stringify(S),email:user.email||"",nome:S.nome,aggiornato:firebase.firestore.FieldValue.serverTimestamp(),promemoria:JSON.stringify(promemoriaList())},{merge:true});syncErr=false}catch(e){syncErr=true}}
+    await myDoc().set({json:JSON.stringify(S),email:user.email||"",nome:prova?"Prova ("+GEN_NOME+")":S.nome,prova:!!prova,provaDi:prova?GEN_NOME:"",aggiornato:firebase.firestore.FieldValue.serverTimestamp(),promemoria:JSON.stringify(promemoriaList())},{merge:true});syncErr=false}catch(e){syncErr=true}}
 function scheduleSync(){if(!user||ruolo!=="studente")return;clearTimeout(syncT);syncT=setTimeout(push,1500)}
 let impUnsub=null;
 function listenImp(){if(impUnsub)impUnsub();impUnsub=myDoc().collection("genitore").doc("impostazioni").onSnapshot(d=>{if(d.exists)IMP=Object.assign(IMP,d.data());if(route().name!=="tutor")render()},()=>{})}
@@ -963,6 +989,7 @@ setInterval(()=>{if(ruolo==="genitore"||localStorage.getItem("ss-push")==="1")re
 
 // ---------- icone ----------
 const IC={
+ share:'<path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 13v7h14v-7"/>',map:'<circle cx="12" cy="12" r="3"/><circle cx="4.5" cy="6" r="2"/><circle cx="19.5" cy="6" r="2"/><circle cx="4.5" cy="18" r="2"/><circle cx="19.5" cy="18" r="2"/><path d="M6.3 7l3.3 3M17.7 7l-3.3 3M6.3 17l3.3-3M17.7 17l-3.3-3"/>',gift:'<rect x="4" y="9" width="16" height="11" rx="1"/><path d="M3 9h18M12 9v11M12 9c-2-4-6-4-6-1.5S12 9 12 9zM12 9c2-4 6-4 6-1.5S12 9 12 9z"/>',
  archive:'<rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v10h14V9M10 13h4"/>',
  home:'<path d="M3 11l9-7 9 7v9h-6v-6H9v6H3z"/>',chat:'<path d="M4 5h16v11H9l-5 4z"/>',cal:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',
  book:'<path d="M5 4h11l3 3v13H5z"/><path d="M9 10h6M9 14h6"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4.5-6 8-6s7 2 8 6"/>',
@@ -1031,7 +1058,10 @@ function vHome(){
       <button type="button" class="icon-btn" style="background:var(--dark2);color:#fff" data-act="askfoto" aria-label="Fotografa">${ic("cam")}</button>
       <button type="button" class="icon-btn pri" data-act="askmic" aria-label="Parla">${ic("mic")}</button></div>
   </form>
-  ${ass.length?`<div class="sec"><h2>Da fare per papà</h2></div><div class="card flush list">${ass.map(a=>`<div class="row"><button class="check" data-act="assok:${a.id}" aria-label="Fatto"></button><div class="grow"><p class="b">${esc(a.testo)}</p><p class="xs muted">${esc(a.materia||"")}${a.entro?` · entro ${quando(a.entro)}`:""}</p></div></div>`).join("")}</div>`:""}
+  ${noteNuove().map(n=>`<div class="card row" style="border-left:4px solid var(--pri)"><div class="grow"><p class="xs b muted">Messaggio da ${esc(daChi(n.da)||"mamma e papà")}</p><p>${esc(n.testo)}</p></div><button class="btn soft sm" data-act="notaok:${n.id}">Letto</button></div>`).join("")}
+  ${condNuovi().length?`<button class="card row" style="text-align:left;width:100%" data-go="dammp"><span class="icon-btn" style="background:var(--pri-soft);color:var(--pri-ink)">${ic("gift")}</span><span class="grow"><span class="b" style="display:block">Novità da mamma e papà</span><span class="small muted">${condNuovi().map(c=>c.tipo==="mappa"?"una mappa":c.tipo==="test"?"un test":"una spiegazione").filter((x,i,a)=>a.indexOf(x)===i).join(", ")} per te</span></span><span class="chip pri">${condNuovi().length}</span></button>`:""}
+  ${ass.length?`<div class="sec"><h2>Da fare per mamma e papà</h2></div><div class="card flush list">${ass.map(a=>`<div class="row"><button class="check" data-act="assok:${a.id}" aria-label="Fatto"></button><div class="grow"><p class="b">${esc(a.testo)}</p><p class="xs muted">${a.da?"da "+esc(daChi(a.da))+" · ":""}${esc(a.materia||"")}${a.entro?` · entro ${quando(a.entro)}`:""}</p></div></div>`).join("")}</div>`:""}
+  ${aiuto("Questa è la tua pagina di ogni giorno. In alto chiedi aiuto al tutor (scrivi, fotografa o parla). Sotto trovi i compiti in scadenza, il piano delle verifiche, il tempo di studio di oggi e il ripasso. I pulsanti in basso portano sempre alle sezioni principali.")}
   <div class="sec"><h2>Cosa studio oggi</h2><a href="#agenda/compiti">Agenda</a></div>
   ${ritardo.length||prossimi.length?`<div class="card flush list">${ritardo.concat(prossimi).slice(0,5).map(c=>rigaCompito(c,true)).join("")}</div>`:`<div class="card empty">Nessun compito in scadenza nei prossimi giorni.<br><button class="link" data-act="newc">Aggiungi un compito</button></div>`}
   ${verifiche.map(v=>{const p=S.piani[v.id];const g=p&&(p.giorni||[]).find(x=>x.data===oggi);
@@ -1056,7 +1086,10 @@ function rigaCompito(c,home){const oggi=today(),rit=c.scadenza<oggi&&!c.fatto;co
 
 // ---------- AGENDA ----------
 function agendaHead(tab){return `<div class="top"><h1>Agenda</h1><div class="seg">${[["orario","Orario"],["compiti","Compiti"],["voti","Voti"]].map(t=>`<button class="${tab===t[0]?"act":""}" data-go="agenda/${t[0]}">${t[1]}</button>`).join("")}</div></div>`}
-function vAgenda(tab){tab=tab||"orario";return agendaHead(tab)+(tab==="compiti"?vCompiti():tab==="voti"?vVoti():vOrario())}
+const AIUTO_AG={orario:["Tocca un giorno per vedere le lezioni. Tocca una lezione vuota per scegliere la materia: così l’app sa quando hai lezione e propone da sola la scadenza dei compiti.","Il lunedì alla 2ª ora hai Matematica: un compito di Matematica segnato venerdì scade lunedì."],
+ compiti:["Aggiungi un compito scrivendolo, dettandolo o fotografandolo dal diario. Puoi mettere un promemoria: arriva una notifica sul telefono. Spunta il cerchio quando l’hai finito. Per verifiche e interrogazioni l’app prepara un piano di studio giorno per giorno."],
+ voti:["Inserisci ogni voto con la materia e il tipo (scritto, orale, pratico). L’app calcola la media di ogni materia e quella generale. Tocca una materia per vedere i voti e fissare un obiettivo: l’app ti dice che voto ti serve per raggiungerlo.","Obiettivo 7 in Inglese con 6 e 6,5: ti serve almeno 8,5 alla prossima."]};
+function vAgenda(tab){tab=tab||"orario";const a=AIUTO_AG[tab]||AIUTO_AG.orario;return agendaHead(tab)+aiuto(a[0],a[1])+`<div class="row" style="justify-content:flex-end;margin-top:-6px"><button class="btn ghost sm" data-act="espag:${tab}">${ic("share",16)} Esporta</button></div>`+(tab==="compiti"?vCompiti():tab==="voti"?vVoti():vOrario())}
 function settimana(){const t=parseD(today());if(agWeek===null)agWeek=t.getDay()===0||(t.getDay()===6&&t.getHours?new Date().getHours()>=14:false)?1:0;
   const off=(t.getDay()+6)%7;const lun=addDays(today(),-off+7*agWeek);return [0,1,2,3,4,5].map(i=>addDays(lun,i))}
 function vOrario(){
@@ -1154,10 +1187,12 @@ async function creaPiano(id){const c=S.compiti.find(x=>x.id===id);if(!c)return;t
 function vPiano(id){const c=S.compiti.find(x=>x.id===id),p=S.piani[id];if(!c||!p)return vStudio();const oggi=today();
   return `<button class="back" data-go="home">${ic("back",18)} Indietro</button>
   <div><span class="chip warm">${c.tipo==="verifica"?"Verifica":"Interrogazione"} di ${esc(c.materia)} · ${esc(dataLunga(c.scadenza))}</span><h1 style="margin-top:8px">Piano di studio</h1><p class="muted small" style="margin-top:4px">${esc(c.testo)}</p></div>
+  ${aiuto("Il piano divide lo studio nei giorni che mancano alla verifica, un pezzo al giorno. Spunta ogni giorno quando hai finito; “Con il tutor” ti fa studiare quel pezzo. Una mappa dell’argomento aiuta a ripassare.")}
   <div class="card flush list">${p.giorni.map((g,i)=>`<div class="row" style="align-items:flex-start;${g.data===oggi?"background:var(--pri-soft)":""}"><button class="check ${g.fatto?"on":""}" data-act="pdone:${id}:${i}" aria-label="Fatto">${g.fatto?ic("check"):""}</button>
     <div class="grow"><p class="xs b muted">${g.data===oggi?"OGGI":esc(dataBreve(g.data))} · ${g.minuti} min</p><p class="b" style="${g.fatto?"text-decoration:line-through;color:var(--ink2)":""}">${esc(g.attivita)}</p></div>
     ${g.fatto?"":`<button class="btn soft sm" data-act="pfai:${id}:${i}">Con il tutor</button>`}</div>`).join("")}</div>
-  <div class="grid2"><button class="btn ghost" data-act="piano:${id}">Rifai il piano</button><button class="btn" data-act="interr:${id}">Interrogami</button></div>`}
+  <div class="grid2"><button class="btn ghost" data-act="piano:${id}">Rifai il piano</button><button class="btn" data-act="interr:${id}">Interrogami</button></div>
+  <div class="grid2"><button class="btn soft" data-act="pmappa:${id}">${ic("map",16)} Crea una mappa</button><button class="btn ghost" data-act="pesp:${id}">${ic("share",16)} Esporta</button></div>`}
 
 function vVoti(){const mm=medieMaterie(),mg=mediaGenerale();
   const mesi={};for(const v of S.voti){const k=v.data.slice(0,7);(mesi[k]=mesi[k]||[]).push(+v.voto)}
@@ -1194,9 +1229,14 @@ function schedaMateria(m){const vs=S.voti.filter(v=>v.materia===m).sort((a,b)=>a
 // ---------- STUDIO ----------
 function vStudio(){const sch=schedeDaFare().length,err=erroriTop(4),ver=compitiAperti().filter(c=>c.tipo!=="compito");
   const tile=(go,act,t,d,icn)=>`<button class="card row" style="text-align:left;width:100%" ${go?`data-go="${go}"`:`data-act="${act}"`}><span class="icon-btn" style="background:var(--pri-soft);color:var(--pri-ink)">${ic(icn)}</span><span class="grow"><span class="b" style="display:block">${t}</span><span class="small muted">${d}</span></span></button>`;
+  const nc=condNuovi().length;
   return `<h1>Studio</h1>
+  ${aiuto("Qui trovi tutto per studiare: il tutor che ti spiega e ti interroga, le mappe, i test, il ripasso degli errori e gli strumenti per ricordare. Il tutor non fa i compiti al posto tuo: ti guida finché ci arrivi da solo.")}
+  <div class="grid2"><button class="card" style="text-align:left;min-height:84px;border-color:var(--pri)" data-go="mappe"><span class="row" style="gap:8px">${ic("map",20)}<span class="b">Mappe di studio</span></span><span class="xs muted" style="display:block;margin-top:4px">${S.mappe.length?S.mappe.length+" mapp"+(S.mappe.length>1?"e":"a"):"Creane una"}</span></button>
+   <button class="card" style="text-align:left;min-height:84px" data-act="ntest"><span class="row" style="gap:8px">${ic("check",20)}<span class="b">Crea un test</span></span><span class="xs muted" style="display:block;margin-top:4px">Domande su un argomento</span></button></div>
+  ${CONDIVISI.length?`<button class="card row" style="text-align:left;width:100%" data-go="dammp"><span class="icon-btn" style="background:var(--pri-soft);color:var(--pri-ink)">${ic("gift")}</span><span class="grow"><span class="b" style="display:block">Da mamma e papà</span><span class="small muted">${nc?nc+" nuov"+(nc>1?"i":"o"):CONDIVISI.length+" element"+(CONDIVISI.length>1?"i":"o")}</span></span>${nc?`<span class="chip pri">Nuovo</span>`:""}</button>`:""}
   <div class="sec"><h2>Con il tutor</h2></div>
-  <div class="grid2">${[["lezione","Spiegami una lezione"],["interrogazione","Interrogami"],["spiegalo","Spiegalo con parole tue"],["mappa","Mappa concettuale"],["ascolto","Ascolto inglese e tedesco"],["verifica","Analizza una verifica"]].map(m=>`<button class="card" style="text-align:left;min-height:76px" data-act="modo:${m[0]}"><span class="b">${m[1]}</span></button>`).join("")}</div>
+  <div class="grid2">${[["lezione","Spiegami una lezione"],["interrogazione","Interrogami"],["spiegalo","Spiegalo con parole tue"],["ascolto","Ascolto inglese e tedesco"],["verifica","Analizza una verifica"]].map(m=>`<button class="card" style="text-align:left;min-height:76px" data-act="modo:${m[0]}"><span class="b">${m[1]}</span></button>`).join("")}</div>
   <div class="sec"><h2>Ripasso su misura</h2><a href="#errori">Quaderno degli errori</a></div>
   ${err.length?`<div class="card flush list">${err.map(e=>`<div class="row"><div class="grow"><p class="xs b" style="color:${mcol(e.materia)}">${esc(e.materia)} · ${e.n} volt${e.n>1?"e":"a"}</p><p class="small b">${esc(e.argomento||"")}</p><p class="xs muted">${esc(e.errore)}</p></div><button class="btn soft sm" data-act="rip:${esc(e.k)}">Allenati</button></div>`).join("")}</div>`:`<div class="card empty">Qui compariranno gli argomenti su cui sbagli più spesso, con esercizi creati apposta per te.</div>`}
   <div class="sec"><h2>Ripasso e strumenti</h2></div>
@@ -1211,6 +1251,9 @@ function vStudio(){const sch=schedeDaFare().length,err=erroriTop(4),ver=compitiA
 
 function vErrori(){const per={};for(const e of erroriTop(200))(per[e.materia]=per[e.materia]||[]).push(e);
   return `<button class="back" data-go="studio">${ic("back",18)} Studio</button><h1>Quaderno degli errori</h1><p class="muted small">Gli errori che fai più spesso, raccolti dal tutor e dagli esercizi.</p>
+  ${aiuto("Ogni volta che sbagli qualcosa con il tutor o negli esercizi, l’errore finisce qui. <b>Allenati</b> crea esercizi proprio su quell’errore; <b>Mappa dei punti deboli</b> prepara una mappa di ripasso con le regole giuste da ricordare.")}
+  ${Object.keys(per).length?`<div class="row wrap">${Object.keys(per).sort().map(m=>`<button class="btn soft sm" data-act="merr:${esc(m)}">${ic("map",16)} Mappa ${esc(m)}</button>`).join("")}</div>`:""}
+  <div class="row"><button class="btn ghost sm" data-act="esperr">${ic("share",16)} Esporta</button></div>
   ${Object.keys(per).length?Object.keys(per).sort().map(m=>`<p class="label" style="color:${mcol(m)}">${esc(m)}</p><div class="card flush list">${per[m].map(e=>`<div class="row"><div class="grow"><p class="small b">${esc(e.argomento||"")}</p><p class="xs muted">${esc(e.errore)} · ${e.n} volt${e.n>1?"e":"a"}</p></div><button class="btn soft sm" data-act="rip:${esc(e.k)}">Allenati</button></div>`).join("")}</div>`).join(""):`<div class="card empty">Ancora nessun errore registrato.</div>`}`}
 async function ripasso(k){const e=S.errori[k];if(!e)return;toast("Preparo gli esercizi per te…",9000);
   try{const r=await ponte("/genera",{tipo:"quiz",materia:e.materia,argomento:e.argomento,dettagli:`Lo studente fa spesso questo errore: ${e.errore}. Concentrati su questo.`,n:6});
@@ -1220,20 +1263,20 @@ function vQz(){if(!gq)return vStudio();const n=gq.domande.length;
   if(gq.i<0)return `<button class="back" data-go="studio">${ic("back",18)} Studio</button><span class="chip" style="align-self:flex-start;background:${mcol(gq.materia)};color:#fff">${esc(gq.materia)}</span><h1>${esc(gq.titolo)}</h1>
    <div class="card stack"><p class="label">Ripasso veloce</p><p style="white-space:pre-wrap">${md(gq.ripasso)}</p></div><button class="btn wide" data-act="qzgo">Inizia gli esercizi (${n})</button>`;
   if(gq.i>=n){const ok=gq.score/n>=.8;return `<div class="card stack" style="text-align:center"><p class="muted">${esc(gq.titolo)}</p><p class="xb" style="font-size:3em;line-height:1">${gq.score}<span class="muted" style="font-size:.4em">/${n}</span></p><p>${ok?"Ottimo: questo errore lo hai superato.":"Bene, continua ad allenarti: riprova tra qualche giorno."}</p>
-   <div class="row"><button class="btn ghost grow" data-go="studio">Studio</button><button class="btn grow" data-act="qzagain">Altri esercizi</button></div></div>`}
+   <div class="row"><button class="btn ghost grow" data-go="${gq.mappa?"mappa/"+gq.mappa:"studio"}">${gq.mappa?"Torna alla mappa":"Studio"}</button><button class="btn grow" data-act="qzagain">Altri esercizi</button></div><button class="btn ghost wide" data-act="qzesp">${ic("share",16)} ${prova?"Esporta o condividi il test":"Esporta il test"}</button></div>`}
   const q=gq.domande[gq.i];
   return `<div class="qtop"><button class="back" data-act="qzquit">✕ Esci</button><div class="qbar"><i style="width:${(gq.i+(gq.ans!=null?1:0))/n*100}%"></i></div><span class="small b muted">${gq.i+1}/${n}</span></div>
   <div class="card stack"><p class="b" style="font-size:1.08em">${md(q.q)}</p>${q.opzioni.map((o,k)=>{let c="";if(gq.ans!=null){if(k===+q.giusta)c="ok";else if(k===gq.ans)c="ko"}return `<button class="opt ${c}" data-act="qzp:${k}" ${gq.ans!=null?"disabled":""}>${md(o)}</button>`}).join("")}</div>
   ${gq.ans!=null?`<div class="fb ${gq.ans===+q.giusta?"ok":"ko"} fade"><h3>${gq.ans===+q.giusta?"Giusto":"Non proprio"}</h3><p>${md(q.spiegazione||"")}</p></div><button class="btn wide" data-act="qznext">${gq.i<n-1?"Avanti":"Vedi il risultato"}</button>`:""}`}
 
 function vSchede(){const due=schedeDaFare();if(flashI>=due.length)flashI=0;const s=due[flashI];
-  return `<button class="back" data-go="studio">${ic("back",18)} Studio</button><h1>Ripasso a intervalli</h1>
+  return `<button class="back" data-go="studio">${ic("back",18)} Studio</button><h1>Ripasso a intervalli</h1>${aiuto("Leggi la domanda, prova a rispondere a mente, poi gira la scheda. Se la sapevi tocca “La sapevo” e tornerà tra qualche giorno; se no tornerà domani. Così ripassi solo quello che serve.")}
   <p class="small muted">Le schede che sai tornano sempre più di rado (dopo 1, 3, 7, 15, 30 giorni); quelle che sbagli tornano domani.</p>
   ${s?`<div class="card flash fade"><p class="xs b" style="color:${mcol(s.materia)}">${esc(s.materia||"")} · ${due.length} da fare</p><p class="b">${esc(s.fronte)}</p>${s.lingua?`<button class="btn ghost sm" data-act="say:${s.lingua}">${ic("spk",16)} Ascolta</button>`:""}${flashShow?`<hr style="width:60%;border:0;border-top:1px solid var(--line)"><p>${esc(s.retro)}</p>`:""}</div>
    ${flashShow?`<div class="grid2"><button class="btn ghost" data-act="fno">Non la sapevo</button><button class="btn" data-act="fok">La sapevo</button></div>`:`<button class="btn wide" data-act="fshow">Mostra la risposta</button>`}`:`<div class="card empty">Per oggi hai ripassato tutto. Le nuove schede arrivano dal tutor (glossario) e dai vocaboli che aggiungi.</div>`}
   <p class="small muted">In tutto: ${S.schede.length} schede.</p>`}
 function vGlossario(){const g=S.glossario.slice().sort((a,b)=>a.termine.localeCompare(b.termine,"it"));
-  return `<button class="back" data-go="studio">${ic("back",18)} Studio</button><h1>Glossario</h1><p class="small muted">Le parole importanti che hai incontrato con il tutor. Finiscono anche nel ripasso a intervalli.</p>
+  return `<button class="back" data-go="studio">${ic("back",18)} Studio</button><h1>Glossario</h1><p class="small muted">Le parole importanti che hai incontrato con il tutor. Finiscono anche nel ripasso a intervalli.</p>${aiuto("Quando il tutor ti spiega una parola nuova, la salva qui con la definizione. Non devi fare niente: rileggile ogni tanto o ripassale con le schede.")}${g.length?`<div class="row"><button class="btn ghost sm" data-act="espglo">${ic("share",16)} Esporta</button></div>`:""}
   ${g.length?`<div class="card flush list">${g.map(x=>`<div><p class="b">${esc(x.termine)} <span class="xs" style="color:${mcol(x.materia)}">· ${esc(x.materia||"")}</span></p><p class="small muted">${esc(x.def)}</p></div>`).join("")}</div>`:`<div class="card empty">Ancora vuoto.</div>`}`}
 function editorVocabolo(){let lingua="en";const html=()=>`<h2>Nuovo vocabolo</h2><div class="seg"><button class="${lingua==="en"?"act":""}" data-s="l:en">Inglese</button><button class="${lingua==="de"?"act":""}" data-s="l:de">Tedesco</button></div>
   <div><label class="flabel" for="vw">Parola o frase in ${lingua==="en"?"inglese":"tedesco"}</label><input class="field" id="vw"></div><div><label class="flabel" for="vi">Significato in italiano</label><input class="field" id="vi"></div>
@@ -1242,7 +1285,7 @@ function editorVocabolo(){let lingua="en";const html=()=>`<h2>Nuovo vocabolo</h2
     if(k==="ok"){const w=bg.querySelector("#vw").value.trim(),it=bg.querySelector("#vi").value.trim();if(!w||!it){toast("Compila entrambi i campi");return}
       S.schede.push({id:uid8(),fronte:w,retro:it,lingua,materia:lingua==="en"?"Inglese":"Tedesco",box:0,prossima:today(),mod:now()});save();bg.querySelector("#vw").value="";bg.querySelector("#vi").value="";bg.querySelector("#vw").focus();toast("Aggiunto al ripasso")}})}
 function vMetodo(){const T=[["Studia a blocchi","25-30 minuti di studio, poi 5 minuti di pausa vera (lontano dal telefono). Dopo 4 blocchi, pausa più lunga."],["Prima capisci, poi ripeti","Leggi tutto il paragrafo, poi chiudi il libro e prova a ripeterlo a voce. Se non ci riesci, non l’hai ancora capito: rileggi solo quel pezzo."],["Fai schemi e mappe","Per Storia, Diritto e Geografia scrivi le parole chiave e collegale. Il tutor ti aiuta con la modalità Mappa concettuale."],["Ripassa a intervalli","Ripassare un po’ ogni giorno funziona meglio che tutto la sera prima. Usa le schede del ripasso a intervalli."],["Esercizi: prima da solo","Prova sempre l’esercizio da solo prima di chiedere aiuto. L’errore è utile: ti mostra cosa ripassare."],["Prima della verifica","Crea il piano di studio, fai l’interrogazione simulata e la sera prima solo un ripasso leggero. Dormi bene: la memoria si fissa di notte."],["Elimina le distrazioni","Telefono in modalità silenziosa, una sola cosa alla volta, scrivania in ordine."]];
-  return `<button class="back" data-go="studio">${ic("back",18)} Studio</button><h1>Metodo di studio</h1>${T.map((t,i)=>`<div class="card stack"><p class="xs b muted">${i+1}</p><p class="b">${t[0]}</p><p class="small">${t[1]}</p></div>`).join("")}`}
+  return `<button class="back" data-go="studio">${ic("back",18)} Studio</button><h1>Metodo di studio</h1>${aiuto("Consigli brevi per studiare meglio e in meno tempo. Provane uno alla volta per una settimana.")}${T.map((t,i)=>`<div class="card stack"><p class="xs b muted">${i+1}</p><p class="b">${t[0]}</p><p class="small">${t[1]}</p></div>`).join("")}`}
 
 // ---------- PROFILO ----------
 function vProfilo(){const seg=(k,o)=>`<div class="seg">${o.map(x=>`<button class="${S[k]===x[0]?"act":""}" data-act="set:${k}:${x[0]}">${x[1]}</button>`).join("")}</div>`;
@@ -1250,6 +1293,7 @@ function vProfilo(){const seg=(k,o)=>`<div class="seg">${o.map(x=>`<button class
   else if(user)acc=`<p class="small">Accesso come <b>${esc(user.email||"")}</b>. ${syncErr?"Sincronizzazione non riuscita: controlla internet.":"Tutto sincronizzato su PC e telefono."}</p><button class="btn ghost wide" data-act="logout">Esci dall’account</button>`;
   else acc=`<p class="small muted">Accedi per usare il tutor e ritrovare tutto su ogni dispositivo.</p><button class="btn wide" data-act="login">Accedi con Google</button>`;
   return `<div class="top"><h1>Profilo</h1>${verChip()}</div>
+  ${aiuto("Qui personalizzi l’app: il tuo nome e l’immagine, il nome del tutor, i colori, il tema chiaro o scuro, le notifiche. Con “Esci dall’account” scolleghi questo dispositivo: i dati restano salvati.")}
   <div class="card stack"><div class="row"><span class="avatar" style="width:64px;height:64px;font-size:1.6em;overflow:hidden">${avatarHtml(64)}</span><div class="grow"><label class="flabel" for="pn">Il tuo nome</label><input class="field" id="pn" value="${esc(S.nome)}" maxlength="20"></div></div>
    <p class="flabel">Immagine del profilo</p><div class="seg">${[["lettera","Iniziale"],["simbolo","Simbolo"],["foto","Foto"]].map(x=>`<button class="${(S.avatarTipo||"lettera")===x[0]?"act":""}" data-act="avtipo:${x[0]}">${x[1]}</button>`).join("")}</div>
    ${S.avatarTipo==="simbolo"?`<div class="row">${SIMBOLI.map((x,i)=>`<button class="tutor-av" style="background:var(--pri-soft);color:var(--pri-ink);${(S.avatarSimbolo||0)===i?"outline:3px solid var(--pri);outline-offset:2px":""}" data-act="avsym:${i}" aria-label="Simbolo ${i+1}">${simbolo(i)}</button>`).join("")}</div>`:""}
@@ -1271,7 +1315,7 @@ function topicPct(id){const t=fT(id),tp=topicById(id);const r=Math.min(t.read.le
 function padronanza(id){const t=fT(id);if(t.done)return["Completato","ok"];const p=topicPct(id);return p===0?["Da iniziare",""]:p<40?["In corso","pri"]:p<75?["Buono","pri"]:["Ottimo","ok"]}
 const livNome=b=>b>=10?"Ottimo":b>=8?"Buono":b>=6?"Sufficiente":b?"Da rifare":"Non fatto";
 function vFisica(){const sel=TOPICS.filter(t=>S.fis.selected.includes(t.id));
-  return `<button class="back" data-go="studio">${ic("back",18)} Studio</button><h1>Fisica</h1><p class="small muted">Lezioni brevi, trucchi per ricordare ed esercizi sempre nuovi.</p>
+  return `<button class="back" data-go="studio">${ic("back",18)} Studio</button><h1>Fisica</h1><p class="small muted">Lezioni brevi, trucchi per ricordare ed esercizi sempre nuovi.</p>${aiuto("Scegli un argomento: leggi la lezione breve con il trucco per ricordare, poi fai gli esercizi a tre livelli. “Allenamento misto” mescola gli argomenti scelti. Con “Argomenti” decidi quali vedere.")}
   <div class="row"><button class="btn ghost grow" data-act="fchoose">Argomenti (${sel.length} su ${TOPICS.length})</button><button class="btn grow" data-act="fstart:mix">Allenamento misto</button></div>
   <div class="stack">${sel.map(tp=>{const [lab,cl]=padronanza(tp.id);return `<button class="card" style="text-align:left;width:100%" data-go="f/${tp.id}/impara"><div class="row" style="margin-bottom:10px"><span class="icon-btn" style="background:${tp.color};color:#fff;font-weight:800">${tp.id}</span><span class="grow"><span class="b" style="display:block">${tp.short}</span><span class="xs muted">${tp.sub}</span></span><span class="chip ${cl}">${lab}</span></div><div class="bar"><i style="width:${topicPct(tp.id)}%;background:${tp.color}"></i></div></button>`}).join("")||`<div class="card empty">Nessun argomento scelto.</div>`}</div>`}
 function chooseFis(){sheet(`<h2>Argomenti di fisica</h2><div class="row"><button class="btn ghost grow" data-s="all">Tutti</button><button class="btn ghost grow" data-s="none">Nessuno</button></div>
@@ -1319,6 +1363,12 @@ function vRisultato(){const r=lastResult;if(!r)return vFisica();const tp=r.topic
   <div class="row"><button class="btn ghost grow" data-go="${tp?`f/${tp.id}/esercizi`:"fisica"}">Indietro</button><button class="btn grow" data-act="fstart:${r.topic}:${r.level}">Riprova</button></div></div>
   ${r.wrong.length?`<div class="sec"><h2>Da ripassare</h2></div><div class="stack">${r.wrong.map(q=>`<div class="card stack"><p>${q.q}</p><p class="small b">Risposta: ${q.type==="mc"?q.options[q.answer]:fmt(q.answer)+(q.unit?" "+q.unit:"")}</p><p class="small muted">${q.explain}</p></div>`).join("")}</div>`:""}`}
 
+function vDaMammaPapa(){const ty={mappa:"Mappa",test:"Test",chat:"Spiegazione"};
+  return `<button class="back" data-go="studio">${ic("back",18)} Studio</button><h1>Da mamma e papà</h1>
+  ${aiuto("Qui trovi le mappe, i test e le spiegazioni che mamma e papà hanno preparato e hanno pensato fossero utili per te. Toccane uno per aprirlo.")}
+  ${CONDIVISI.length?`<div class="card flush list">${CONDIVISI.map(c=>`<button class="row" style="width:100%;background:none;border:0;border-bottom:1px solid var(--line2);text-align:left" data-act="apricond:${c.id}"><span class="grow"><span class="xs b muted" style="display:block">${ty[c.tipo]||"Contenuto"}${c.materia?" · "+esc(c.materia):""} · da ${esc(daChi(c.da))} · ${new Date(c.t).toLocaleDateString("it-IT",{day:"numeric",month:"short"})}</span><span class="b small">${esc(c.titolo||"")}</span>${c.nota?`<span class="xs muted" style="display:block">${esc(c.nota)}</span>`:""}</span>${S.condivisiVisti.includes(c.id)?"":`<span class="chip pri">Nuovo</span>`}</button>`).join("")}</div>`:`<div class="card empty">Ancora niente.</div>`}`}
+
+const CHK=()=>"ss-chats"+(prova?"-prova":"");
 // ===== STUDIO SMART – tutor =====
 const MODI=[["compiti","Aiuto compiti"],["lezione","Spiegami una lezione"],["interrogazione","Interrogami"],["spiegalo","Spiegalo tu"],["mappa","Mappa concettuale"],["ascolto","Ascolto lingue"],["verifica","Analizza verifica"]];
 const MODO_INTRO={
@@ -1331,7 +1381,7 @@ const MODO_INTRO={
  verifica:"Fotografa la verifica corretta dal professore: capiamo insieme gli errori e come recuperare."};
 let T={sess:null,sending:false,foto:[],draft:"",materia:"",rimasti:null};
 function nuovaSess(modo,materia){T.sess={id:uid8(),t:now(),modo:modo||"compiti",materia:materia!==undefined?materia:T.materia,msgs:[],titolo:""};T.foto=[];T.draft=""}
-function salvaLocale(){try{const all=JSON.parse(localStorage.getItem("ss-chats")||"[]").filter(x=>x.id!==T.sess.id);all.unshift(T.sess);localStorage.setItem("ss-chats",JSON.stringify(all.slice(0,15).map(s=>Object.assign({},s,{msgs:s.msgs.map(m=>({r:m.r,t:m.t,f:m.f&&m.f.length?["x"]:null}))}))))}catch(e){}}
+function salvaLocale(){try{const all=JSON.parse(localStorage.getItem(CHK())||"[]").filter(x=>x.id!==T.sess.id);all.unshift(T.sess);localStorage.setItem(CHK(),JSON.stringify(all.slice(0,15).map(s=>Object.assign({},s,{msgs:s.msgs.map(m=>({r:m.r,t:m.t,f:m.f&&m.f.length?["x"]:null}))}))))}catch(e){}}
 const linguaDi=()=>T.sess&&T.sess.modo==="ascolto"?(T.sess.materia==="Tedesco"?"de-DE":T.sess.materia==="Inglese"?"en-GB":"it-IT"):"it-IT";
 
 function vTutor(){
@@ -1347,7 +1397,7 @@ function vTutor(){
     <div class="row"><button class="icon-btn" style="background:none" data-go="home" aria-label="Indietro">${ic("back")}</button>
      <div class="tutor-av">${simbolo(S.tutorSimbolo)}</div>
      <div class="grow"><p class="xb">${esc(S.tutorNome||"Orione")}</p><p class="xs muted">Tutor · IA</p></div>
-     <button class="chip" style="border:1px solid var(--line);background:var(--card);color:var(--pri-ink);min-height:34px" data-act="tmat">${esc(s.materia||"Tutte le materie")}</button></div>
+     ${s.msgs.length>1?`<button class="icon-btn" style="width:38px;height:38px" data-act="tesp" aria-label="${prova?"Esporta o condividi":"Esporta"}">${ic("share",18)}</button>`:""}<button class="chip" style="border:1px solid var(--line);background:var(--card);color:var(--pri-ink);min-height:34px" data-act="tmat">${esc(s.materia||"Tutte le materie")}</button></div>
     <div class="quick">${MODI.map(m=>`<button class="chip ${s.modo===m[0]?"on":""}" data-act="tmodo:${m[0]}">${m[1]}</button>`).join("")}</div>
     ${prova?`<span class="chip warm" style="align-self:flex-start">Prova: questa conversazione non finisce nel registro di Davide</span>`:""}<p class="ai-note">Stai parlando con un’intelligenza artificiale: può sbagliare, nel dubbio controlla sul libro.${T.rimasti!=null&&T.rimasti<=10?` Messaggi rimasti oggi: ${T.rimasti}.`:""}</p>
    </div>
@@ -1365,7 +1415,8 @@ function bolla(m,i){
   const a=t.match(/<ascolto(?:\s+lingua="(\w+)")?>([\s\S]*?)<\/ascolto>/);
   if(a){const lang=a[1]==="de"?"de-DE":"en-GB";t=t.replace(a[0],"").trim();const shown=m.mostra;
     listen=`<div class="listen"><span class="xs b">Testo da ascoltare (${a[1]==="de"?"tedesco":"inglese"})</span><div class="row wrap"><button class="btn sm" data-act="tsay:${i}:${lang}">${ic("spk",16)} Ascolta</button><button class="btn ghost sm" data-act="tshow:${i}">${shown?"Nascondi":"Mostra"} il testo</button></div>${shown?`<p>${esc(a[2])}</p>`:""}</div>`}
-  return `<div class="msg a">${listen}${md(t)}${t?`<br><button class="tts" data-act="tread:${i}">${ic("spk",14)} Ascolta</button>`:""}</div>`}
+  const mapBtn=m.mappaId&&S.mappe.some(x=>x.id===m.mappaId)?`<div class="listen"><span class="xs b">Mappa salvata tra le tue mappe</span><button class="btn sm" data-go="mappa/${m.mappaId}">Apri la mappa</button></div>`:"";
+  return `<div class="msg a">${listen}${mapBtn}${md(t)}${t?`<br><button class="tts" data-act="tread:${i}">${ic("spk",14)} Ascolta</button>`:""}</div>`}
 function scrollChat(){const m=$("#msgs");if(m)requestAnimationFrame(()=>{const last=m.lastElementChild;if(last)last.scrollIntoView({block:"end"})})}
 function renderTutor(){if(route().name==="tutor"){render();scrollChat()}}
 
@@ -1378,18 +1429,22 @@ async function invia(testoForzato){
   try{
     const messaggi=s.msgs.filter(m=>m.r==="u"||m.r==="a").map((m,i,arr)=>({ruolo:m.r==="u"?"user":"assistant",testo:m.t+(m.r==="u"&&m.f&&m.f.length&&i<arr.length-1?" [foto inviata prima]":""),...(i===arr.length-1&&foto.length?{foto}:{})}));
     const r=await ponte("/chat",{messaggi,materia:s.materia||"",modo:s.modo,nomeTutor:S.tutorNome,nome:S.nome,sessione:s.id});
-    s.msgs.push({r:"a",t:r.risposta||"…"});T.rimasti=r.rimasti;
-    const mt=r.meta||{};const mat=MATERIE.includes(mt.materia)?mt.materia:(s.materia||"Altro");
+    let risp=r.risposta||"…",mapId=null;const mt=r.meta||{};const mat=MATERIE.includes(mt.materia)?mt.materia:(s.materia||"Altro");
+    const mm=risp.match(/<mappa>([\s\S]*?)<\/mappa>/);if(mm){risp=risp.replace(mm[0],"").trim();try{const mp=salvaMappaDaTutor(r.mappa||JSON.parse(mm[1]),mat);if(mp)mapId=mp.id}catch(e){}}
+    else if(r.mappa){const mp=salvaMappaDaTutor(r.mappa,mat);if(mp)mapId=mp.id}
+    s.msgs.push(Object.assign({r:"a",t:risp||"Ecco la mappa."},mapId?{mappaId:mapId}:{}));T.rimasti=r.rimasti;
     if(mt.errore)addErrore(mat,mt.argomento||"",mt.errore);
     for(const g of mt.glossario||[])addGlossario(mat,g);
     S.stat.tutor++;if(mt.esito==="corretto")S.stat.corretti++;save();
   }catch(e){s.msgs.pop();T.draft=testo;T.foto=foto.map(f=>f.base64);toast(e.message,5000)}
   T.sending=false;for(const m of s.msgs)if(m.f)m.f=m.f.map(f=>f&&f.length>200000?"x":f);
   salvaLocale();salvaChat(T.sess);renderTutor()}
+function esportaChat(){const s=T.sess;if(!s)return;const msgs=s.msgs.map(m=>({r:m.r,t:m.t}));esportaSheet({titolo:(s.titolo||"Conversazione con il tutor"),testo:testoMsgs(msgs),html:htmlMsgs(msgs),
+  condividi:prova?{tipo:"chat",titolo:s.titolo||"Una spiegazione per te",materia:s.materia||"",dati:{msgs,modo:s.modo}}:null})}
 
 function sceltaMateria(){sheet(`<h2>Su cosa vuoi lavorare?</h2><div class="stack"><button class="btn ${!T.sess.materia?"":"ghost"} wide" data-s="">Tutte le materie (mescola)</button>
   <div class="grid2">${MATERIE.map(m=>`<button class="btn ${T.sess.materia===m?"":"ghost"}" data-s="${m}" style="min-height:52px;font-size:.84em">${m}</button>`).join("")}</div></div>`,(k,bg)=>{T.materia=k;T.sess.materia=k;bg.remove();renderTutor()})}
-async function vStorico(){const remoti=await elencoChat();let locali=[];try{locali=JSON.parse(localStorage.getItem("ss-chats")||"[]")}catch(e){}
+async function vStorico(){const remoti=await elencoChat();let locali=[];try{locali=JSON.parse(localStorage.getItem(CHK())||"[]")}catch(e){}
   const mappa=new Map();for(const c of locali)mappa.set(c.id,{id:c.id,t:c.t,modo:c.modo,materia:c.materia,titolo:c.titolo,msgs:c.msgs});
   for(const c of remoti)if(!mappa.has(c.id)){let msgs=[];try{msgs=JSON.parse(c.msgs).map(m=>({r:m.r,t:m.t,f:m.f?["x"]:null}))}catch(e){}mappa.set(c.id,{id:c.id,t:c.t,modo:c.modo,materia:c.materia,titolo:c.titolo,msgs})}
   const list=[...mappa.values()].sort((a,b)=>b.t-a.t);window._storico=list;
@@ -1401,6 +1456,7 @@ document.addEventListener("keydown",e=>{if(e.target.id==="tin"&&e.key==="Enter"&
 function tutorAct(cmd,x,y){const s=T.sess;
   switch(cmd){
    case "tsend":invia();return true;
+   case "tesp":esportaChat();return true;
    case "tfoto":scegliFoto(b=>{T.foto=T.foto.concat(b).slice(0,2);T.draft=($("#tin")||{}).value||T.draft;renderTutor()},true);return true;
    case "tunfoto":T.foto.splice(+x,1);renderTutor();return true;
    case "tmic":{const inp=$("#tin"),btn=$("#tmic");const base=inp.value?inp.value+" ":"";const r=detta(linguaDi(),t=>{inp.value=base+t;T.draft=inp.value},()=>{btn&&btn.classList.remove("rec")});if(r&&btn)btn.classList.add("rec");return true}
@@ -1418,10 +1474,14 @@ function tutorAct(cmd,x,y){const s=T.sess;
 // ===== STUDIO SMART – area genitore =====
 const G={stud:[],cur:null,dati:null,imp:{},log:[],stato:{},caricato:false,
  async init(){try{const q=await fb.db.collection("studenti").get();
-   this.stud=q.docs.filter(d=>d.data().json).map(d=>({uid:d.id,email:d.data().email||"",prova:d.id===user.uid,nome:d.id===user.uid?"Prova (papà)":(d.data().nome||"Studente"),agg:d.data().aggiornato}));
-   this.stud.sort((a,b)=>a.prova-b.prova);
+   const gh=genitoriCfg();const L=[];
+   for(const d of q.docs){const o=d.data();if(!o.json)continue;const eh=o.email?await sha256(String(o.email).toLowerCase()):"";const gp=gh.find(g=>g.hash===eh);
+     const pr=d.id===user.uid||!!o.prova||!!gp;const di=d.id===user.uid?GEN_NOME:(o.provaDi||(gp&&gp.nome)||"");
+     L.push({uid:d.id,email:o.email||"",prova:pr,mia:d.id===user.uid,provaDi:di,nome:pr?`Prova (${di||"genitore"})`:(o.nome||"Studente"),agg:o.aggiornato})}
+   this.stud=L;
+   this.stud.sort((a,b)=>a.prova-b.prova||b.mia-a.mia);
    const scelto=localStorage.getItem("ss-g-stud");this.cur=(this.stud.find(s=>s.uid===scelto)||this.stud.find(s=>!s.prova)||this.stud[0]||null);
-   await gStatoCarica();if(this.cur)await this.carica()}catch(e){toast("Non riesco a leggere i dati: controlla le regole di Firebase",5000)}this.caricato=true},
+   await gStatoCarica();if(this.cur)await this.carica();await this.caricaCondivisi()}catch(e){toast("Non riesco a leggere i dati: controlla le regole di Firebase",5000)}this.caricato=true},
  ref(){return fb.db.collection("studenti").doc(this.cur.uid)},
  async carica(){const ref=this.ref();
    const [d,imp,st,lg]=await Promise.all([ref.get(),ref.collection("genitore").doc("impostazioni").get(),ref.collection("sistema").doc("stato").get().catch(()=>null),ref.collection("log").orderBy("t","desc").limit(300).get().catch(()=>({docs:[]}))]);
@@ -1430,7 +1490,10 @@ const G={stud:[],cur:null,dati:null,imp:{},log:[],stato:{},caricato:false,
    this.imp=Object.assign({tetto:60,obiettivoMin:20,premio:"",premioSessioni:5,assegnati:[],oraFine:"",oraInizio:""},imp.exists?imp.data():{});
    this.stato=st&&st.exists?st.data():{};
    this.log=lg.docs.map(x=>{const o=x.data();o.id=x.id;o.ms=o.t&&o.t.toDate?o.t.toDate().getTime():Date.parse(o.t)||0;return o})},
- async salvaImp(){await this.ref().collection("genitore").doc("impostazioni").set(this.imp,{merge:true})},
+ async salvaImp(){this.imp.modDa=GEN_NOME;this.imp.modT=now();await this.ref().collection("genitore").doc("impostazioni").set(this.imp,{merge:true})},
+ condivisi:null,
+ async caricaCondivisi(){this.condivisi=[];const d=this.stud.find(s=>!s.prova);if(!d)return;
+   try{const q=await fb.db.collection("studenti").doc(d.uid).collection("condivisi").orderBy("t","desc").limit(100).get();this.condivisi=q.docs.map(x=>Object.assign({id:x.id},x.data()))}catch(e){}},
  async salvaDati(){const D=this.dati;D.updatedAt=now();await this.ref().set({json:JSON.stringify(D),promemoria:JSON.stringify(promemoriaList(D))},{merge:true})},
  async svuota(coll){const ref=this.ref().collection(coll);for(let i=0;i<20;i++){const q=await ref.limit(300).get();if(q.empty)break;const b=fb.db.batch();q.docs.forEach(d=>b.delete(d.ref));await b.commit()}}
 };
@@ -1457,7 +1520,7 @@ function vLock(){const cfg=lockCfg();return `<div class="lock"><div class="logo"
 // ---------- intestazione ----------
 function gHead(t,back){const s=G.cur;return `${back?`<button class="back" data-act="gback">${ic("back",18)} Indietro</button>`:""}
  <div class="top"><div><p class="xs b muted">AREA GENITORE${s?" · "+esc(s.nome):""}</p><h1>${t}</h1></div><div class="gbtns">${verChip()}${G.stud.length>1?`<button class="btn ghost sm" data-act="gstud">Cambia</button>`:""}<button class="btn ghost sm" data-act="greload">Aggiorna</button></div></div>`}
-const provaCard=()=>`<div class="card row" style="flex-wrap:wrap"><div class="grow" style="min-width:200px"><p class="b">Prova l’app come Davide</p><p class="small muted">Apri l’app studente con il tuo account di prova: dati e conversazioni restano separati da quelli di Davide.</p></div><button class="btn" data-act="gprova">${ic("user",18)} Prova come Davide</button></div>`;
+const provaCard=()=>`<div class="card row" style="flex-wrap:wrap"><div class="grow" style="min-width:200px"><p class="b">Prova l’app come Davide</p><p class="small muted">Apri l’app studente con il tuo account di prova: dati e conversazioni restano separati da quelli di Davide e li vedete solo tu e ${GEN_NOME==="mamma"?"papà":"mamma"}. Se una mappa, un test o una spiegazione vengono bene, puoi condividerli con lui.</p></div><button class="btn" data-act="gprova">${ic("user",18)} Prova come Davide</button></div>`;
 function gVuoto(t,back){return `${gHead(t,back)}<div class="card stack"><p class="b">Nessuno studente collegato</p><p class="small muted">Fai accedere Davide con il suo account Google nell’app sul suo telefono: i suoi dati compariranno qui.</p></div>${provaCard()}`}
 
 // ---------- panoramica ----------
@@ -1476,6 +1539,7 @@ function gPanoramica(){if(!G.cur)return gVuoto("Area genitore");const D=G.dati,o
   const ass=(G.imp.assegnati||[]);
   const agg=G.cur.agg&&G.cur.agg.toDate?G.cur.agg.toDate():null;
   return `${gHead("Panoramica")}
+  ${aiuto("Il riassunto della settimana di Davide: quanto ha studiato (barre per giorno, la linea è l’obiettivo), quanti messaggi ha scritto al tutor, i compiti fatti in tempo, le medie dei voti e gli argomenti dove sbaglia di più. In alto con “Cambia” passi dai dati di Davide a quelli delle prove di mamma o papà.")}
   ${G.cur.prova?`<p class="chip warm" style="align-self:flex-start">Stai guardando l’account di prova</p>`:""}
   ${agg?`<p class="xs muted">Ultimo aggiornamento dall’app: ${agg.toLocaleString("it-IT",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</p>`:""}
   ${segn.length?`<button class="card warn row" style="text-align:left;width:100%" data-go="g/segn"><span class="icon-btn" style="background:var(--warm-soft);color:var(--warm)">${ic("flag")}</span><span class="grow"><span class="b" style="display:block">${segn.length} segnalazion${segn.length>1?"i":"e"} questa settimana</span><span class="small muted">${segn.filter(s=>s.segnalazione==="delicato").length?"Include un argomento delicato. ":""}Tocca per leggere.</span></span></button>`:""}
@@ -1499,8 +1563,13 @@ function gPanoramica(){if(!G.cur)return gVuoto("Area genitore");const D=G.dati,o
 // ---------- conversazioni e segnalazioni ----------
 // ---------- conversazioni e segnalazioni ----------
 const GS={arch:new Set(),lette:new Set(),caric:false,filtro:"",vista:"attive",pend:new Map()};
-async function gStatoCarica(){if(GS.caric)return;try{const d=await fb.db.collection("genitori").doc(user.uid).get();const o=d.exists?d.data():{};GS.arch=new Set(o.archivio||[]);GS.lette=new Set(o.lette||[])}catch(e){}GS.caric=true}
-async function gStatoSalva(){try{await fb.db.collection("genitori").doc(user.uid).set({archivio:[...GS.arch].slice(-3000),lette:[...GS.lette].slice(-3000)},{merge:true})}catch(e){toast("Non salvato: controlla le regole di Firebase",4000)}}
+const famRef=()=>fb.db.collection("famiglia").doc("stato");
+async function gStatoCarica(){if(GS.caric)return;let o=null;
+  try{const f=await famRef().get();if(f.exists)o=f.data()}catch(e){}
+  if(!o){try{const d=await fb.db.collection("genitori").doc(user.uid).get();o=d.exists?d.data():{}}catch(e){o={}}}
+  GS.arch=new Set(o.archivio||[]);GS.lette=new Set(o.lette||[]);GS.caric=true}
+async function gStatoSalva(){try{await famRef().set({archivio:[...GS.arch].slice(-3000),lette:[...GS.lette].slice(-3000),da:GEN_NOME},{merge:true})}catch(e){}
+  try{await fb.db.collection("genitori").doc(user.uid).set({archivio:[...GS.arch].slice(-3000),lette:[...GS.lette].slice(-3000)},{merge:true})}catch(e){toast("Non salvato: controlla le regole di Firebase",4000)}}
 const lk=l=>G.cur.uid+"/"+l.id;
 const logVisibili=()=>G.log.filter(l=>!String(l.modo).startsWith("genera")&&!GS.pend.has(l.id));
 function segnNuove(){if(!G.cur)return 0;return logVisibili().filter(l=>l.segnalazione&&!GS.lette.has(lk(l))&&!GS.arch.has(lk(l))).length}
@@ -1511,18 +1580,19 @@ function gChat(soloSegn){const t=soloSegn?"Segnalazioni":"Conversazioni";if(!G.c
   const materie=[...new Set(logVisibili().map(l=>l.materia||"Altro"))].sort();
   if(GS.filtro)L=L.filter(l=>(l.materia||"Altro")===GS.filtro);
   const perGiorno={};for(const l of L){const d=ymd(new Date(l.ms));(perGiorno[d]=perGiorno[d]||[]).push(l)}
-  const nomeMod=m=>(MODI.find(x=>x[0]===m)||["","Tutor"])[1];const chi=G.cur.prova?"Prova (papà)":esc(G.cur.nome);
+  const nomeMod=m=>(MODI.find(x=>x[0]===m)||["","Tutor"])[1];const chi=esc(G.cur.nome);
   const nuove=soloSegn?L.filter(l=>!GS.lette.has(lk(l))).length:0;const provaOggi=G.cur.prova?logVisibili().filter(l=>oggiProva(l.ms)).length:0;
   const btn=(act,icon,lab,col)=>`<button class="icon-btn" style="width:38px;height:38px;${col?`color:${col}`:""}" data-act="${act}" aria-label="${lab}" title="${lab}">${ic(icon,17)}</button>`;
   return `${gHead(t,true)}
   ${G.cur.prova?`<div class="card row warn" style="flex-wrap:wrap"><span class="chip warm">Prova</span><p class="small grow" style="min-width:160px">Stai guardando l’account di prova.</p>${provaOggi||G.dati?`<button class="btn danger sm" data-act="gprovaoggi">${ic("trash",16)} Cancella le prove di oggi</button>`:""}</div>`:""}
   ${soloSegn?`<p class="small muted">Richieste di farsi fare i compiti e argomenti delicati. Il tutor non dà mai le soluzioni e su temi delicati invita a parlarne con voi.</p>`:`<p class="small muted">Tutto quello che è stato scritto al tutor e le risposte, dalle più recenti. Dall’app studente questo registro non si può cancellare.</p>`}
+  ${aiuto(soloSegn?"Qui finiscono le domande in cui Davide ha chiesto di farsi fare i compiti (“scorciatoia”) o ha toccato un argomento delicato. Tocca ✓ per segnarle come lette, l’archivio per toglierle dalla lista, il cestino per eliminarle (hai 10 secondi per annullare). Mamma e papà vedono le stesse segnalazioni: se una la legge uno, risulta letta anche per l’altro.":"Ogni riquadro è una domanda di Davide con la risposta del tutor. “Risolto da solo” vuol dire che ci è arrivato senza aiuto. Con il filtro scegli una materia. Con le icone a destra puoi esportare o condividere, archiviare o eliminare.","Una risposta del tutor fatta bene in prova? Tocca la freccia e scegli “Condividi con Davide”.")}
   <div class="row wrap"><div class="seg" style="flex:1;min-width:200px"><button class="${arch?"":"act"}" data-act="gvista:attive">${soloSegn?"Da vedere":"Attive"}</button><button class="${arch?"act":""}" data-act="gvista:archiviate">Archiviate</button></div>
    <select class="field" id="gfiltro" style="width:auto;min-width:160px;min-height:40px" aria-label="Filtra per materia"><option value="">Tutte le materie</option>${materie.map(m=>`<option ${GS.filtro===m?"selected":""}>${esc(m)}</option>`).join("")}</select></div>
   ${nuove?`<div class="row"><span class="chip pri">${nuove} nuov${nuove>1?"e":"a"}</span><span class="grow"></span><button class="link" data-act="glettetutte">Segna tutte come lette</button></div>`:""}
   ${Object.keys(perGiorno).length?Object.keys(perGiorno).sort().reverse().map(d=>`<p class="label">${esc(dataLunga(d))}</p><div class="stack">${perGiorno[d].map(l=>{const nuova=l.segnalazione&&!GS.lette.has(lk(l));return `<div class="card stack ${l.segnalazione?"warn":""}">
     <div class="row" style="align-items:flex-start"><div class="row wrap grow" style="gap:6px"><span class="xs b muted">${new Date(l.ms).toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"})}</span>${G.cur.prova?`<span class="chip warm">Prova</span>`:""}${nuova?`<span class="chip pri">Nuova</span>`:""}<span class="chip">${esc(nomeMod(l.modo))}</span><span class="chip" style="color:${mcol(l.materia)}">${esc(l.materia||"")}</span>${l.segnalazione?`<span class="chip warm">${l.segnalazione==="delicato"?"Argomento delicato":"Scorciatoia"}</span>`:""}${l.esito==="corretto"?`<span class="chip ok">Risolto da solo</span>`:""}</div>
-     <span class="gbtns">${nuova?btn("glett:"+l.id,"check","Segna come letta"):""}${btn((arch?"gdisarch:":"garch:")+l.id,arch?"back":"archive",arch?"Riporta tra le attive":"Archivia")}${btn("gdellog:"+l.id,"trash","Elimina","var(--bad)")}</span></div>
+     <span class="gbtns">${btn("gesp:"+l.id,"share",G.cur.prova?"Esporta o condividi":"Esporta")}${nuova?btn("glett:"+l.id,"check","Segna come letta"):""}${btn((arch?"gdisarch:":"garch:")+l.id,arch?"back":"archive",arch?"Riporta tra le attive":"Archivia")}${btn("gdellog:"+l.id,"trash","Elimina","var(--bad)")}</span></div>
     <p class="small"><b>${chi}:</b> ${l.haFoto?`<span class="chip">foto</span> `:""}${esc(l.domanda||"")}</p>
     <p class="small muted" style="white-space:pre-wrap"><b>Tutor:</b> ${md((l.risposta||"").replace(/<ascolto[^>]*>/,"[testo di ascolto] ").replace(/<\/ascolto>/,""))}</p>
     ${l.errore?`<p class="xs" style="color:var(--warm)"><b>Errore:</b> ${esc(l.errore)}</p>`:""}</div>`}).join("")}</div>`).join(""):`<div class="card empty">${arch?"Nessuna conversazione archiviata.":soloSegn?"Nessuna segnalazione da vedere.":GS.filtro?"Nessuna conversazione per questa materia.":"Nessuna conversazione ancora."}</div>`}`}
@@ -1536,9 +1606,9 @@ function gDelLog(ids,msg){const ref=G.ref(),uid=G.cur.uid,items=G.log.filter(l=>
     for(const id of ids)GS.pend.delete(id);render()},10000);
   for(const id of ids)GS.pend.set(id,t);render();
   toastUndo(msg||"Eliminata.",()=>{clearTimeout(t);for(const id of ids)GS.pend.delete(id);render();toast("Ripristinata")})}
-async function gProvaOggi(){if(!G.cur||!G.cur.prova)return;if(!confirm("Cancellare tutto quello che hai fatto oggi con l’account di prova (conversazioni, compiti, voti, errori, schede, tempo di studio)?"))return;
+async function gProvaOggi(){if(!G.cur||!G.cur.prova)return;if(!confirm("Cancellare tutto quello che hai fatto oggi con l’account di prova (conversazioni, mappe, compiti, voti, errori, schede, tempo di studio)?"))return;
   const D=G.dati,t=now(),inizio=parseD(today()).getTime(),creato=id=>{const ms=parseInt(String(id).replace(/^s/,"").slice(0,8),36);return ms>=inizio&&ms<=t+6e4};
-  for(const k of ["compiti","voti","glossario","schede"]){for(const x of D[k])if(creato(x.id)){D.del[x.id]=t;if(k==="compiti")delete D.piani[x.id]}D[k]=D[k].filter(x=>!creato(x.id))}
+  for(const k of ["compiti","voti","glossario","schede","mappe"]){for(const x of D[k]||[])if(creato(x.id)){D.del[x.id]=t;if(k==="compiti")delete D.piani[x.id]}D[k]=D[k].filter(x=>!creato(x.id))}
   for(const k in D.errori)if((D.errori[k].ultimo||0)>=inizio){D.errori[k].n=0;D.errori[k].ultimo=t}
   delete D.tempo[today()];D.resets.tempo=t;
   try{await G.salvaDati()}catch(e){toast("Non riuscito: aggiorna le regole di Firebase",5000);return}
@@ -1555,6 +1625,7 @@ function gDati(){if(!G.cur)return gVuoto("Dati",true);const D=G.dati;
   const minTot=Math.round(Object.values(D.tempo).reduce((a,b)=>a+b,0));
   const fisN=Object.keys(D.fis.topics||{}).length;const usati=G.stato.giorno===today()?G.stato.n||0:0;
   return `${gHead("Dati",true)}
+  ${aiuto("Tutto quello che c’è nell’app di Davide, diviso per sezioni. Apri una sezione per correggere o eliminare un elemento (hai 10 secondi per annullare). “Azzera” svuota una sezione intera. Quello che cancelli qui non ricompare sul suo telefono.")}
   ${G.cur.prova?`<button class="btn danger wide" data-act="gprovaoggi">${ic("trash",18)} Cancella le prove di oggi</button>`:""}
   <p class="small muted">${G.cur.prova?"Dati dell’account di prova.":`Dati di ${esc(G.cur.nome)}.`} Le modifiche arrivano anche sull’app studente al prossimo aggiornamento, e quello che cancelli non ricompare.</p>
   <div class="card stack"><p class="b">Copia di sicurezza</p><p class="small muted">Salva tutti i dati in un file sul computer, da ripristinare se cancelli qualcosa per errore.</p><div class="grid2"><button class="btn ghost" data-act="gbackup">Scarica una copia</button><button class="btn ghost" data-act="grestore">Ripristina</button></div></div>
@@ -1562,6 +1633,7 @@ function gDati(){if(!G.cur)return gVuoto("Dati",true);const D=G.dati;
   ${sez("voti","Voti",D.voti.length,"",voti.length?`<div class="list" style="margin:0 -16px">${voti.map(v=>`<div class="row"><div class="grow"><p class="small b">${G.cur.prova?`<span class="chip warm" style="margin-right:6px">Prova</span>`:""}${esc(v.materia)} · ${fmtVoto(v.voto)}</p><p class="xs muted">${esc(dataBreve(v.data))} · ${esc(v.tipo)}${v.nota?" · "+esc(v.nota):""}</p></div>${rigaBtn("gvoto:"+v.id,"gdelv:"+v.id)}</div>`).join("")}</div>`:"")}
   ${sez("errori","Quaderno degli errori",errs.length,"",errs.length?`<div class="list" style="margin:0 -16px">${errs.slice(0,60).map(([k,e],i)=>`<div class="row"><div class="grow"><p class="small b">${esc(e.materia)} · ${esc(e.argomento||"")}</p><p class="xs muted">${esc(e.errore)} · ${e.n} volt${e.n>1?"e":"a"}</p></div>${rigaBtn("","gdele:"+i)}</div>`).join("")}</div>`:"")}
   ${sez("orario","Orario delle lezioni",ore,"Ore di lezione inserite")}
+  ${sez("mappe","Mappe di studio",(D.mappe||[]).length,"",(D.mappe||[]).length?`<div class="list" style="margin:0 -16px">${(D.mappe||[]).slice().sort((a,b)=>(b.mod||0)-(a.mod||0)).map(m=>`<div class="row"><div class="grow"><p class="xs b" style="color:${mcol(m.materia)}">${esc(m.materia||"")}</p><p class="small b">${esc(m.titolo)}</p><p class="xs muted">${(m.rami||[]).length} rami · ${m.origine==="tutor"?"con il tutor":"automatica"}</p></div><span class="gbtns"><button class="icon-btn" style="width:38px;height:38px" data-act="gespm:${m.id}" aria-label="Esporta">${ic("share",17)}</button><button class="icon-btn" style="width:38px;height:38px;color:var(--bad)" data-act="gdelm:${m.id}" aria-label="Elimina">${ic("trash",17)}</button></span></div>`).join("")}</div>`:"")}
   ${sez("glossario","Glossario e schede di ripasso",D.glossario.length+D.schede.length,`${D.glossario.length} parole · ${D.schede.length} schede`)}
   ${sez("tempo","Tempo di studio",minTot,"Minuti totali registrati")}
   ${sez("fis","Progressi di fisica",fisN,"Lezioni lette, livelli e argomenti completati")}
@@ -1569,12 +1641,12 @@ function gDati(){if(!G.cur)return gVuoto("Dati",true);const D=G.dati;
   ${sez("log","Conversazioni con il tutor",G.log.length,"Cancella il registro completo e le copie nell’app")}
   ${sez("contatori","Messaggi usati oggi",usati,"Riporta a zero il conteggio del tetto giornaliero")}
   <div class="card stack warn"><p class="b">Azzera tutto</p><p class="small muted">Cancella compiti, voti, orario, errori, schede, tempo, progressi e conversazioni${G.cur.prova?" dell’account di prova":` di ${esc(G.cur.nome)}`}. Restano il nome e le tue impostazioni.</p><button class="btn danger" data-act="gres:tutto">${ic("trash",18)} Azzera tutto</button></div>`}
-const NOMI_RES={compiti:"tutti i compiti",voti:"tutti i voti",errori:"il quaderno degli errori",orario:"l’orario",glossario:"glossario e schede",tempo:"il tempo di studio",fis:"i progressi di fisica",piani:"i piani di studio",log:"tutte le conversazioni",contatori:"il conteggio dei messaggi di oggi",tutto:"TUTTI i dati"};
+const NOMI_RES={mappe:"tutte le mappe",compiti:"tutti i compiti",voti:"tutti i voti",errori:"il quaderno degli errori",orario:"l’orario",glossario:"glossario e schede",tempo:"il tempo di studio",fis:"i progressi di fisica",piani:"i piani di studio",log:"tutte le conversazioni",contatori:"il conteggio dei messaggi di oggi",tutto:"TUTTI i dati"};
 async function gReset(k){const chi=G.cur.prova?"dell’account di prova":"di "+G.cur.nome;
   if(!confirm(`Cancellare ${NOMI_RES[k]} ${chi}? Non si può annullare.`))return;
   if(k==="tutto"){if(!confirm("Sei proprio sicuro? Verranno cancellati tutti i dati."))return;if(confirm("Vuoi prima scaricare una copia di sicurezza? (consigliato)"))scaricaCopia()}
   toast("Cancello…",8000);const D=G.dati,t=now(),B=blank();
-  const doKey=key=>{if(["compiti","voti","glossario","schede"].includes(key))for(const x of D[key])D.del[x.id]=t;
+  const doKey=key=>{if(["compiti","voti","glossario","schede","mappe"].includes(key))for(const x of D[key])D.del[x.id]=t;
     if(key==="fis")D.fis=Object.assign(JSON.parse(JSON.stringify(B.fis)),{selected:D.fis.selected});else D[key]=JSON.parse(JSON.stringify(B[key]));
     if(key==="orario"){D.orario.mod=t;D.orario.ore=G.dati.orario.ore||B.orario.ore}D.resets[key]=t};
   try{
@@ -1606,6 +1678,7 @@ function gEditVoto(id){const v=Object.assign({},G.dati.voti.find(x=>x.id===id));
 // ---------- impostazioni ----------
 function gImp(){const I=G.imp,cfg=lockCfg()||{};
   return `${gHead("Impostazioni",true)}
+  ${aiuto("Qui decidi le regole del tutor (quanti messaggi al giorno e in che orari), l’obiettivo di studio e il premio. Puoi mandare un messaggio a Davide, assegnargli un’attività, vedere cosa avete condiviso con lui e proteggere l’area con impronta o PIN. Le impostazioni valgono per lo studente scelto in alto: mamma e papà le vedono e le modificano entrambi.")}
   ${G.cur?`<form class="card stack" data-form="gimp"><p class="b">Tutor${G.cur.prova?" (account di prova)":` di ${esc(G.cur.nome)}`}</p>
    <div><label class="flabel" for="gt">Messaggi al giorno (tetto di spesa)</label><input class="field" id="gt" type="number" min="5" max="300" value="${I.tetto||60}"></div>
    <div class="grid2"><div><label class="flabel" for="gi">Disponibile dalle</label><input class="field" id="gi" type="time" value="${esc(I.oraInizio||"")}"></div><div><label class="flabel" for="gf">Fino alle</label><input class="field" id="gf" type="time" value="${esc(I.oraFine||"")}"></div></div>
@@ -1614,10 +1687,15 @@ function gImp(){const I=G.imp,cfg=lockCfg()||{};
    <div><label class="flabel" for="gp">Premio della settimana (facoltativo)</label><input class="field" id="gp" value="${esc(I.premio||"")}" placeholder="Es. pizza il venerdì"></div>
    <div><label class="flabel" for="gps">Giorni con obiettivo raggiunto per il premio</label><input class="field" id="gps" type="number" min="1" max="7" value="${I.premioSessioni||5}"></div>
    <button class="btn" type="submit">Salva</button></form>
+  ${I.modDa?`<p class="xs muted">Ultima modifica: ${esc(daChi(I.modDa))}, ${new Date(I.modT).toLocaleString("it-IT",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</p>`:""}
+  <div class="card stack"><p class="b">Messaggio per Davide</p><p class="small muted">Compare in cima alla sua Home finché non tocca “Letto”.</p>
+   ${(I.note||[]).map(n=>`<div class="row"><span class="chip ${(G.dati.noteViste||[]).includes(n.id)?"ok":"warm"}">${(G.dati.noteViste||[]).includes(n.id)?"Letto":"Non letto"}</span><span class="small grow">${esc(n.testo)} <span class="xs muted">· ${esc(daChi(n.da))}</span></span><button class="icon-btn" style="width:38px;height:38px;color:var(--bad)" data-act="gdelnota:${n.id}" aria-label="Elimina">${ic("trash",18)}</button></div>`).join("")}
+   <form data-form="gnota" class="stack"><input class="field" id="gn" placeholder="Es. Bravo per la verifica di ieri!" maxlength="200" required><button class="btn ghost" type="submit">Invia il messaggio</button></form></div>
   <div class="card stack"><p class="b">Assegna un’attività</p><p class="small muted">La vede nella Home dell’app e tu vedi quando la completa.</p>
-   ${(I.assegnati||[]).map(a=>`<div class="row"><span class="chip ${G.dati.assegnatiFatti.includes(a.id)?"ok":"warm"}">${G.dati.assegnatiFatti.includes(a.id)?"Fatto":"Da fare"}</span><span class="small grow">${esc(a.testo)}${a.entro?` · entro ${quando(a.entro)}`:""}</span><button class="icon-btn" style="width:38px;height:38px;color:var(--bad)" data-act="gdel:${a.id}" aria-label="Elimina">${ic("trash",18)}</button></div>`).join("")}
+   ${(I.assegnati||[]).map(a=>`<div class="row"><span class="chip ${G.dati.assegnatiFatti.includes(a.id)?"ok":"warm"}">${G.dati.assegnatiFatti.includes(a.id)?"Fatto":"Da fare"}</span><span class="small grow">${esc(a.testo)}${a.entro?` · entro ${quando(a.entro)}`:""}${a.da?` <span class="xs muted">· ${esc(daChi(a.da))}</span>`:""}</span><button class="icon-btn" style="width:38px;height:38px;color:var(--bad)" data-act="gdel:${a.id}" aria-label="Elimina">${ic("trash",18)}</button></div>`).join("")}
    <form data-form="gass" class="stack"><input class="field" id="ga" placeholder="Es. ripassa il capitolo 3 di storia" required><div class="grid2"><select class="field" id="gam">${selMaterie("","<option value=''>Materia</option>")}</select><input class="field" id="gae" type="date" aria-label="Entro il"></div><button class="btn ghost" type="submit">${ic("plus",16)} Assegna</button></form></div>`:""}
   ${provaCard()}
+  ${gCondivisiCard()}
   <div class="card stack"><p class="b">Verifica collegamento</p><p class="small muted">Controlla Firebase, ponte Cloudflare e credito di Claude, e ti dice cosa sistemare.</p><button class="btn ghost wide" data-act="gverifica">${ic("shield",18)} Verifica ora</button></div>
   <div class="card stack"><p class="b">Colore dell’area genitore</p>${swatches(coloreAttivo(),"gcol")}</div>
   <div class="card stack"><p class="b">Notifiche su questo telefono</p><p class="small muted">Ricevi un avviso quando c’è una segnalazione.</p><button class="btn ghost wide" data-act="notif">Attiva le notifiche</button></div>
@@ -1641,6 +1719,10 @@ async function gAct(cmd,x){if(ruolo!=="genitore")return false;switch(cmd){
   case "greload":toast("Aggiorno…");await G.init();render();return true;
   case "gprova":entraProva();return true;
   case "gstud":sheet(`<h2>Di chi vuoi vedere i dati?</h2>${G.stud.map(s=>`<button class="btn ${s.uid===G.cur.uid?"":"ghost"} wide" data-s="${s.uid}">${esc(s.nome)}${s.prova?"":" · "+esc(s.email)}</button>`).join("")}`,async(k,bg)=>{GS.filtro="";G.cur=G.stud.find(s=>s.uid===k);localStorage.setItem("ss-g-stud",k);bg.remove();await G.carica();render()});return true;
+  case "gdelnota":G.imp.note=(G.imp.note||[]).filter(n=>n.id!==x);await G.salvaImp();render();return true;
+  case "gesp":{const l=G.log.find(z=>z.id===x);if(!l)return true;const msgs=[{r:"u",t:l.domanda||""},{r:"a",t:String(l.risposta||"").replace(/<ascolto[^>]*>[\s\S]*?<\/ascolto>/g,"").replace(/<mappa>[\s\S]*?<\/mappa>/g,"")}];
+    esportaSheet({titolo:(l.materia?l.materia+": ":"")+String(l.domanda||"Domanda").slice(0,60),testo:testoMsgs(msgs),html:htmlMsgs(msgs),condividi:{tipo:"chat",titolo:String(l.domanda||"Una spiegazione per te").slice(0,80),materia:l.materia||"",dati:{msgs,modo:l.modo}}});return true}
+  case "gritira":if(!confirm("Ritirare questo elemento? Davide non lo vedrà più."))return true;{const d=G.stud.find(s=>!s.prova);try{await fb.db.collection("studenti").doc(d.uid).collection("condivisi").doc(x).delete();G.condivisi=G.condivisi.filter(c=>c.id!==x);toast("Ritirato");render()}catch(e){toast("Non ritirato: aggiorna le regole di Firebase",5000)}}return true;
   case "gdel":G.imp.assegnati=(G.imp.assegnati||[]).filter(a=>a.id!==x);await G.salvaImp();render();return true;
   case "gres":gReset(x);return true;
   case "gvista":GS.vista=x;render();return true;
@@ -1656,6 +1738,8 @@ async function gAct(cmd,x){if(ruolo!=="genitore")return false;switch(cmd){
   case "greport":resocontoMese();return true;
   case "gcol":localStorage.setItem("ss-gcolore",x);applyAccent();render();return true;
   case "gdelc":gDelItem("compiti",x);return true;
+  case "gdelm":gDelItem("mappe",x);return true;
+  case "gespm":{const m=(G.dati.mappe||[]).find(z=>z.id===x);if(m)esportaSheet({titolo:"Mappa: "+m.titolo,testo:mappaTesto(m),html:mappaHtmlStampa(m),condividi:G.cur.prova?{tipo:"mappa",titolo:m.titolo,materia:m.materia,dati:{titolo:m.titolo,centro:m.centro,rami:m.rami,materia:m.materia}}:null});return true}
   case "gdelv":gDelItem("voti",x);return true;
   case "gdele":gDelErr(+x);return true;
   case "gcomp":gEditCompito(x);return true;
@@ -1669,12 +1753,20 @@ async function gForm(f){
   if(f==="pin"){const cfg=lockCfg();const v=$("#pinin").value;if(cfg&&cfg.pin&&await sha256("ss:"+v)===cfg.pin){sessionStorage.setItem("ss-unl",now());render()}else{toast("PIN errato");$("#pinin").value=""}return true}
   if(f==="gimp"){const I=G.imp;I.tetto=Math.max(5,+$("#gt").value||60);I.oraInizio=$("#gi").value;I.oraFine=$("#gf").value;I.obiettivoMin=Math.max(5,+$("#go").value||20);I.premio=$("#gp").value.trim();I.premioSessioni=Math.min(7,Math.max(1,+$("#gps").value||5));
     try{await G.salvaImp();toast("Impostazioni salvate")}catch(e){toast("Non salvato: controlla le regole di Firebase")}return true}
-  if(f==="gass"){const t=$("#ga").value.trim();if(!t)return true;G.imp.assegnati=(G.imp.assegnati||[]).concat({id:uid8(),testo:t,materia:$("#gam").value,entro:$("#gae").value,creato:now()});
+  if(f==="gass"){const t=$("#ga").value.trim();if(!t)return true;G.imp.assegnati=(G.imp.assegnati||[]).concat({id:uid8(),testo:t,materia:$("#gam").value,entro:$("#gae").value,creato:now(),da:GEN_NOME});
     try{await G.salvaImp();toast("Attività assegnata");render()}catch(e){toast("Non salvato")}return true}
+  if(f==="gnota"){const t=$("#gn").value.trim();if(!t)return true;G.imp.note=(G.imp.note||[]).concat({id:uid8(),testo:t,da:GEN_NOME,t:now()}).slice(-10);
+    try{await G.salvaImp();toast("Messaggio inviato");render()}catch(e){toast("Non salvato")}return true}
   return false}
+
+function gCondivisiCard(){const C=G.condivisi||[];const ty={mappa:"Mappa",test:"Test",chat:"Spiegazione"};
+  return `<div class="card stack"><p class="b">Condivisi con Davide</p><p class="small muted">Mappe, test e spiegazioni che avete mandato nella sua app (sezione “Da mamma e papà”).</p>
+   ${aiuto("Per condividere: entra in “Prova come Davide”, crea una mappa o un test o fai una domanda al tutor; se il risultato è buono tocca <b>Esporta o condividi</b> e poi <b>Condividi con Davide</b>. Puoi condividere anche una risposta dalle Conversazioni. Con il cestino lo ritiri.")}
+   ${C.length?C.map(c=>`<div class="row"><span class="chip">${ty[c.tipo]||"Altro"}</span><span class="small grow">${esc(c.titolo||"")} <span class="xs muted">· da ${esc(daChi(c.da))} · ${new Date(c.t).toLocaleDateString("it-IT",{day:"numeric",month:"short"})}</span></span><button class="icon-btn" style="width:38px;height:38px;color:var(--bad)" data-act="gritira:${c.id}" aria-label="Ritira">${ic("trash",18)}</button></div>`).join(""):`<p class="small muted">Ancora niente.</p>`}</div>`}
 
 // ===== STUDIO SMART – novità v2.1 =====
 const NOVITA=[
+ ["2.3","26 novembre 2026",["Mappe di studio: in automatico o costruite insieme al tutor, anche dalle foto del libro","Mappe: modifica con indicazioni, altre versioni, torna indietro, “Mettiti alla prova”","Mappa dei punti deboli dal quaderno degli errori e dal piano di una verifica","Crea un test su qualsiasi argomento","Esporta tutto con WhatsApp, email o PDF da stampare","Accesso anche per mamma: vede tutto e fa le sue prove","Le prove dei genitori restano separate; quelle riuscite si possono condividere con Davide","Sezione “Da mamma e papà” e messaggi dei genitori nella Home","Si vede chi ha fatto cosa (mamma o papà)","“Come funziona” in ogni sezione"]],
  ["2.2","19 novembre 2026",["Barra Home, Tutor, Agenda, Studio e Profilo sempre in basso","Area genitore: cestino e Annulla su ogni conversazione e segnalazione","Archivia per nascondere una conversazione senza cancellarla","Segnalazioni nuove con il numero nel menu e “Segna come letta”","Filtro per materia nelle conversazioni","Account di prova: badge “Prova” e “Cancella le prove di oggi”"]],
  ["2.1","14 novembre 2026",["Numero di versione e questo elenco delle novità","Avviso quando c’è una nuova versione da caricare","Colore dell’app e colori delle materie personalizzabili","Foto o simbolo del profilo","Promemoria serale con i compiti di domani","Timer di concentrazione da 25 minuti","Area genitore: prova come Davide, gestione dei dati, verifica del collegamento, copia di sicurezza, annulla, resoconto del mese"]],
  ["2.0","14 novembre 2026",["Studio Smart: tutor per tutte le materie, agenda con orario, compiti e voti, area genitore"]],
@@ -1791,6 +1883,187 @@ function resocontoMese(){if(!G.cur)return;const D=G.dati,oggi=today(),mese=oggi.
   <script>setTimeout(()=>print(),400)<\/script></body></html>`;
   const w=window.open("","_blank");if(!w){toast("Consenti le finestre pop-up per creare il resoconto",5000);return}w.document.write(html);w.document.close()}
 
+// ===== STUDIO SMART – v2.3: mappe, condivisione, esportazione, spiegazioni =====
+
+// ---------- "Come funziona" (freccetta apribile) ----------
+const aiuto=(testo,es)=>`<details class="howto"><summary>Come funziona</summary><div>${testo}${es?`<p class="howto-es"><b>Esempio:</b> ${es}</p>`:""}</div></details>`;
+
+// ---------- genitori ----------
+let GEN_NOME="";
+const GENITORI_BASE=[{nome:"mamma",hash:"1144d9f532f177aa4b1e2131d3248d741192fbc0824a841cbc85814176614ae4"}];
+function genitoriCfg(){const l=Array.isArray(CFG.genitori)?CFG.genitori.slice():GENITORI_BASE.slice();if(CFG.genitoreHash&&!l.some(g=>g.hash===CFG.genitoreHash))l.unshift({nome:"papà",hash:CFG.genitoreHash});return l.map(g=>({nome:g.nome,hash:String(g.hash||"").toLowerCase()}))}
+async function nomeGenitoreDaEmail(email){if(!email)return null;const h=await sha256(String(email).toLowerCase());const g=genitoriCfg().find(x=>x.hash===h);return g?g.nome:null}
+const daChi=n=>n?(n==="mamma"?"mamma":n==="papà"?"papà":n):"";
+
+// ---------- testo e stampa ----------
+function stampaHtml(titolo,corpo){const w=window.open("","_blank");if(!w){toast("Consenti le finestre pop-up per creare il PDF",5000);return}
+  w.document.write(`<!DOCTYPE html><html lang="it"><head><meta charset="utf-8"><title>${esc(titolo)}</title><style>
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#172033;max-width:780px;margin:28px auto;padding:0 20px;font-size:13px;line-height:1.5}
+  h1{font-size:21px;margin:0 0 2px}h2{font-size:15px;margin:20px 0 8px;border-bottom:2px solid #E3E6EC;padding-bottom:4px}.m{color:#5B6577}
+  table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:5px 6px;border-bottom:1px solid #EEF0F4;vertical-align:top}th{color:#5B6577;font-weight:600}
+  .msg{border:1px solid #E3E6EC;border-radius:10px;padding:8px 10px;margin:8px 0}.msg b{display:block;font-size:11px;color:#5B6577;margin-bottom:2px}
+  .mc{display:inline-block;background:#172033;color:#fff;border-radius:14px;padding:10px 16px;font-weight:800;font-size:16px;margin:6px 0 14px}
+  .mg{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.mr{border:1px solid #E3E6EC;border-left:6px solid var(--c);border-radius:10px;padding:8px 10px;break-inside:avoid}.mr p{margin:0 0 4px;font-weight:800}.mr ul{margin:0;padding-left:18px}
+  .ok{color:#0F766E;font-weight:700}@media print{body{margin:0}}</style></head><body><h1>${esc(titolo)}</h1><p class="m">Studio Smart · ${esc(dataLunga(today()))}</p>${corpo}<script>setTimeout(()=>print(),400)<\/script></body></html>`);w.document.close()}
+function esportaSheet(o){// o:{titolo,testo,html,condividi}
+  const testo=(o.titolo+"\n\n"+o.testo).slice(0,6000);const nav=!!navigator.share;
+  sheet(`<h2>Esporta</h2><p class="small muted">${esc(o.titolo)}</p>
+   ${aiuto("Scegli come inviarlo. <b>WhatsApp</b> ed <b>Email</b> mandano il testo; <b>PDF</b> apre la stampa: scegli “Salva come PDF” per avere il file, oppure stampa direttamente.")}
+   <div class="grid2"><button class="btn ghost" data-s="wa">WhatsApp</button><button class="btn ghost" data-s="mail">Email</button><button class="btn ghost" data-s="pdf">PDF / Stampa</button>${nav?`<button class="btn ghost" data-s="altro">Altre app</button>`:`<button class="btn ghost" data-s="copia">Copia il testo</button>`}</div>
+   ${o.condividi?`<div class="card stack"><p class="b">Condividi con Davide</p><p class="small muted">Lo trova nella sua app, nella sezione “Da mamma e papà”.</p><input class="field" id="cnota" placeholder="Un messaggio per lui (facoltativo)"><button class="btn" data-s="dav">Condividi con Davide</button></div>`:""}
+   <button class="btn ghost wide" data-s="x">Chiudi</button>`,async(k,bg)=>{
+    if(k==="x")bg.remove();
+    if(k==="wa")window.open("https://wa.me/?text="+encodeURIComponent(testo),"_blank");
+    if(k==="mail")location.href="mailto:?subject="+encodeURIComponent("Studio Smart – "+o.titolo)+"&body="+encodeURIComponent(testo.slice(0,1800));
+    if(k==="pdf")stampaHtml(o.titolo,o.html||`<pre style="white-space:pre-wrap;font-family:inherit">${esc(o.testo)}</pre>`);
+    if(k==="altro")navigator.share({title:o.titolo,text:testo}).catch(()=>{});
+    if(k==="copia"){try{await navigator.clipboard.writeText(testo);toast("Testo copiato")}catch(e){toast("Copia non riuscita")}}
+    if(k==="dav"){const nota=bg.querySelector("#cnota").value.trim();bg.remove();await condividiConDavide(Object.assign({},o.condividi,{nota}))}})}
+
+// ---------- condivisione con Davide ----------
+let CONDIVISI=[],condUnsub=null;
+async function davideUid(){if(G.stud&&G.stud.length){const d=G.stud.find(s=>!s.prova);if(d)return d.uid}
+  try{const q=await fb.db.collection("studenti").get();const gh=genitoriCfg().map(g=>g.hash);
+    for(const d of q.docs){if(!d.data().json)continue;const h=await sha256(String(d.data().email||"").toLowerCase());if(!gh.includes(h)&&!d.data().prova)return d.id}}catch(e){}return null}
+async function condividiConDavide(c){if(!fb||!user){toast("Serve l’accesso con Google");return}
+  const uid=await davideUid();if(!uid){toast("Davide non ha ancora fatto l’accesso all’app",5000);return}
+  const id=uid8();try{await fb.db.collection("studenti").doc(uid).collection("condivisi").doc(id).set({tipo:c.tipo,titolo:c.titolo||"",materia:c.materia||"",nota:c.nota||"",da:GEN_NOME||"genitore",t:now(),dati:JSON.stringify(c.dati||{})});
+    toast("Condiviso con Davide");if(ruolo==="genitore"){await G.caricaCondivisi();render()}}catch(e){toast("Non condiviso: aggiorna le regole di Firebase",5000)}}
+function ascoltaCondivisi(){if(condUnsub)condUnsub();if(!user||prova)return;
+  condUnsub=myDoc().collection("condivisi").orderBy("t","desc").limit(100).onSnapshot(q=>{CONDIVISI=q.docs.map(d=>{const o=d.data();o.id=d.id;try{o.dati=JSON.parse(o.dati||"{}")}catch(e){o.dati={}}return o});if(route().name!=="tutor")render()},()=>{})}
+const condNuovi=()=>CONDIVISI.filter(c=>!S.condivisiVisti.includes(c.id));
+function apriCondiviso(id){const c=CONDIVISI.find(x=>x.id===id);if(!c)return;if(!S.condivisiVisti.includes(id)){S.condivisiVisti.push(id);save()}
+  if(c.tipo==="mappa")go("mappa/c:"+id);else if(c.tipo==="test"){gq={titolo:c.titolo,materia:c.materia||"Altro",ripasso:c.dati.ripasso||"",domande:c.dati.domande||[],i:-1,score:0,ans:null,daCond:c.da};go("qz")}else go("cond/"+id)}
+function vCondiviso(id){const c=CONDIVISI.find(x=>x.id===id);if(!c)return vStudio();const msgs=c.dati.msgs||[];
+  return `<button class="back" data-go="home">${ic("back",18)} Home</button><span class="chip warm" style="align-self:flex-start">Da ${esc(daChi(c.da))}</span><h1>${esc(c.titolo||"Una spiegazione per te")}</h1>
+  ${c.nota?`<div class="card"><p class="small"><b>${esc(daChi(c.da))}:</b> ${esc(c.nota)}</p></div>`:""}
+  ${aiuto("È una domanda fatta al tutor da mamma o papà che hanno pensato potesse esserti utile. Leggila con calma; se qualcosa non è chiaro, chiedi al tutor.")}
+  <div class="msgs">${msgs.map(m=>`<div class="msg ${m.r==="u"?"u":"a"}">${m.r==="u"?esc(m.t):md(m.t)}</div>`).join("")}</div>
+  <div class="grid2"><button class="btn ghost" data-act="espcond:${id}">Esporta</button><button class="btn" data-act="chiedicond:${id}">Chiedi al tutor</button></div>`}
+function testoMsgs(msgs){return msgs.map(m=>(m.r==="u"?"Domanda: ":"Tutor: ")+String(m.t||"").replace(/<[^>]+>/g,"").replace(/\*\*/g,"")).join("\n\n")}
+function htmlMsgs(msgs){return msgs.map(m=>`<div class="msg"><b>${m.r==="u"?"Domanda":"Tutor"}</b>${esc(String(m.t||"").replace(/<[^>]+>/g,"")).replace(/\*\*(.+?)\*\*/g,"<b style='display:inline;color:inherit;font-size:inherit'>$1</b>")}</div>`).join("")}
+
+// ---------- mappe di studio ----------
+const MCOLS=["#3451D1","#0F766E","#B42350","#9A4316","#6B3FA0","#1D5FA8","#556B12","#8A5A00"];
+let mapZoom=null;
+const mappaById=id=>{if(String(id).startsWith("c:")){const c=CONDIVISI.find(x=>x.id===id.slice(2));return c?Object.assign({id,condivisa:true,da:c.da,nota:c.nota},c.dati):null}return S.mappe.find(m=>m.id===id)};
+function mappaTesto(m){return `${m.centro||m.titolo}\n`+(m.rami||[]).map(r=>`\n• ${r.t}\n`+(r.punti||[]).map(p=>`   - ${p}`).join("\n")).join("\n")}
+function mappaHtmlStampa(m){return `<div class="mc">${esc(m.centro||m.titolo)}</div><div class="mg">${(m.rami||[]).map((r,i)=>`<div class="mr" style="--c:${MCOLS[i%8]}"><p>${esc(r.t)}</p><ul>${(r.punti||[]).map(p=>`<li>${esc(p)}</li>`).join("")}</ul></div>`).join("")}</div>`}
+function normMappa(d,base){const m=Object.assign({},base||{});m.titolo=String(d.titolo||m.titolo||d.centro||"Mappa").slice(0,80);m.centro=String(d.centro||m.titolo).slice(0,80);
+  m.rami=(Array.isArray(d.rami)?d.rami:[]).slice(0,8).map(r=>({t:String(r.t||r.titolo||"").slice(0,60),punti:(Array.isArray(r.punti)?r.punti:[]).slice(0,6).map(p=>String(p).slice(0,90))})).filter(r=>r.t);return m}
+function vMappe(){const mie=S.mappe.slice().sort((a,b)=>(b.mod||0)-(a.mod||0));const cond=CONDIVISI.filter(c=>c.tipo==="mappa");const per={};for(const m of mie)(per[m.materia||"Altro"]=per[m.materia||"Altro"]||[]).push(m);
+  return `<button class="back" data-go="studio">${ic("back",18)} Studio</button><h1>Mappe di studio</h1>
+  ${aiuto("Una mappa mette al centro l’argomento e intorno i concetti principali, ognuno con le sue parole chiave. Puoi crearla <b>in automatico</b> (la prepara il tutor in pochi secondi) oppure <b>insieme al tutor</b> (la costruisci tu rispondendo alle sue domande: ci vuole di più ma si impara meglio). Poi puoi modificarla, crearne un’altra versione, metterti alla prova ed esportarla.","Argomento “La Repubblica romana”: al centro il titolo, intorno “Magistrature”, “Senato”, “Guerre puniche”, “Crisi”.")}
+  <div class="grid2"><button class="btn" data-act="mnuova:auto">${ic("plus",18)} In automatico</button><button class="btn soft" data-act="mnuova:tutor">${ic("chat",18)} Insieme al tutor</button></div>
+  ${cond.length?`<p class="label">Da mamma e papà</p><div class="card flush list">${cond.map(c=>`<button class="row" style="width:100%;background:none;border:0;border-bottom:1px solid var(--line2);text-align:left" data-act="apricond:${c.id}"><span class="grow"><span class="xs b" style="color:${mcol(c.materia)};display:block">${esc(c.materia||"")} · da ${esc(daChi(c.da))}</span><span class="b small">${esc(c.titolo)}</span></span>${S.condivisiVisti.includes(c.id)?"":`<span class="chip pri">Nuova</span>`}</button>`).join("")}</div>`:""}
+  ${Object.keys(per).length?Object.keys(per).sort().map(mt=>`<p class="label" style="color:${mcol(mt)}">${esc(mt)}</p><div class="card flush list">${per[mt].map(m=>`<button class="row" style="width:100%;background:none;border:0;border-bottom:1px solid var(--line2);text-align:left" data-go="mappa/${m.id}"><span class="grow"><span class="b small" style="display:block">${prova?`<span class="chip warm" style="margin-right:6px;padding:1px 8px">Prova</span>`:""}${esc(m.titolo)}</span><span class="xs muted">${(m.rami||[]).length} rami · ${m.origine==="tutor"?"fatta con il tutor":m.origine==="condivisa"?"da mamma e papà":"automatica"} · ${new Date(m.mod||m.creata||now()).toLocaleDateString("it-IT",{day:"numeric",month:"short"})}</span></span></button>`).join("")}</div>`).join(""):`<div class="card empty">Ancora nessuna mappa. Prova con l’argomento della prossima verifica.</div>`}`}
+function nuovaMappaSheet(modo,pre){pre=pre||{};let foto=[];
+  const html=()=>`<h2>Nuova mappa ${modo==="tutor"?"insieme al tutor":"in automatico"}</h2>
+   ${aiuto(modo==="tutor"?"Il tutor ti fa domande sull’argomento e tu proponi i concetti; lui ti corregge e ti suggerisce cosa manca. Alla fine la mappa viene salvata da sola.":"Scrivi l’argomento (o fotografa le pagine del libro): il tutor prepara la mappa in pochi secondi. Se aggiungi una foto, la mappa segue quello che c’è scritto nel tuo libro.")}
+   <div><label class="flabel" for="mm">Materia</label><select class="field" id="mm">${selMaterie(pre.materia||"")}</select></div>
+   <div><label class="flabel" for="ma">Argomento</label><div class="row"><input class="field grow" id="ma" value="${esc(pre.argomento||"")}" placeholder="Es. La Repubblica romana"><button class="icon-btn" data-s="mic" aria-label="Detta">${ic("mic")}</button></div></div>
+   <div class="row wrap">${foto.map((f,i)=>`<div class="thumbs"><div><img src="data:image/jpeg;base64,${f}" alt="Foto ${i+1}"><button data-s="nf:${i}" aria-label="Togli foto">×</button></div></div>`).join("")}${foto.length<3?`<button class="btn ghost sm" data-s="foto">${ic("cam",18)} Foto del libro</button>`:""}</div>
+   ${modo==="auto"?`<div><label class="flabel" for="mi">Indicazioni (facoltative)</label><input class="field" id="mi" value="${esc(pre.dettagli||"")}" placeholder="Es. semplice, con le date principali"></div>`:""}
+   <div class="row"><button class="btn ghost grow" data-s="x">Annulla</button><button class="btn grow" data-s="ok">${modo==="tutor"?"Inizia con il tutor":"Crea la mappa"}</button></div>`;
+  const read=bg=>{pre.materia=bg.querySelector("#mm").value;pre.argomento=bg.querySelector("#ma").value.trim();const i=bg.querySelector("#mi");if(i)pre.dettagli=i.value.trim()};
+  sheet(html(),async(k,bg)=>{read(bg);const redraw=()=>bg.querySelector(".sheet").innerHTML=html();
+    if(k==="x")bg.remove();
+    if(k==="mic"){const inp=bg.querySelector("#ma");detta("it-IT",t=>inp.value=t)}
+    if(k==="foto")scegliFoto(b=>{foto.push(b);foto=foto.slice(0,3);read(bg);redraw()},true);
+    if(k.startsWith("nf:")){foto.splice(+k.slice(3),1);redraw()}
+    if(k==="ok"){if(!pre.argomento&&!foto.length){toast("Scrivi l’argomento o aggiungi una foto");return}bg.remove();
+      if(modo==="tutor"){pendingAsk={testo:`Costruiamo insieme una mappa su: ${pre.argomento||"l’argomento nelle foto"}`,foto,materia:pre.materia,modo:"mappa",nuova:true};go("tutor")}
+      else creaMappaAuto({materia:pre.materia,argomento:pre.argomento,dettagli:pre.dettagli,foto})}})}
+async function creaMappaAuto(p,base){toast(base?"Preparo un’altra versione…":"Preparo la mappa…",12000);
+  try{const r=await ponte("/genera",{tipo:"mappa",materia:p.materia,argomento:p.argomento,dettagli:p.dettagli||"",foto:(p.foto||[]).map(b=>({tipo:"image/jpeg",base64:b})),variante:base?mappaTesto(base):""});
+    const m=normMappa(r.dati||{},{id:uid8(),materia:p.materia||"Altro",argomento:p.argomento||"",origine:"auto",creata:now()});if(!m.rami.length)throw new Error("Mappa non riuscita, riprova.");
+    if(base)m.titolo=(base.titolo.replace(/\s*\(versione \d+\)$/,""))+` (versione ${(S.mappe.filter(x=>x.titolo.startsWith(base.titolo.replace(/\s*\(versione \d+\)$/,""))).length)+1})`;
+    m.mod=now();S.mappe.push(m);save();toast("Mappa pronta");go("mappa/"+m.id)}catch(e){toast(e.message,5000)}}
+function salvaMappaDaTutor(d,materia){const m=normMappa(d,{id:uid8(),materia:materia||"Altro",origine:"tutor",creata:now()});if(!m.rami.length)return null;m.mod=now();S.mappe.push(m);save();return m}
+function vMappa(id){const m=mappaById(id);if(!m)return vMappe();
+  const rami=m.rami||[],L=rami.filter((r,i)=>i%2===1),R=rami.filter((r,i)=>i%2===0);
+  const box=(r,i)=>`<button class="mbranch" data-mr="${i}" ${m.condivisa?"":`data-act="medr:${id}:${i}"`} style="--c:${MCOLS[i%8]};--o:${i+1}"><b>${esc(r.t)}</b>${(r.punti||[]).length?`<ul>${r.punti.map(p=>`<li>${esc(p)}</li>`).join("")}</ul>`:""}</button>`;
+  const idx=r=>rami.indexOf(r);
+  return `<button class="back" data-go="mappe">${ic("back",18)} Mappe</button>
+  <div class="row" style="align-items:flex-start"><div class="grow"><p class="xs b" style="color:${mcol(m.materia)}">${prova?`<span class="chip warm" style="margin-right:6px;padding:1px 8px">Prova</span>`:""}${esc(m.materia||"")}${m.condivisa?` · da ${esc(daChi(m.da))}`:""}</p><h1 style="font-size:1.35em">${esc(m.titolo)}</h1></div>
+   <div class="gbtns"><button class="icon-btn" style="width:40px;height:40px" data-act="mzoom:-" aria-label="Rimpicciolisci">−</button><button class="icon-btn" style="width:40px;height:40px" data-act="mzoom:+" aria-label="Ingrandisci">+</button></div></div>
+  ${m.nota?`<div class="card"><p class="small"><b>${esc(daChi(m.da))}:</b> ${esc(m.nota)}</p></div>`:""}
+  ${aiuto(m.condivisa?"Questa mappa te l’hanno preparata mamma o papà. Puoi leggerla, esportarla e salvarne una copia tra le tue mappe per modificarla.":"Al centro c’è l’argomento, intorno i concetti principali con le parole chiave. <b>Tocca un riquadro</b> per modificarlo. Con i pulsanti sotto puoi chiedere al tutor di cambiarla (“aggiungi le date”, “più semplice”), crearne un’altra versione o metterti alla prova. Usa + e − per ingrandire.","Scrivi in “Modifica con indicazioni”: “aggiungi un ramo sulle cause della guerra”.")}
+  <div class="mapzoom" id="mapzoom"><div class="mapcanvas" id="mapcanvas"><svg class="mlines" id="mlines" aria-hidden="true"></svg>
+   <div class="mcol">${L.map(r=>box(r,idx(r))).join("")}</div><div class="mcenter"><div class="mnode" id="mnode" ${m.condivisa?"":`data-act="medc:${id}"`}>${esc(m.centro||m.titolo)}</div></div><div class="mcol">${R.map(r=>box(r,idx(r))).join("")}</div></div></div>
+  ${m.condivisa?`<div class="grid2"><button class="btn" data-act="mcopia:${id}">Salva tra le mie mappe</button><button class="btn ghost" data-act="mesp:${id}">Esporta</button></div><button class="btn soft wide" data-act="mtest:${id}">Mettiti alla prova</button>`:
+  `<div class="grid2"><button class="btn" data-act="mtest:${id}">Mettiti alla prova</button><button class="btn ghost" data-act="mesp:${id}">${prova?"Esporta o condividi":"Esporta"}</button></div>
+  <div class="card stack"><p class="b">Modifica con indicazioni</p><div class="row"><input class="field grow" id="mind" placeholder="Es. più semplice, aggiungi le date"><button class="icon-btn" data-act="mmic" aria-label="Detta">${ic("mic")}</button></div><button class="btn soft" data-act="mmod:${id}">Applica</button>
+   ${(m.storia||[]).length?`<button class="link" data-act="mundo:${id}">Torna alla versione precedente</button>`:""}</div>
+  <div class="grid2"><button class="btn ghost" data-act="mvar:${id}">Un’altra versione</button><button class="btn ghost" data-act="maddr:${id}">${ic("plus",16)} Aggiungi ramo</button></div>
+  <button class="btn danger wide" data-act="mdel:${id}">${ic("trash",18)} Elimina mappa</button>`}`}
+function disegnaMappa(){const z=$("#mapzoom"),c=$("#mapcanvas"),n=$("#mnode"),svg=$("#mlines");if(!z||!c||!n)return;
+  const narrow=z.clientWidth<620;c.classList.toggle("narrow",narrow);
+  const W=narrow?z.clientWidth-2:980;const fit=narrow?1:Math.min(1,(z.clientWidth-4)/W);if(mapZoom===null)mapZoom=fit;
+  c.style.width=W+"px";c.style.transform=`scale(${mapZoom})`;const H=c.offsetHeight;z.style.height=Math.ceil(H*mapZoom+6)+"px";
+  svg.setAttribute("width",W);svg.setAttribute("height",H);
+  const pos=el=>{let x=0,y=0,e=el;while(e&&e!==c){x+=e.offsetLeft;y+=e.offsetTop;e=e.offsetParent}return{x,y,w:el.offsetWidth,h:el.offsetHeight}};
+  const N=pos(n);let p="";
+  c.querySelectorAll(".mbranch").forEach(b=>{const B=pos(b);const colr=getComputedStyle(b).getPropertyValue("--c");
+    if(narrow){const x0=14,y0=N.y+N.h/2,y2=B.y+Math.min(B.h/2,22);p+=`<path d="M${N.x} ${y0} H${x0+8} Q${x0} ${y0} ${x0} ${y0+8} V${y2-8} Q${x0} ${y2} ${x0+8} ${y2} H${B.x}" fill="none" stroke="${colr}" stroke-width="2.5" stroke-linecap="round" opacity=".7"/>`;return}
+    const left=B.x<N.x;const x1=left?N.x:N.x+N.w,y1=N.y+N.h/2,x2=left?B.x+B.w:B.x,y2=B.y+Math.min(B.h/2,28);const mx=(x1+x2)/2;
+    p+=`<path d="M${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}" fill="none" stroke="${colr}" stroke-width="3" stroke-linecap="round" opacity=".75"/>`});
+  svg.innerHTML=p}
+addEventListener("resize",()=>{if(route().name==="mappa"){mapZoom=null;disegnaMappa()}});
+function editRamo(id,i){const m=S.mappe.find(x=>x.id===id);if(!m)return;const nuovo=i==="new";const r=nuovo?{t:"",punti:[]}:m.rami[+i];
+  sheet(`<h2>${nuovo?"Nuovo ramo":"Modifica ramo"}</h2><div><label class="flabel" for="rt">Concetto</label><input class="field" id="rt" value="${esc(r.t)}"></div>
+   <div><label class="flabel" for="rp">Parole chiave (una per riga)</label><textarea class="field" id="rp" style="min-height:130px">${esc((r.punti||[]).join("\n"))}</textarea></div>
+   <div class="row">${nuovo?"":`<button class="btn danger" data-s="del">${ic("trash",18)}</button>`}<button class="btn ghost grow" data-s="x">Annulla</button><button class="btn grow" data-s="ok">Salva</button></div>`,(k,bg)=>{
+   if(k==="x"){bg.remove();return}snapMappa(m);
+   if(k==="del"){m.rami.splice(+i,1)}
+   if(k==="ok"){const t=bg.querySelector("#rt").value.trim();if(!t){toast("Scrivi il concetto");return}const pt=bg.querySelector("#rp").value.split("\n").map(s=>s.trim()).filter(Boolean).slice(0,6);if(nuovo)m.rami.push({t,punti:pt});else m.rami[+i]={t,punti:pt}}
+   m.origine=m.origine==="auto"?"auto":m.origine;m.mod=now();save();bg.remove();render()})}
+function editCentro(id){const m=S.mappe.find(x=>x.id===id);if(!m)return;sheet(`<h2>Argomento centrale</h2><div><label class="flabel" for="mt">Titolo della mappa</label><input class="field" id="mt" value="${esc(m.titolo)}"></div><div><label class="flabel" for="mc">Al centro</label><input class="field" id="mc" value="${esc(m.centro||"")}"></div><div class="row"><button class="btn ghost grow" data-s="x">Annulla</button><button class="btn grow" data-s="ok">Salva</button></div>`,(k,bg)=>{if(k==="ok"){snapMappa(m);m.titolo=bg.querySelector("#mt").value.trim()||m.titolo;m.centro=bg.querySelector("#mc").value.trim()||m.centro;m.mod=now();save();render()}bg.remove()})}
+function snapMappa(m){m.storia=(m.storia||[]).concat([JSON.stringify({titolo:m.titolo,centro:m.centro,rami:m.rami})]).slice(-5)}
+async function modificaMappaAI(id){const m=S.mappe.find(x=>x.id===id);const ind=($("#mind")||{}).value;if(!m)return;if(!ind||!ind.trim()){toast("Scrivi cosa cambiare");return}toast("Modifico la mappa…",12000);
+  try{const r=await ponte("/genera",{tipo:"mappa_mod",materia:m.materia,argomento:m.titolo,mappa:JSON.stringify({titolo:m.titolo,centro:m.centro,rami:m.rami}),dettagli:ind.trim()});
+    const nm=normMappa(r.dati||{},{});if(!nm.rami.length)throw new Error("Modifica non riuscita, riprova.");snapMappa(m);m.titolo=nm.titolo;m.centro=nm.centro;m.rami=nm.rami;m.mod=now();save();mapZoom=null;render();toast("Mappa aggiornata")}catch(e){toast(e.message,5000)}}
+async function testDaMappa(id){const m=mappaById(id);if(!m)return;toast("Preparo le domande…",9000);
+  try{const r=await ponte("/genera",{tipo:"quiz",materia:MATERIE.includes(m.materia)?m.materia:"",argomento:m.titolo,dettagli:"Fai domande solo su questa mappa di studio:\n"+mappaTesto(m),n:5});const d=r.dati||{};
+    if(!Array.isArray(d.domande)||!d.domande.length)throw new Error("Domande non pronte, riprova.");
+    gq={titolo:m.titolo,materia:m.materia||"Altro",ripasso:d.ripasso||"",domande:d.domande.filter(q=>q&&q.q&&Array.isArray(q.opzioni)&&q.opzioni.length>1),i:-1,score:0,ans:null,mappa:id};go("qz")}catch(e){toast(e.message,5000)}}
+function esportaMappa(id){const m=mappaById(id);if(!m)return;esportaSheet({titolo:"Mappa: "+m.titolo,testo:mappaTesto(m),html:mappaHtmlStampa(m),condividi:prova&&!m.condivisa?{tipo:"mappa",titolo:m.titolo,materia:m.materia,dati:{titolo:m.titolo,centro:m.centro,rami:m.rami,materia:m.materia}}:null})}
+function mappaErrori(materia){const e=erroriTop(12,materia);if(!e.length){toast("Nessun errore registrato per questa materia");return}
+  creaMappaAuto({materia,argomento:`I miei punti deboli di ${materia}`,dettagli:"Crea una mappa di ripasso che spieghi in modo semplice questi argomenti dove lo studente sbaglia, con le regole giuste da ricordare: "+e.map(x=>`${x.argomento}: ${x.errore}`).join("; ")})}
+
+// ---------- test creato su richiesta ----------
+function nuovoTestSheet(pre){pre=pre||{};sheet(`<h2>Crea un test</h2>${aiuto("Scegli materia e argomento: il tutor prepara 6 domande a scelta multipla con un breve ripasso iniziale. Alla fine vedi il punteggio e la spiegazione di ogni risposta.","Matematica, “frazioni e potenze”.")}
+  <div><label class="flabel" for="tm">Materia</label><select class="field" id="tm">${selMaterie(pre.materia||"")}</select></div>
+  <div><label class="flabel" for="ta">Argomento</label><input class="field" id="ta" value="${esc(pre.argomento||"")}" placeholder="Es. le equivalenze"></div>
+  <div class="row"><button class="btn ghost grow" data-s="x">Annulla</button><button class="btn grow" data-s="ok">Crea il test</button></div>`,async(k,bg)=>{if(k==="x"){bg.remove();return}
+  const mat=bg.querySelector("#tm").value,arg=bg.querySelector("#ta").value.trim();if(!arg){toast("Scrivi l’argomento");return}bg.remove();toast("Preparo il test…",10000);
+  try{const r=await ponte("/genera",{tipo:"quiz",materia:mat,argomento:arg,n:6});const d=r.dati||{};if(!Array.isArray(d.domande)||!d.domande.length)throw new Error("Test non pronto, riprova.");
+    gq={titolo:arg,materia:mat,ripasso:d.ripasso||"",domande:d.domande.filter(q=>q&&q.q&&Array.isArray(q.opzioni)&&q.opzioni.length>1),i:-1,score:0,ans:null};go("qz")}catch(e){toast(e.message,5000)}})}
+function testTesto(q){return q.domande.map((d,i)=>`${i+1}. ${d.q}\n`+d.opzioni.map((o,k)=>`   ${String.fromCharCode(97+k)}) ${o}${k===+d.giusta?"  ✓":""}`).join("\n")+(d.spiegazione?`\n   ${d.spiegazione}`:"")).join("\n\n")}
+function esportaTest(){if(!gq)return;esportaSheet({titolo:"Test: "+gq.titolo,testo:(gq.ripasso?gq.ripasso+"\n\n":"")+testTesto(gq),
+  html:(gq.ripasso?`<p>${esc(gq.ripasso)}</p>`:"")+gq.domande.map((d,i)=>`<h2>${i+1}. ${esc(d.q)}</h2><ol type="a">${d.opzioni.map((o,k)=>`<li${k===+d.giusta?' class="ok"':""}>${esc(o)}</li>`).join("")}</ol>${d.spiegazione?`<p class="m">${esc(d.spiegazione)}</p>`:""}`).join(""),
+  condividi:prova?{tipo:"test",titolo:gq.titolo,materia:gq.materia,dati:{ripasso:gq.ripasso,domande:gq.domande}}:null})}
+
+// ---------- note dei genitori ----------
+const noteNuove=()=>(IMP.note||[]).filter(n=>!S.noteViste.includes(n.id));
+
+// ---------- esportazioni delle altre sezioni ----------
+const tabella=(cap,righe)=>`<table><tr>${cap.map(c=>`<th>${esc(c)}</th>`).join("")}</tr>${righe.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</table>`;
+function esportaAgenda(tab){
+  if(tab==="voti"){const vs=S.voti.slice().sort((a,b)=>a.data<b.data?1:-1),mm=medieMaterie();
+    const t="Medie\n"+Object.entries(mm).map(([m,v])=>`${m}: ${fmtMedia(v)}`).join("\n")+`\nMedia generale: ${fmtMedia(mediaGenerale())}\n\nVoti\n`+vs.map(v=>`${dataBreve(v.data)} ${v.materia} (${v.tipo}): ${fmtVoto(v.voto)}`).join("\n");
+    esportaSheet({titolo:"Voti di "+S.nome,testo:t,html:`<h2>Medie</h2>${tabella(["Materia","Media"],Object.entries(mm).map(([m,v])=>[m,fmtMedia(v)]).concat([["Media generale",fmtMedia(mediaGenerale())]]))}<h2>Tutti i voti</h2>${tabella(["Data","Materia","Tipo","Voto"],vs.map(v=>[dataBreve(v.data),v.materia,v.tipo,fmtVoto(v.voto)]))}`});return}
+  if(tab==="compiti"){const ap=compitiAperti().sort((a,b)=>a.scadenza<b.scadenza?-1:1);
+    esportaSheet({titolo:"Compiti da fare",testo:ap.map(c=>`${dataBreve(c.scadenza)} · ${c.materia}${c.tipo!=="compito"?" ("+c.tipo+")":""}: ${c.testo}`).join("\n")||"Nessun compito aperto.",html:tabella(["Per il","Materia","Tipo","Cosa"],ap.map(c=>[dataBreve(c.scadenza),c.materia,c.tipo,c.testo]))});return}
+  const ore=S.orario.ore||[];const g=[1,2,3,4,5,6];
+  esportaSheet({titolo:"Orario delle lezioni",testo:g.map(d=>`${GGL[d]}: `+(S.orario.giorni[d]||[]).map((m,i)=>m?`${i+1}ª ${m}`:"").filter(Boolean).join(", ")).join("\n"),
+    html:tabella(["Ora"].concat(g.map(d=>GG[d])),ore.map((o,i)=>[o].concat(g.map(d=>(S.orario.giorni[d]||[])[i]||""))))})}
+function esportaPiano(id){const c=S.compiti.find(x=>x.id===id),p=S.piani[id];if(!c||!p)return;
+  esportaSheet({titolo:`Piano: ${c.tipo} di ${c.materia} del ${dataBreve(c.scadenza)}`,testo:c.testo+"\n\n"+p.giorni.map(g=>`${g.fatto?"✓":"○"} ${dataBreve(g.data)} (${g.minuti} min): ${g.attivita}`).join("\n"),
+    html:`<p>${esc(c.testo)}</p>`+tabella(["Giorno","Minuti","Attività","Fatto"],p.giorni.map(g=>[dataBreve(g.data),g.minuti,g.attivita,g.fatto?"✓":""]))})}
+function esportaErrori(){const e=erroriTop(200);esportaSheet({titolo:"Quaderno degli errori",testo:e.map(x=>`${x.materia} · ${x.argomento||""}: ${x.errore} (${x.n} volte)`).join("\n")||"Nessun errore.",html:tabella(["Materia","Argomento","Errore","Volte"],e.map(x=>[x.materia,x.argomento||"",x.errore,x.n]))})}
+function esportaGlossario(){const g=S.glossario.slice().sort((a,b)=>a.termine.localeCompare(b.termine,"it"));esportaSheet({titolo:"Glossario",testo:g.map(x=>`${x.termine} (${x.materia||""}): ${x.def}`).join("\n"),html:tabella(["Parola","Materia","Significato"],g.map(x=>[x.termine,x.materia||"",x.def]))})}
+
 // ===== STUDIO SMART – avvio, navigazione, eventi =====
 function render(){applyTheme();
   if(fbConfigured()&&!fbReady){$("#app").innerHTML=`<div class="lock"><div class="logo" style="width:56px;height:56px;border-radius:16px">${LOGO}</div><p class="muted">Studio Smart</p></div>`;return}
@@ -1814,10 +2087,15 @@ function render(){applyTheme();
     case "risultato":html=vRisultato();act="studio";break;
     case "storico":html="";act="profilo";break;
     case "timer":html=vTimer();act="home";break;
+    case "mappe":html=vMappe();act="studio";break;
+    case "mappa":html=vMappa(r.a);act="studio";break;
+    case "dammp":html=vDaMammaPapa();act="studio";break;
+    case "cond":html=vCondiviso(r.a);act="studio";break;
     default:html=vHome();act="home"}
   const full=r.name==="tutor"||r.name==="quiz"||r.name==="qz"||r.name==="timer";
   $("#app").innerHTML=`${prova?`<div class="prova-bar"><span class="grow">Modalità prova: stai usando l’app come la vede Davide (account di prova)</span><button data-act="esciprova">Torna all’area genitore</button></div>`:""}<div class="app">${navHtml(act)}<main id="main" class="fade" ${r.name==="tutor"?'style="padding-bottom:0"':""}>${html}</main></div>`;
   if(r.name==="storico")vStorico();
+  if(r.name==="mappa")requestAnimationFrame(disegnaMappa);else mapZoom=null;
   if(r.name==="tutor")scrollChat();
   const a=$("#ans");if(a&&quiz&&!quiz.answered)a.focus({preventScroll:true})}
 
@@ -1868,7 +2146,32 @@ document.addEventListener("click",async e=>{
     case "qzgo":gq.i=0;gq.ans=null;render();break;
     case "qzp":if(gq.ans==null){gq.ans=+x;const q=gq.domande[gq.i];if(+x===+q.giusta)gq.score++;render()}break;
     case "qznext":gq.i++;gq.ans=null;if(gq.i>=gq.domande.length&&gq.errK&&S.errori[gq.errK]&&gq.score/gq.domande.length>=.8){S.errori[gq.errK].n=Math.max(0,S.errori[gq.errK].n-2);save()}render();scrollTo(0,0);break;
-    case "qzagain":ripasso(gq.errK);break;
+    case "qzagain":if(gq.errK)ripasso(gq.errK);else if(gq.mappa)testDaMappa(gq.mappa);else{const q=gq;toast("Preparo altre domande…",9000);ponte("/genera",{tipo:"quiz",materia:q.materia,argomento:q.titolo,n:6}).then(r=>{const d=r.dati||{};gq=Object.assign({},q,{ripasso:d.ripasso||"",domande:(d.domande||[]).filter(z=>z&&z.q&&Array.isArray(z.opzioni)&&z.opzioni.length>1),i:-1,score:0,ans:null});render()}).catch(e=>toast(e.message,5000))}break;
+    case "qzesp":esportaTest();break;
+    case "ntest":nuovoTestSheet();break;
+    case "mnuova":nuovaMappaSheet(x);break;
+    case "mzoom":{const z=$("#mapzoom");const fit=z?(z.clientWidth<620?1:Math.min(1,(z.clientWidth-4)/980)):1;mapZoom=Math.max(fit,Math.min(1.6,(mapZoom||fit)*(x==="+"?1.25:.8)));disegnaMappa();break}
+    case "medr":editRamo(x,y);break;
+    case "maddr":editRamo(x,"new");break;
+    case "medc":editCentro(x);break;
+    case "mmod":modificaMappaAI(x);break;
+    case "mmic":{const inp=$("#mind");if(inp){detta("it-IT",t=>inp.value=t);toast("Ti ascolto…")}break}
+    case "mundo":{const m=S.mappe.find(z=>z.id===x);if(m&&(m.storia||[]).length){const o=JSON.parse(m.storia.pop());Object.assign(m,o);m.mod=now();save();mapZoom=null;render();toast("Versione precedente ripristinata")}break}
+    case "mvar":{const m=S.mappe.find(z=>z.id===x);if(m)creaMappaAuto({materia:m.materia,argomento:m.argomento||m.titolo,dettagli:"Organizza i concetti in modo diverso dalla versione precedente."},m);break}
+    case "mtest":testDaMappa(y?x+":"+y:x);break;
+    case "mesp":esportaMappa(y?x+":"+y:x);break;
+    case "mcopia":{const m=mappaById(y?x+":"+y:x);if(m){const n=normMappa(m,{id:uid8(),materia:m.materia||"Altro",origine:"condivisa",creata:now()});n.mod=now();S.mappe.push(n);save();toast("Salvata tra le tue mappe");go("mappa/"+n.id)}break}
+    case "mdel":{const m=S.mappe.find(z=>z.id===x);if(m){delItem("mappe",x);go("mappe")}break}
+    case "merr":mappaErrori(x);break;
+    case "apricond":apriCondiviso(x);break;
+    case "espcond":{const c=CONDIVISI.find(z=>z.id===x);if(c)esportaSheet({titolo:c.titolo||"Spiegazione",testo:testoMsgs(c.dati.msgs||[]),html:htmlMsgs(c.dati.msgs||[])});break}
+    case "chiedicond":{const c=CONDIVISI.find(z=>z.id===x);if(c){pendingAsk={testo:`Ho letto la spiegazione “${c.titolo}” che mi hanno mandato. Ho un dubbio: `,materia:c.materia,modo:"lezione",nuova:true,invia:false};go("tutor")}break}
+    case "notaok":S.noteViste.push(x);save();render();break;
+    case "pmappa":{const c=S.compiti.find(z=>z.id===x);if(c)nuovaMappaSheet("auto",{materia:c.materia,argomento:c.testo});break}
+    case "pesp":esportaPiano(x);break;
+    case "espag":esportaAgenda(x);break;
+    case "esperr":esportaErrori();break;
+    case "espglo":esportaGlossario();break;
     case "qzquit":if(confirm("Uscire dagli esercizi?")){gq=null;go("studio")}break;
     case "fshow":flashShow=true;render();break;
     case "fok":case "fno":{const s=schedeDaFare()[flashI];if(s){s.box=cmd==="fok"?Math.min(4,s.box+1):0;s.prossima=addDays(today(),cmd==="fok"?INT[s.box]:1);s.mod=now();save()}flashShow=false;render();break}
@@ -1889,7 +2192,7 @@ document.addEventListener("click",async e=>{
     case "qquit":if(confirm("Uscire? Le risposte di questo giro non verranno salvate.")){quiz=null;go("fisica")}break;
   }});
 function splitAct(s){const i=s.indexOf(":");if(i<0)return[s];const cmd=s.slice(0,i),rest=s.slice(i+1);
-  if(["rip","vmat","set","tri","fstart","pdone","pfai","tsay"].includes(cmd)){if(cmd==="rip"||cmd==="vmat")return[cmd,rest];const j=rest.lastIndexOf(":");return j<0?[cmd,rest]:[cmd,rest.slice(0,j),rest.slice(j+1)]}
+  if(["rip","vmat","merr","set","tri","fstart","pdone","pfai","tsay"].includes(cmd)){if(cmd==="rip"||cmd==="vmat"||cmd==="merr")return[cmd,rest];const j=rest.lastIndexOf(":");return j<0?[cmd,rest]:[cmd,rest.slice(0,j),rest.slice(j+1)]}
   const p=rest.split(":");return[cmd,p[0],p.slice(1).join(":")]}
 document.addEventListener("submit",async e=>{const f=e.target.dataset.form;if(!f)return;e.preventDefault();
   if(await gForm(f))return;
