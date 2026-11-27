@@ -285,6 +285,14 @@ form.dark{background:linear-gradient(135deg,var(--dark) 55%,color-mix(in srgb,va
 .prova-bar button{background:rgba(255,255,255,.95);color:var(--warm);border:0}
 .app.provamode::after{content:"";position:fixed;inset:0;border:4px solid var(--warm);pointer-events:none;z-index:60}
 .guardo{border-width:1.5px}
+.guardo.sim{border:2px solid var(--warm);background:var(--warm-soft)}
+.opzg{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 14px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:inherit;cursor:pointer}
+.opzg b{display:block}.opzg span span{display:block;font-size:.82em;color:var(--ink2)}
+.opzg.on{border-color:var(--pri);background:var(--pri-soft)}
+.opzg.sim svg{color:var(--warm)}.opzg.sim.on{border-color:var(--warm);background:var(--warm-soft)}
+.opzg[disabled]{opacity:.55;cursor:default}
+:root[data-theme="dark"] .gbar{background:color-mix(in srgb,var(--pri) 45%,#0b1020)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .gbar{background:color-mix(in srgb,var(--pri) 45%,#0b1020)}}
 
 </style>
 <script src="config.js"></script>
@@ -817,7 +825,7 @@ function makeSet(topicIds,levels,n){
 
 
 // ===== STUDIO SMART – nucleo: dati, sincronizzazione, utilità =====
-const APP_VERSION="2.5";
+const APP_VERSION="2.6";
 const CFG=Object.assign({firebase:{},ponteUrl:"",vapidKey:"",genitoreHash:""},window.STUDIO_CONFIG||{});
 const MATERIE=["Italiano","Storia","Inglese","Tedesco","Matematica","Diritto ed economia","Economia aziendale","Informatica","Geografia","Scienze della Terra e Biologia","Fisica"];
 const MCOL={"Italiano":"#B42350","Storia":"#9A4316","Inglese":"#1D5FA8","Tedesco":"#6B3FA0","Matematica":"#3451D1","Diritto ed economia":"#556B12","Economia aziendale":"#0F766E","Informatica":"#0B6E99","Geografia":"#2F7D32","Scienze della Terra e Biologia":"#7A5C12","Fisica":"#8A5A00","Altro":"#5B6577"};
@@ -931,7 +939,7 @@ function promemoriaList(st){st=st||S;const out=[];
   const lim=now()-864e5;return out.filter(p=>Date.parse(p.at)>lim).slice(0,80)}
 async function push(){if(!user||ruolo!=="studente")return;
   try{const d=await myDoc().get();if(d.exists&&d.data().json){S=merge(S,JSON.parse(d.data().json));persist()}
-    await myDoc().set({json:JSON.stringify(S),email:user.email||"",nome:prova?"Prova ("+GEN_NOME+")":S.nome,prova:!!prova,provaDi:prova?GEN_NOME:"",aggiornato:firebase.firestore.FieldValue.serverTimestamp(),promemoria:JSON.stringify(promemoriaList())},{merge:true});syncErr=false}catch(e){syncErr=true}}
+    await myDoc().set({json:JSON.stringify(S),email:user.email||"",nome:prova?"Simulazione "+GEN_NOME:S.nome,prova:!!prova,provaDi:prova?GEN_NOME:"",aggiornato:firebase.firestore.FieldValue.serverTimestamp(),promemoria:JSON.stringify(promemoriaList())},{merge:true});syncErr=false}catch(e){syncErr=true}}
 function scheduleSync(){if(!user||ruolo!=="studente")return;clearTimeout(syncT);syncT=setTimeout(push,1500)}
 let impUnsub=null;
 function listenImp(){if(impUnsub)impUnsub();impUnsub=myDoc().collection("genitore").doc("impostazioni").onSnapshot(d=>{if(d.exists)IMP=Object.assign(IMP,d.data());if(route().name!=="tutor")render()},()=>{})}
@@ -1512,7 +1520,7 @@ const G={stud:[],cur:null,dati:null,imp:{},log:[],stato:{},caricato:false,
    const gh=genitoriCfg();const L=[];
    for(const d of q.docs){const o=d.data();if(!o.json)continue;const eh=o.email?await sha256(String(o.email).toLowerCase()):"";const gp=gh.find(g=>g.hash===eh);
      const pr=d.id===user.uid||!!o.prova||!!gp;const di=d.id===user.uid?GEN_NOME:(o.provaDi||(gp&&gp.nome)||"");
-     L.push({uid:d.id,email:o.email||"",prova:pr,mia:d.id===user.uid,provaDi:di,nome:pr?`Prova (${di||"genitore"})`:(o.nome||"Studente"),agg:o.aggiornato})}
+     L.push({uid:d.id,email:o.email||"",prova:pr,mia:d.id===user.uid,provaDi:di,nome:pr?`Simulazione ${di||"genitore"}`:(o.nome||"Studente"),agg:o.aggiornato})}
    this.stud=L;
    this.stud.sort((a,b)=>a.prova-b.prova||b.mia-a.mia);
    const scelto=localStorage.getItem("ss-g-stud");this.cur=(this.stud.find(s=>s.uid===scelto)||this.stud.find(s=>!s.prova)||this.stud[0]||null);
@@ -1556,7 +1564,7 @@ function vLock(){const cfg=lockCfg();return `<div class="lock"><div class="logo"
 // ---------- intestazione ----------
 function gHead(t,back){return `${back?`<button class="back" data-act="gback">${ic("back",18)} Indietro</button>`:""}
  <div class="top"><div><p class="xs b muted">${esc(saluto())}, ${esc(nomeMio())}</p><h1>${t}</h1></div><div class="gbtns">${verChip()}<button class="btn ghost sm" data-act="greload">Aggiorna</button></div></div>${G.stud.length>1||G.cur&&G.cur.prova?chiGuardo():""}`}
-const provaCard=()=>`<div class="card row" style="flex-wrap:wrap"><div class="grow" style="min-width:200px"><p class="b">Prova l’app come Davide</p><p class="small muted">Apri l’app studente con il tuo account di prova: dati e conversazioni restano separati da quelli di Davide e li vedete solo tu e ${GEN_NOME==="mamma"?"papà":"mamma"}. Se una mappa, un test o una spiegazione vengono bene, puoi condividerli con lui.</p></div><button class="btn" data-act="gprova">${ic("user",18)} Prova come Davide</button></div>`;
+const provaCard=()=>`<div class="card row" style="flex-wrap:wrap"><div class="grow" style="min-width:200px"><p class="b">Usa l’app come Davide (simulazione)</p><p class="small muted">Apri l’app studente con il tuo account di prova: dati e conversazioni restano separati da quelli di Davide e li vedete solo tu e ${GEN_NOME==="mamma"?"papà":"mamma"}. Se una mappa, un test o una spiegazione vengono bene, puoi condividerli con lui.</p></div><button class="btn" data-act="gprova" style="background:var(--warm)">${ic("user",18)} Usa l’app come Davide</button></div>`;
 function gVuoto(t,back){return `${gHead(t,back)}<div class="card stack"><p class="b">Nessuno studente collegato</p><p class="small muted">Fai accedere Davide con il suo account Google nell’app sul suo telefono: i suoi dati compariranno qui.</p></div>${provaCard()}`}
 
 // ---------- panoramica ----------
@@ -1576,7 +1584,6 @@ function gPanoramica(){if(!G.cur)return gVuoto("Area genitore");const D=G.dati,o
   const agg=G.cur.agg&&G.cur.agg.toDate?G.cur.agg.toDate():null;
   return `${gHead("Panoramica")}
   ${aiuto("Il riassunto della settimana di Davide: quanto ha studiato (barre per giorno, la linea è l’obiettivo), quanti messaggi ha scritto al tutor, i compiti fatti in tempo, le medie dei voti e gli argomenti dove sbaglia di più. In alto con “Cambia” passi dai dati di Davide a quelli delle prove di mamma o papà.")}
-  ${G.cur.prova?`<p class="chip warm" style="align-self:flex-start">Stai guardando l’account di prova</p>`:""}
   ${agg?`<p class="xs muted">Ultimo aggiornamento dall’app: ${agg.toLocaleString("it-IT",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</p>`:""}
   ${segn.length?`<button class="card warn row" style="text-align:left;width:100%" data-go="g/segn"><span class="icon-btn" style="background:var(--warm-soft);color:var(--warm)">${ic("flag")}</span><span class="grow"><span class="b" style="display:block">${segn.length} segnalazion${segn.length>1?"i":"e"} questa settimana</span><span class="small muted">${segn.filter(s=>s.segnalazione==="delicato").length?"Include un argomento delicato. ":""}Tocca per leggere.</span></span></button>`:""}
   ${rigaAccessi()}
@@ -1645,7 +1652,7 @@ function gDelLog(ids,msg){const ref=G.ref(),uid=G.cur.uid,items=G.log.filter(l=>
     for(const id of ids)GS.pend.delete(id);render()},10000);
   for(const id of ids)GS.pend.set(id,t);render();
   toastUndo(msg||"Eliminata.",()=>{clearTimeout(t);for(const id of ids)GS.pend.delete(id);render();toast("Ripristinata")})}
-async function gProvaOggi(){if(!G.cur||!G.cur.prova)return;if(!confirm("Cancellare tutto quello che hai fatto oggi con l’account di prova (conversazioni, mappe, compiti, voti, errori, schede, tempo di studio)?"))return;
+async function gProvaOggi(){if(!G.cur||!G.cur.prova)return;if(!confirm("Cancellare tutto quello che è stato fatto oggi in questa simulazione (conversazioni, mappe, compiti, voti, errori, schede, tempo di studio)?"))return;
   const D=G.dati,t=now(),inizio=parseD(today()).getTime(),creato=id=>{const ms=parseInt(String(id).replace(/^s/,"").slice(0,8),36);return ms>=inizio&&ms<=t+6e4};
   for(const k of ["compiti","voti","glossario","schede","mappe"]){for(const x of D[k]||[])if(creato(x.id)){D.del[x.id]=t;if(k==="compiti")delete D.piani[x.id]}D[k]=D[k].filter(x=>!creato(x.id))}
   for(const k in D.errori)if((D.errori[k].ultimo||0)>=inizio){D.errori[k].n=0;D.errori[k].ultimo=t}
@@ -1666,7 +1673,7 @@ function gDati(){if(!G.cur)return gVuoto("Dati",true);const D=G.dati;
   return `${gHead("Dati",true)}
   ${aiuto("Tutto quello che c’è nell’app di Davide, diviso per sezioni. Apri una sezione per correggere o eliminare un elemento (hai 10 secondi per annullare). “Azzera” svuota una sezione intera. Quello che cancelli qui non ricompare sul suo telefono.")}
   ${G.cur.prova?`<button class="btn danger wide" data-act="gprovaoggi">${ic("trash",18)} Cancella le prove di oggi</button>`:""}
-  <p class="small muted">${G.cur.prova?"Dati dell’account di prova.":`Dati di ${esc(G.cur.nome)}.`} Le modifiche arrivano anche sull’app studente al prossimo aggiornamento, e quello che cancelli non ricompare.</p>
+  <p class="small muted">${G.cur.prova?"Dati della simulazione.":`Dati di ${esc(G.cur.nome)}.`} Le modifiche arrivano anche sull’app studente al prossimo aggiornamento, e quello che cancelli non ricompare.</p>
   <div class="card stack"><p class="b">Copia di sicurezza</p><p class="small muted">Salva tutti i dati in un file sul computer, da ripristinare se cancelli qualcosa per errore.</p><div class="grid2"><button class="btn ghost" data-act="gbackup">Scarica una copia</button><button class="btn ghost" data-act="grestore">Ripristina</button></div></div>
   ${sez("compiti","Compiti e verifiche",D.compiti.length,"",comp.length?`<div class="list" style="margin:0 -16px">${comp.map(c=>`<div class="row"><div class="grow"><p class="xs b" style="color:${mcol(c.materia)}">${G.cur.prova?`<span class="chip warm" style="margin-right:6px">Prova</span>`:""}${esc(c.materia)} · ${esc(c.tipo)} · ${esc(dataBreve(c.scadenza))}${c.fatto?" · fatto":""}</p><p class="small b">${esc(c.testo)}</p></div>${rigaBtn("gcomp:"+c.id,"gdelc:"+c.id)}</div>`).join("")}</div>`:"")}
   ${sez("voti","Voti",voti.length,"Quelli che inserite voi Davide li vede ma non può modificarli.",`<button class="btn soft sm" style="align-self:flex-start" data-act="fvgnew">${ic("plus",16)} Aggiungi voto</button>`+(voti.length?`<div class="list" style="margin:0 -16px">${voti.map(v=>`<div class="row mrow" style="--m:${mcol(v.materia)}">${sigla(v.materia)}<div class="grow"><p class="small b">${G.cur.prova?`<span class="chip warm" style="margin-right:6px">Prova</span>`:""}${esc(v.materia)} · ${fmtVoto(v.voto)}</p><p class="xs muted">${esc(dataBreve(v.data))} · ${esc(v.tipo)}${v.nota?" · "+esc(v.nota):""} · da ${v.gen?esc(daChi(v.da)):"Davide"}</p></div><span class="gbtns"><button class="icon-btn" style="width:38px;height:38px" data-act="fvap:${v.id}" aria-label="Appunto">${ic("flag",17)}</button>${v.gen?`<button class="icon-btn" style="width:38px;height:38px" data-act="fvgedit:${v.id}" aria-label="Modifica">${ic("edit",17)}</button>`:rigaBtn("gvoto:"+v.id,"gdelv:"+v.id)}</span></div>`).join("")}</div>`:""))}
@@ -1679,9 +1686,9 @@ function gDati(){if(!G.cur)return gVuoto("Dati",true);const D=G.dati;
   ${sez("piani","Piani di studio",Object.keys(D.piani).length,"")}
   ${sez("log","Conversazioni con il tutor",G.log.length,"Cancella il registro completo e le copie nell’app")}
   ${sez("contatori","Messaggi usati oggi",usati,"Riporta a zero il conteggio del tetto giornaliero")}
-  <div class="card stack warn"><p class="b">Azzera tutto</p><p class="small muted">Cancella compiti, voti, orario, errori, schede, tempo, progressi e conversazioni${G.cur.prova?" dell’account di prova":` di ${esc(G.cur.nome)}`}. Restano il nome e le tue impostazioni.</p><button class="btn danger" data-act="gres:tutto">${ic("trash",18)} Azzera tutto</button></div>`}
+  <div class="card stack warn"><p class="b">Azzera tutto</p><p class="small muted">Cancella compiti, voti, orario, errori, schede, tempo, progressi e conversazioni${G.cur.prova?" della simulazione":` di ${esc(G.cur.nome)}`}. Restano il nome e le tue impostazioni.</p><button class="btn danger" data-act="gres:tutto">${ic("trash",18)} Azzera tutto</button></div>`}
 const NOMI_RES={mappe:"tutte le mappe",compiti:"tutti i compiti",voti:"tutti i voti",errori:"il quaderno degli errori",orario:"l’orario",glossario:"glossario e schede",tempo:"il tempo di studio",fis:"i progressi di fisica",piani:"i piani di studio",log:"tutte le conversazioni",contatori:"il conteggio dei messaggi di oggi",tutto:"TUTTI i dati"};
-async function gReset(k){const chi=G.cur.prova?"dell’account di prova":"di "+G.cur.nome;
+async function gReset(k){const chi=G.cur.prova?"della simulazione":"di "+G.cur.nome;
   if(!confirm(`Cancellare ${NOMI_RES[k]} ${chi}? Non si può annullare.`))return;
   if(k==="tutto"){if(!confirm("Sei proprio sicuro? Verranno cancellati tutti i dati."))return;if(confirm("Vuoi prima scaricare una copia di sicurezza? (consigliato)"))scaricaCopia()}
   toast("Cancello…",8000);const D=G.dati,t=now(),B=blank();
@@ -1719,7 +1726,7 @@ function gImp(){const I=G.imp,cfg=lockCfg()||{};
   return `${gHead("Impostazioni",true)}
   ${cardProfiloGen()}
   ${aiuto("Qui decidi le regole del tutor (quanti messaggi al giorno e in che orari), l’obiettivo di studio e il premio. Puoi mandare un messaggio a Davide, assegnargli un’attività, vedere cosa avete condiviso con lui e proteggere l’area con impronta o PIN. Le impostazioni valgono per lo studente scelto in alto: mamma e papà le vedono e le modificano entrambi.")}
-  ${G.cur?`<form class="card stack" data-form="gimp"><p class="b">Tutor${G.cur.prova?" (account di prova)":` di ${esc(G.cur.nome)}`}</p>
+  ${G.cur?`<form class="card stack" data-form="gimp"><p class="b">Tutor${G.cur.prova?" (simulazione)":` di ${esc(G.cur.nome)}`}</p>
    <div><label class="flabel" for="gt">Messaggi al giorno (tetto di spesa)</label><input class="field" id="gt" type="number" min="5" max="300" value="${I.tetto||60}"></div>
    <div class="grid2"><div><label class="flabel" for="gi">Disponibile dalle</label><input class="field" id="gi" type="time" value="${esc(I.oraInizio||"")}"></div><div><label class="flabel" for="gf">Fino alle</label><input class="field" id="gf" type="time" value="${esc(I.oraFine||"")}"></div></div>
    <p class="xs muted">Lascia vuoto per non mettere limiti di orario.</p>
@@ -1750,13 +1757,18 @@ function renderGenitore(){const r=route();
   if(!location.hash.startsWith("#g")){location.hash="g";return}
   const name=r.a?"g/"+r.a:"g";
   const html=name==="g/chat"?gChat(false):name==="g/segn"?gChat(true):name==="g/dati"?gDati():name==="g/imp"?gImp():name==="g/agenda"?gAgenda(r.b):gPanoramica();
-  $("#app").innerHTML=`${barraGenitore()}<div class="app gmode">${gnav(name)}<main id="main" class="fade">${html}</main></div>`;if(!GP.guida&&GP.caric&&!window._guida){window._guida=1;setTimeout(guidaIniziale,400)}}
+  $("#app").innerHTML=`${barraGenitore()}<div class="app gmode">${gnav(name)}<main id="main" class="fade">${html}</main></div>`;if(!GP.guida&&GP.caric&&!window._guida){window._guida=1;setTimeout(benvenuto,400)}}
 async function gAct(cmd,x){if(ruolo!=="genitore")return false;if(bloccoLettura(cmd))return true;switch(cmd){
   case "gimpronta":if(await usaImpronta()){sessionStorage.setItem("ss-unl",now());render()}else toast("Impronta non riconosciuta");return true;
   case "gback":if(history.length>1&&location.hash!=="#g")history.back();else go("g");return true;
   case "greload":toast("Aggiorno…");await G.init();render();return true;
   case "gprova":confermaProva();return true;
-  case "gstud":sheet(`<h2>Cosa vuoi guardare?</h2>${aiuto("“Davide” sono i suoi dati veri. Le prove sono gli account con cui tu e "+esc(nomeAltro())+" usate l’app come Davide: restano separate e lui non le vede.")}${G.stud.map(s=>`<button class="btn ${s.uid===G.cur.uid?"":"ghost"} wide" data-s="${s.uid}" style="justify-content:flex-start;gap:10px">${ic(s.prova?"edit":"user",18)} ${s.prova?`Prova di ${esc(s.provaDi||"genitore")}${s.mia?" (la tua)":""}`:`Dati di ${esc(s.nome)}`}</button>`).join("")}`,async(k,bg)=>{GS.filtro="";G.cur=G.stud.find(s=>s.uid===k);localStorage.setItem("ss-g-stud",k);bg.remove();await G.carica();render()});return true;
+  case "gstud":{const sim=r=>G.stud.find(s=>s.prova&&s.provaDi===r);const opz=(s,t,d,icn)=>`<button class="opzg ${s&&s.uid===G.cur.uid?"on":""} ${s&&s.prova?"sim":""}" ${s?`data-s="${s.uid}"`:"disabled"}>${ic(icn,20)}<span class="grow"><b>${t}</b><span>${d}</span></span></button>`;
+   sheet(`<h2>Di chi vuoi vedere i dati?</h2><p class="small muted">Resti nell’area genitore, come amministratore.</p>
+    ${opz(G.stud.find(s=>!s.prova),"Dati di Davide","Quello che fa Davide nella sua app: i dati veri.","user")}
+    ${["papà","mamma"].map(r=>{const s=sim(r);return opz(s,"Simulazione "+r,s?(r===GEN_NOME?"Quello che hai fatto tu":"Quello che ha fatto "+(r==="mamma"?"mamma":"papà"))+" usando l’app come Davide.":(r===GEN_NOME?"Non hai ancora usato l’app come Davide.":(r==="mamma"?"Mamma":"Papà")+" non ha ancora usato l’app come Davide."),"edit")}).join("")}
+    <button class="btn wide" data-s="usa" style="background:var(--warm);margin-top:4px">${ic("user",18)} Usa l’app come Davide</button>
+    <p class="xs muted" style="text-align:center">Lo schermo diventa arancione: quello che fai finisce nella tua simulazione, non nei dati di Davide.</p>`,async(k,bg)=>{if(k==="usa"){bg.remove();confermaProva();return}GS.filtro="";G.cur=G.stud.find(s=>s.uid===k);localStorage.setItem("ss-g-stud",k);bg.remove();await G.carica();render()});return true}
   case "gdelnota":G.imp.note=(G.imp.note||[]).filter(n=>n.id!==x);await G.salvaImp();render();return true;
   case "gesp":{const l=G.log.find(z=>z.id===x);if(!l)return true;const msgs=[{r:"u",t:l.domanda||""},{r:"a",t:String(l.risposta||"").replace(/<ascolto[^>]*>[\s\S]*?<\/ascolto>/g,"").replace(/<mappa>[\s\S]*?<\/mappa>/g,"")}];
     esportaSheet({titolo:(l.materia?l.materia+": ":"")+String(l.domanda||"Domanda").slice(0,60),testo:testoMsgs(msgs),html:htmlMsgs(msgs),condividi:{tipo:"chat",titolo:String(l.domanda||"Una spiegazione per te").slice(0,80),materia:l.materia||"",dati:{msgs,modo:l.modo}}});return true}
@@ -1803,10 +1815,11 @@ function gCondivisiCard(){const C=G.condivisi||[];const ty={mappa:"Mappa",test:"
    ${C.length?C.map(c=>`<div class="row"><span class="chip">${ty[c.tipo]||"Altro"}</span><span class="small grow">${esc(c.titolo||"")} <span class="xs muted">· da ${esc(daChi(c.da))} · ${new Date(c.t).toLocaleDateString("it-IT",{day:"numeric",month:"short"})}</span></span><button class="icon-btn" style="width:38px;height:38px;color:var(--bad)" data-act="gritira:${c.id}" aria-label="Ritira">${ic("trash",18)}</button></div>`).join(""):`<p class="small muted">Ancora niente.</p>`}</div>`}
 
 function gAgenda(sub){if(!G.cur)return gVuoto("Agenda",true);
-  return `${sub?"":gHead("Agenda")}${G.cur.prova&&!sub?`<p class="chip warm" style="align-self:flex-start">Stai guardando l’agenda dell’account di prova</p>`:""}${famView(sub)}${sub?"":`<button class="btn ghost wide" data-act="fespag">${ic("share",18)} Esporta l’agenda</button>`}`}
+  return `${sub?"":gHead("Agenda")}${famView(sub)}${sub?"":`<button class="btn ghost wide" data-act="fespag">${ic("share",18)} Esporta l’agenda</button>`}`}
 
 // ===== STUDIO SMART – novità v2.1 =====
 const NOVITA=[
+ ["2.6","27 novembre 2026",["«Sei nell’area genitore»: è sempre chiaro se guardi i dati veri di Davide o una simulazione","Le prove ora si chiamano «Simulazione papà» e «Simulazione mamma»","Pulsante arancione «Usa l’app come Davide» anche dentro «Cambia»","In alto c’è sempre scritta la modalità: amministratore o simulazione","Benvenuto al primo accesso: scegli come essere chiamato e capisci le due modalità","Conferma quando esci dalla simulazione"]],
  ["2.5","27 novembre 2026",["Ogni genitore ha il suo profilo: nome, foto, colore e tema, uguali su ogni dispositivo","Barra «Area genitore» con il tuo nome sempre in alto","Prova come Davide in arancione, con conferma all’ingresso e «Ricomincia da zero»","«Stai guardando»: Dati di Davide o la prova di mamma o papà","Bacheca «Tra voi due» che Davide non vede","Ultimo accesso di Davide e dell’altro genitore","Chi va al colloquio: il promemoria arriva solo a lui o a lei","Notifiche scelte da ognuno e riepilogo della domenica sera","Solo lettura e blocco con impronta personali","Guida iniziale"]],
  ["2.4","26 novembre 2026",["Agenda di famiglia condivisa: colloqui, riunioni, uscite, con chi li ha inseriti","Colloqui con la lista delle domande da fare, anche per chi non va, e “Com’è andata”","Promemoria che apre direttamente l’appuntamento","Rubrica dei professori con email e ricevimento; “Fissa colloquio” già nel giorno giusto","Mamma e papà possono inserire voti; Davide li vede ma non li può modificare","Appunti condivisi: ognuno modifica solo i propri","Pagina “La scuola” con i contatti dell’Istituto Paolini","Colori delle materie ovunque: sigle, strisce, orario a riquadri","Domani a scuola nella Home e grafica più curata"]],
  ["2.3","26 novembre 2026",["Mappe di studio: in automatico o costruite insieme al tutor, anche dalle foto del libro","Mappe: modifica con indicazioni, altre versioni, torna indietro, “Mettiti alla prova”","Mappa dei punti deboli dal quaderno degli errori e dal piano di una verifica","Crea un test su qualsiasi argomento","Esporta tutto con WhatsApp, email o PDF da stampare","Accesso anche per mamma: vede tutto e fa le sue prove","Le prove dei genitori restano separate; quelle riuscite si possono condividere con Davide","Sezione “Da mamma e papà” e messaggi dei genitori nella Home","Si vede chi ha fatto cosa (mamma o papà)","“Come funziona” in ogni sezione"]],
@@ -2328,9 +2341,12 @@ function rigaAccessi(){const alt=Object.entries(FAMG).find(([u,g])=>u!==user.uid
 
 // ---------- intestazione dell'area genitore ----------
 function avatarGen(px){px=px||38;return GP.avatar?`<img src="data:image/jpeg;base64,${GP.avatar}" alt="" style="width:${px}px;height:${px}px;border-radius:50%;object-fit:cover">`:`<span style="width:${px}px;height:${px}px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.18);color:#fff;font-weight:800">${esc(nomeMio().slice(0,1).toUpperCase())}</span>`}
-function barraGenitore(){return `<div class="gbar"><span class="gbar-ic">${ic("shield",16)}</span><span class="grow"><b>Area genitore</b> · ${esc(nomeMio())}${GP.soloLettura?` · <span class="gbar-ro">solo lettura</span>`:""}</span><button class="gbar-av" data-go="g/imp" aria-label="Il tuo profilo">${avatarGen(30)}</button></div>`}
-function chiGuardo(){const s=G.cur;if(!s)return"";const tit=s.prova?`Prova di ${s.provaDi==="mamma"?"mamma":s.provaDi==="papà"?"papà":s.provaDi||"un genitore"}`:`Dati di ${s.nome}`;
-  return `<button class="card row guardo ${s.prova?"warn":""}" data-act="gstud" style="width:100%;text-align:left"><span class="icon-btn" style="background:${s.prova?"var(--warm-soft)":"var(--pri-soft)"};color:${s.prova?"var(--warm)":"var(--pri-ink)"}">${ic(s.prova?"edit":"user")}</span><span class="grow"><span class="xs b muted" style="display:block">STAI GUARDANDO</span><span class="b">${esc(tit)}</span></span><span class="btn ghost sm">Cambia</span></button>`}
+function barraGenitore(){return `<div class="gbar"><span class="gbar-ic">${ic("shield",16)}</span><span class="grow"><span style="display:block;font-size:.78em;opacity:.85;text-transform:uppercase;letter-spacing:.04em">Modalità: amministratore</span><b>Area genitore</b> · ${esc(nomeMio())}${GP.soloLettura?` · <span class="gbar-ro">solo lettura</span>`:""}</span><button class="gbar-av" data-go="g/imp" aria-label="Il tuo profilo">${avatarGen(30)}</button></div>`}
+function simVuota(){const D=G.dati||{};return !G.log.length&&!(D.compiti||[]).length&&!(D.voti||[]).length&&!(D.mappe||[]).length&&!Object.keys(D.errori||{}).length}
+function chiGuardo(){const s=G.cur;if(!s)return"";const r=s.provaDi||"genitore";const tit=s.prova?`Simulazione ${r}`:`Dati di ${s.nome}`;
+  const sub=s.prova?(r===GEN_NOME?"Quello che hai fatto tu usando l’app come Davide: non sono dati veri.":`Quello che ha fatto ${r} usando l’app come Davide: non sono dati veri.`):"I dati veri: quello che fa Davide nella sua app.";
+  return `<button class="card row guardo ${s.prova?"sim":""}" data-act="gstud" style="width:100%;text-align:left"><span class="icon-btn" style="background:${s.prova?"var(--warm)":"var(--pri-soft)"};color:${s.prova?"#fff":"var(--pri-ink)"}">${ic(s.prova?"edit":"user")}</span><span class="grow"><span class="xs b muted" style="display:block">SEI NELL’AREA GENITORE</span><span class="b">${esc(tit)}</span><span class="xs muted" style="display:block">${sub}</span></span><span class="btn ghost sm">Cambia</span></button>
+   ${s.prova&&simVuota()?`<div class="card empty">${r===GEN_NOME?"Non hai ancora usato l’app come Davide.":(r==="mamma"?"Mamma":"Papà")+" non ha ancora usato l’app come Davide."} Per iniziare tocca «Usa l’app come Davide» in Impostazioni.</div>`:""}`}
 
 // ---------- profilo personale ----------
 function cardProfiloGen(){const n=GP.notif;const ck=(k,t)=>`<label class="row" style="cursor:pointer"><input type="checkbox" data-gnotif="${k}" ${n[k]?"checked":""} style="width:22px;height:22px;accent-color:var(--pri)"><span class="small grow">${t}</span></label>`;
@@ -2346,19 +2362,19 @@ function cardProfiloGen(){const n=GP.notif;const ck=(k,t)=>`<label class="row" s
    <button class="link" data-act="gguida">Rivedi la guida iniziale</button></div>`}
 function guidaIniziale(){const P=[["Benvenuta nell’area genitore","Qui vedi tutto quello che fa Davide nell’app: tempo di studio, voti, compiti e le conversazioni con il tutor. In alto c’è sempre la barra «Area genitore» con il tuo nome."],
   ["Le sezioni in basso","<b>Panoramica</b>: il riassunto della settimana. <b>Chat</b>: tutte le domande al tutor. <b>Segnalazioni</b>: quando chiede di farsi fare i compiti o tocca temi delicati. <b>Agenda</b>: colloqui, professori, appunti. <b>Dati</b>: voti e compiti da correggere. <b>Impostazioni</b>: il tuo profilo e le regole del tutor."],
-  ["Prova come Davide","Da Impostazioni puoi usare l’app come la vede Davide. Lo schermo diventa arancione: quello che fai lì resta separato, lo vedete solo voi due. Se una mappa o un test vengono bene, puoi condividerli con lui."]];
+  ["Usa l’app come Davide","Da Impostazioni puoi usare l’app come la vede Davide: è una <b>simulazione</b>, lo schermo diventa arancione e quello che fai resta separato dai suoi dati. Poi, dall’area genitore, con «Cambia» puoi rivedere la tua simulazione. Se una mappa o un test vengono bene, puoi condividerli con lui."]];
   if(GEN_NOME!=="mamma")P[0][0]="Benvenuto nell’area genitore";let i=0;
   const html=()=>`<p class="xs b muted">${i+1} di ${P.length}</p><h2>${P[i][0]}</h2><p class="small" style="line-height:1.55">${P[i][1]}</p><div class="row">${i?`<button class="btn ghost grow" data-s="prev">Indietro</button>`:`<button class="btn ghost grow" data-s="x">Salta</button>`}<button class="btn grow" data-s="next">${i<P.length-1?"Avanti":"Ho capito"}</button></div>`;
-  sheet(html(),(k,bg)=>{if(k==="x"||(k==="next"&&i===P.length-1)){bg.remove();gpSalva({guida:true});return}i+=k==="next"?1:-1;bg.querySelector(".sheet").innerHTML=html()})}
-function confermaProva(){sheet(`<div class="row"><span class="icon-btn" style="background:var(--warm-soft);color:var(--warm)">${ic("user")}</span><h2 style="margin:0">Prova come Davide</h2></div>
-  <p class="small">Vedrai l’app esattamente come la vede Davide, con lo schermo bordato di <b style="color:var(--warm)">arancione</b>.</p>
-  <p class="small">Quello che fai qui resta <b>separato da Davide</b>: lo vedete solo tu e ${esc(nomeAltro())}. Per tornare, tocca «Torna all’area genitore» nella barra in alto.</p>
-  <div class="row"><button class="btn ghost grow" data-s="x">Annulla</button><button class="btn grow" data-s="ok">Inizia la prova</button></div>`,(k,bg)=>{bg.remove();if(k==="ok")entraProva()})}
-async function ricominciaProva(){if(!prova||!confirm("Cancellare tutta la tua prova e ripartire da zero? Davide e la prova dell’altro genitore non vengono toccati."))return;
-  const ref=myDoc();toast("Svuoto la prova…",6000);
+  sheet(html(),(k,bg)=>{if(k==="x"||(k==="next"&&i===P.length-1)){bg.remove();return}i+=k==="next"?1:-1;bg.querySelector(".sheet").innerHTML=html()})}
+function confermaProva(){sheet(`<div class="row"><span class="icon-btn" style="background:var(--warm-soft);color:var(--warm)">${ic("user")}</span><h2 style="margin:0">Usa l’app come Davide</h2></div>
+  <p class="small">Vedrai l’app esattamente come la vede Davide, con lo schermo bordato di <b style="color:var(--warm)">arancione</b>. È una <b>simulazione</b>.</p>
+  <p class="small">Quello che fai finisce nella <b>Simulazione ${esc(GEN_NOME)}</b>, separata dai dati di Davide: la vedete solo tu e ${esc(nomeAltro())}. Per tornare, tocca «Torna all’area genitore» nella barra in alto.</p>
+  <div class="row"><button class="btn ghost grow" data-s="x">Annulla</button><button class="btn grow" data-s="ok" style="background:var(--warm)">Inizia la simulazione</button></div>`,(k,bg)=>{bg.remove();if(k==="ok")entraProva()})}
+async function ricominciaProva(){if(!prova||!confirm("Cancellare tutta la tua simulazione e ripartire da zero? I dati di Davide e la simulazione dell’altro genitore non vengono toccati."))return;
+  const ref=myDoc();toast("Svuoto la simulazione…",6000);
   try{for(const c of ["log","chat","agenda","domande","appunti","prof","voti","condivisi"]){for(let i=0;i<10;i++){const q=await ref.collection(c).limit(300).get();if(q.empty)break;const b=fb.db.batch();q.docs.forEach(d=>b.delete(d.ref));await b.commit()}}
     const t=now(),nome=S.nome,col=S.colore;S=blank();S.nome=nome;S.colore=col;for(const k of RESETTABILI)S.resets[k]=t;S.del={};persist();
-    await ref.set({json:JSON.stringify(S),promemoria:"[]"},{merge:true});try{localStorage.removeItem(CHK())}catch(e){}T.sess=null;location.hash="home";render();toast("Prova ripartita da zero")}catch(e){toast("Non riuscito: aggiorna le regole di Firebase",5000)}}
+    await ref.set({json:JSON.stringify(S),promemoria:"[]"},{merge:true});try{localStorage.removeItem(CHK())}catch(e){}T.sess=null;location.hash="home";render();toast("Simulazione ripartita da zero")}catch(e){toast("Non riuscito: aggiorna le regole di Firebase",5000)}}
 
 // ---------- solo lettura ----------
 const MODIFICA=new Set(["gdel","gdelnota","gres","gdellog","gprovaoggi","gdelc","gdelv","gdele","gcomp","gvoto","gdelm","gritira","grestore","fimpnew","fimp","fimpdel","fprofnew","fprof","fcoll","fappnew","fapp","fdomok","fdomdel","fesito","fvgedit","fvgnew","fvap"]);
@@ -2379,6 +2395,17 @@ document.addEventListener("change",e=>{if(ruolo!=="genitore")return;
   if(e.target.id==="gpn"){gpSalva({nome:e.target.value.trim().slice(0,20)});toast("Nome salvato");render()}
   if(e.target.id==="gpro"){gpSalva({soloLettura:e.target.checked});toast(e.target.checked?"Solo lettura attiva":"Solo lettura disattivata");render()}
   if(e.target.dataset&&e.target.dataset.gnotif){const n=Object.assign({},GP.notif,{[e.target.dataset.gnotif]:e.target.checked});gpSalva({notif:n});toast("Salvato")}});
+
+function benvenuto(){const m=GEN_NOME==="mamma";
+  sheet(`<p class="xs b muted">BENVENUT${m?"A":"O"}</p><h2>Area genitore di Studio Smart</h2>
+   <div><label class="flabel" for="bvn">Come vuoi essere chiamat${m?"a":"o"}?</label><input class="field" id="bvn" value="${esc(nomeMio())}" maxlength="20"></div>
+   <div class="card stack" style="gap:6px"><p class="small"><b style="color:var(--pri)">${ic("shield",14)} Area genitore</b> (barra colorata in alto): sei come amministratore e guardi i dati veri di Davide.</p>
+    <p class="small"><b style="color:var(--warm)">${ic("user",14)} Simulazione</b> (schermo arancione): usi l’app come la vede Davide; quello che fai resta separato e lui non lo vede.</p>
+    <p class="xs muted">In alto c’è sempre scritto in quale modalità sei.</p></div>
+   <label class="row" style="cursor:pointer"><input type="checkbox" id="bvno" style="width:22px;height:22px;accent-color:var(--pri)"><span class="small grow">Non mostrare più</span></label>
+   <div class="row"><button class="btn ghost grow" data-s="tour">Guida completa</button><button class="btn grow" data-s="ok">Ho capito</button></div>`,async(k,bg)=>{
+   const n=bg.querySelector("#bvn").value.trim().slice(0,20),no=bg.querySelector("#bvno").checked;bg.remove();
+   await gpSalva(Object.assign({nome:n||nomeMio()},no?{guida:true}:{}));render();if(k==="tour")guidaIniziale()})}
 
 // ===== STUDIO SMART – avvio, navigazione, eventi =====
 function render(){applyTheme();
@@ -2409,7 +2436,7 @@ function render(){applyTheme();
     case "cond":html=vCondiviso(r.a);act="studio";break;
     default:html=vHome();act="home"}
   const full=r.name==="tutor"||r.name==="quiz"||r.name==="qz"||r.name==="timer";
-  $("#app").innerHTML=`${prova?`<div class="prova-bar"><span class="grow">${ic("user",16)} Stai provando l’app come Davide · prova di ${esc(nomeMio())}</span><button data-act="pricomincia">Ricomincia da zero</button><button data-act="esciprova">Torna all’area genitore</button></div>`:""}<div class="app ${prova?"provamode":""}">${navHtml(act)}<main id="main" class="fade" ${r.name==="tutor"?'style="padding-bottom:0"':""}>${html}</main></div>`;
+  $("#app").innerHTML=`${prova?`<div class="prova-bar"><span class="grow"><span style="display:block;font-size:.8em;opacity:.9;text-transform:uppercase;letter-spacing:.04em">Modalità: simulazione come Davide</span>${esc(nomeMio())} sta usando l’app come la vede Davide</span><button data-act="pricomincia">Ricomincia da zero</button><button data-act="esciprova">Torna all’area genitore</button></div>`:""}<div class="app ${prova?"provamode":""}">${navHtml(act)}<main id="main" class="fade" ${r.name==="tutor"?'style="padding-bottom:0"':""}>${html}</main></div>`;
   if(r.name==="storico")vStorico();
   if(r.name==="mappa")requestAnimationFrame(disegnaMappa);else mapZoom=null;
   if(r.name==="tutor")scrollChat();
@@ -2425,7 +2452,7 @@ document.addEventListener("click",async e=>{
   if(await profAct(cmd,x))return;
   switch(cmd){
     case "login":login();break;
-    case "esciprova":esciProva();break;
+    case "esciprova":sheet(`<h2>Torni all’area genitore</h2><p class="small">Quello che hai fatto resta salvato nella <b>Simulazione ${esc(GEN_NOME||"genitore")}</b>: lo ritrovi la prossima volta e Davide non lo vede.</p><div class="row"><button class="btn ghost grow" data-s="x">Resta qui</button><button class="btn grow" data-s="ok">Torna all’area genitore</button></div>`,(k,bg)=>{bg.remove();if(k==="ok")esciProva()});break;
     case "novita":mostraNovita();break;
     case "aggiorna":aggiornaApp();break;
     case "colore":S.colore=x;S.prefMod=now();save();render();break;
